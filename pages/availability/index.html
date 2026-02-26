@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Availability — Hi-Me Expert</title>
+  <link rel="stylesheet" href="../../css/global.css">
+  <style>
+    /* ─── Header ─── */
+    .page-header {
+      background: var(--bg-card); border-bottom: 1px solid var(--border);
+      padding: 0 20px; position: sticky; top: 0; z-index: 20;
+    }
+    .header-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 0;
+    }
+    .header-left { display: flex; align-items: center; gap: 10px; }
+    .header-title { font-size: 17px; font-weight: 800; color: var(--text-primary); }
+    .btn-save {
+      padding: 8px 18px; background: var(--primary); color: white;
+      border-radius: var(--r-sm); font-size: 13px; font-weight: 700;
+      border: none; cursor: pointer; transition: background .15s;
+    }
+    .btn-save:active { background: var(--primary-hover); }
+
+    /* ─── Summary Banner ─── */
+    .summary-banner {
+      margin: 16px 20px 0;
+      background: linear-gradient(135deg, var(--teal-800), var(--teal-700));
+      border-radius: var(--r-lg); padding: 16px 20px;
+      display: flex; align-items: center; gap: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+    .summary-icon {
+      width: 44px; height: 44px; border-radius: var(--r-sm);
+      background: rgba(255,255,255,.12); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; color: white;
+    }
+    .summary-text {}
+    .summary-label { font-size: 11px; font-weight: 700; color: rgba(255,255,255,.6); text-transform: uppercase; letter-spacing: 0.5px; }
+    .summary-value { font-size: 22px; font-weight: 800; color: white; letter-spacing: -0.5px; margin-top: 1px; }
+    .summary-sub   { font-size: 12px; color: rgba(255,255,255,.55); margin-top: 1px; }
+
+    /* ─── Leave Mode ─── */
+    .leave-card {
+      margin: 14px 20px 0;
+      background: var(--bg-card); border-radius: var(--r-lg);
+      border: 1px solid var(--border); box-shadow: var(--shadow-xs); overflow: hidden;
+    }
+    .leave-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 16px;
+    }
+    .leave-title { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+    .leave-sub   { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+    /* Toggle Switch */
+    .toggle-wrap { display: flex; align-items: center; gap: 8px; }
+    .toggle {
+      position: relative; width: 42px; height: 24px;
+      border-radius: 100px; cursor: pointer; flex-shrink: 0;
+      transition: background .2s;
+      background: var(--border-dark);
+    }
+    .toggle.on { background: var(--primary); }
+    .toggle::after {
+      content: ''; position: absolute; top: 3px; left: 3px;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: white; box-shadow: var(--shadow-xs);
+      transition: transform .2s;
+    }
+    .toggle.on::after { transform: translateX(18px); }
+
+    .leave-body {
+      padding: 0 16px 16px; display: none;
+      border-top: 1px solid var(--border);
+    }
+    .leave-body.visible { display: block; }
+    .leave-date-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px;
+    }
+    .date-input-wrap {}
+    .date-input-label { font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 5px; }
+    .date-input {
+      width: 100%; padding: 9px 12px;
+      border: 1.5px solid var(--border); border-radius: var(--r-sm);
+      font-size: 13px; font-weight: 600; color: var(--text-primary);
+      background: var(--bg); cursor: pointer;
+    }
+    .date-input:focus { outline: none; border-color: var(--primary); background: var(--bg-card); }
+
+    /* Leave Active Banner */
+    .leave-active-banner {
+      display: none; align-items: center; gap: 10px;
+      background: rgba(244,162,97,.1); border: 1px solid rgba(244,162,97,.3);
+      border-radius: var(--r-md); padding: 10px 14px;
+      margin-top: 12px;
+    }
+    .leave-active-banner.visible { display: flex; }
+    .leave-active-text { font-size: 12px; color: #92400E; line-height: 1.5; }
+
+    /* ─── Day Cards ─── */
+    .days-section { padding: 0 20px 20px; }
+    .days-section-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.5px; color: var(--text-muted);
+      padding: 16px 0 10px;
+    }
+
+    .day-card {
+      background: var(--bg-card); border-radius: var(--r-lg);
+      border: 1px solid var(--border); margin-bottom: 10px;
+      overflow: hidden; box-shadow: var(--shadow-xs);
+      transition: box-shadow .15s;
+    }
+    .day-card.inactive { opacity: .55; }
+
+    .day-header {
+      display: flex; align-items: center; gap: 12px; padding: 14px 16px;
+      cursor: pointer;
+    }
+    .day-name-col { flex: 1; }
+    .day-name { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+    .day-summary { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+    .day-body { border-top: 1px solid var(--border); padding: 14px 16px; }
+
+    /* Slots */
+    .slots-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 8px; }
+    .slot-row {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+    }
+    .slot-time-input {
+      flex: 1; padding: 8px 10px;
+      border: 1.5px solid var(--border); border-radius: var(--r-sm);
+      font-size: 13px; font-weight: 600; color: var(--text-primary);
+      background: var(--bg);
+    }
+    .slot-time-input:focus { outline: none; border-color: var(--primary); }
+    .slot-sep { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+    .btn-slot-remove {
+      width: 28px; height: 28px; border-radius: var(--r-xs);
+      background: rgba(214,40,40,.08); color: var(--danger);
+      border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .btn-slot-add {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12px; font-weight: 700; color: var(--primary);
+      background: var(--primary-xpale); border: 1.5px dashed var(--primary-pale);
+      border-radius: var(--r-sm); padding: 8px 12px;
+      cursor: pointer; width: 100%; justify-content: center;
+      margin-top: 4px;
+    }
+
+    /* Session Type Chips */
+    .types-row { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 14px; }
+    .types-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 8px; }
+    .type-chip-toggle {
+      padding: 6px 14px; border-radius: 100px;
+      font-size: 12px; font-weight: 700;
+      border: 1.5px solid var(--border); background: var(--bg);
+      color: var(--text-muted); cursor: pointer; transition: all .15s;
+    }
+    .type-chip-toggle.chat.on    { background: rgba(58,134,255,.1); border-color: #3A86FF; color: #3A86FF; }
+    .type-chip-toggle.call.on    { background: rgba(93,186,132,.1); border-color: #5DBA84; color: #5DBA84; }
+    .type-chip-toggle.offline.on { background: rgba(244,162,97,.1); border-color: #E07B39; color: #E07B39; }
+
+    /* Max Sessions Stepper */
+    .max-row { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; }
+    .max-label-wrap {}
+    .max-label { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+    .max-sub   { font-size: 11px; color: var(--text-muted); }
+    .stepper { display: flex; align-items: center; gap: 0; }
+    .step-btn {
+      width: 32px; height: 32px; border-radius: var(--r-xs); border: 1.5px solid var(--border);
+      background: var(--bg); color: var(--text-primary);
+      font-size: 16px; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .1s;
+    }
+    .step-btn:active { background: var(--primary-pale); }
+    .step-val {
+      min-width: 36px; text-align: center;
+      font-size: 16px; font-weight: 800; color: var(--primary);
+      border-top: 1.5px solid var(--border); border-bottom: 1.5px solid var(--border);
+      height: 32px; line-height: 32px;
+    }
+
+    /* ─── Toast ─── */
+    .availability-toast {
+      position: fixed; bottom: 30px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #1F2937; color: white; border-radius: var(--r-sm);
+      padding: 10px 18px; font-size: 13px; font-weight: 600;
+      opacity: 0; transition: all .25s; pointer-events: none; z-index: 200; white-space: nowrap;
+    }
+    .availability-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="statusbar">
+      <span class="status-time" id="headerTime">09:41</span>
+      <div class="status-icons">
+        <svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3v4M8 3v4M2 11h20"/></svg>
+      </div>
+    </div>
+    <div class="header-row">
+      <div class="header-left">
+        <button onclick="go('schedule')" style="background:none;border:none;cursor:pointer;color:var(--text-muted);padding:4px;">
+          <svg class="icon-svg" width="22" height="22" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div>
+          <div class="header-title">Availability</div>
+          <div id="slotSummary" style="font-size:11px;color:var(--text-muted);font-weight:600;margin-top:1px;"></div>
+        </div>
+      </div>
+      <button class="btn-save" onclick="saveAvailability()">Simpan</button>
+    </div>
+  </div>
+
+  <div class="scroll-area" style="padding-bottom: 30px;" id="mainScroll">
+
+    <!-- Summary Banner -->
+    <div class="summary-banner anim-fade-up d1">
+      <div class="summary-icon">
+        <svg class="icon-svg" width="22" height="22" viewBox="0 0 24 24" stroke="white"><path d="M7 3v4"/><path d="M17 3v4"/><path d="M4 8h16"/><path d="M5 5h14a1 1 0 0 1 1 1v14H4V6a1 1 0 0 1 1-1z"/></svg>
+      </div>
+      <div class="summary-text">
+        <div class="summary-label">Tersedia Minggu Ini</div>
+        <div class="summary-value" id="weekSlotCount">—</div>
+        <div class="summary-sub" id="activeDayCount">— hari aktif</div>
+      </div>
+    </div>
+
+    <!-- Leave / Cuti Mode -->
+    <div class="leave-card anim-fade-up d1">
+      <div class="leave-header" onclick="toggleLeave()">
+        <div>
+          <div class="leave-title">Mode Cuti / Libur</div>
+          <div class="leave-sub">Blokir semua slot dalam rentang tanggal</div>
+        </div>
+        <div class="toggle" id="leaveToggle"></div>
+      </div>
+      <div class="leave-body" id="leaveBody">
+        <div class="leave-date-row">
+          <div class="date-input-wrap">
+            <div class="date-input-label">Mulai</div>
+            <input type="date" class="date-input" id="leaveStart" oninput="updateLeaveBanner()">
+          </div>
+          <div class="date-input-wrap">
+            <div class="date-input-label">Selesai</div>
+            <input type="date" class="date-input" id="leaveEnd" oninput="updateLeaveBanner()">
+          </div>
+        </div>
+        <div class="leave-active-banner" id="leaveBanner">
+          <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24" stroke="#92400E"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+          <div class="leave-active-text" id="leaveBannerText"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Day Sections -->
+    <div class="days-section">
+      <div class="days-section-label">Jam Kerja per Hari</div>
+      <div id="dayList"></div>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="availability-toast" id="globalToast"></div>
+
+<script src="../../js/app.js"></script>
+<script>
+  // Deep clone availability state
+  let avail = JSON.parse(JSON.stringify(MOCK_AVAILABILITY));
+  let leaveActive = false;
+
+  // ── Render all days ──
+  function renderDays() {
+    const list = document.getElementById('dayList');
+    list.innerHTML = avail.days.map((d, i) => buildDayCard(d, i)).join('');
+    updateSummary();
+  }
+
+  function buildDayCard(d, i) {
+    const typeClasses = { Chat: 'chat', Call: 'call', Offline: 'offline' };
+    const slotsHtml = d.slots.map((sl, si) => `
+      <div class="slot-row" id="slot-${i}-${si}">
+        <input type="time" class="slot-time-input" value="${sl.start}" oninput="updateSlot(${i},${si},'start',this.value)">
+        <span class="slot-sep">—</span>
+        <input type="time" class="slot-time-input" value="${sl.end}" oninput="updateSlot(${i},${si},'end',this.value)">
+        <button class="btn-slot-remove" onclick="removeSlot(${i},${si})">
+          <svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+        </button>
+      </div>
+    `).join('');
+
+    const typesHtml = ['Chat','Call','Offline'].map(t => `
+      <div class="type-chip-toggle ${typeClasses[t]} ${d.types.includes(t)?'on':''}"
+           onclick="toggleType(${i},'${t}',this)">${t}</div>
+    `).join('');
+
+    const slotCount = d.slots.reduce((acc, sl) => {
+      const [sh,sm] = sl.start.split(':').map(Number);
+      const [eh,em] = sl.end.split(':').map(Number);
+      const hrs = (eh * 60 + em - sh * 60 - sm) / 60;
+      return acc + Math.max(0, Math.floor(hrs));
+    }, 0);
+
+    return `
+      <div class="day-card ${d.active?'':'inactive'}" id="daycard-${i}">
+        <div class="day-header">
+          <div class="day-name-col">
+            <div class="day-name">${d.name}</div>
+            <div class="day-summary">${d.active ? `${d.slots.length} slot · maks ${d.maxSessions} sesi · ${slotCount} jam tersedia` : 'Tidak aktif'}</div>
+          </div>
+          <div class="toggle ${d.active?'on':''}" onclick="toggleDay(${i})"></div>
+        </div>
+        ${d.active ? `
+        <div class="day-body">
+          <div class="slots-label">Jam Tersedia</div>
+          ${slotsHtml}
+          <button class="btn-slot-add" onclick="addSlot(${i})">
+            <svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+            Tambah Slot Waktu
+          </button>
+
+          <div class="types-label" style="margin-top:16px;">Tipe Sesi</div>
+          <div class="types-row">${typesHtml}</div>
+
+          <div class="max-row">
+            <div class="max-label-wrap">
+              <div class="max-label">Maks. Sesi per Hari</div>
+              <div class="max-sub">Booking ditutup otomatis bila tercapai</div>
+            </div>
+            <div class="stepper">
+              <button class="step-btn" onclick="stepMax(${i},-1)">−</button>
+              <div class="step-val" id="maxVal-${i}">${d.maxSessions}</div>
+              <button class="step-btn" onclick="stepMax(${i},1)">+</button>
+            </div>
+          </div>
+        </div>
+        ` : ''}
+      </div>
+    `;
+  }
+
+  function toggleDay(i) {
+    avail.days[i].active = !avail.days[i].active;
+    renderDays();
+  }
+
+  function addSlot(i) {
+    avail.days[i].slots.push({ start: '08:00', end: '10:00' });
+    renderDays();
+  }
+
+  function removeSlot(i, si) {
+    avail.days[i].slots.splice(si, 1);
+    renderDays();
+  }
+
+  function updateSlot(i, si, key, val) {
+    avail.days[i].slots[si][key] = val;
+    updateSummary();
+  }
+
+  function toggleType(i, type, el) {
+    const idx = avail.days[i].types.indexOf(type);
+    if (idx >= 0) { avail.days[i].types.splice(idx, 1); el.classList.remove('on'); }
+    else          { avail.days[i].types.push(type);    el.classList.add('on'); }
+    updateSummary();
+  }
+
+  function stepMax(i, delta) {
+    const d = avail.days[i];
+    d.maxSessions = Math.max(1, Math.min(10, d.maxSessions + delta));
+    const el = document.getElementById(`maxVal-${i}`);
+    if (el) el.textContent = d.maxSessions;
+    updateSummary();
+  }
+
+  // ── Summary ──
+  function updateSummary() {
+    const activeDays = avail.days.filter(d => d.active);
+    const totalSlots = activeDays.reduce((a,d) => a + d.slots.length, 0);
+    document.getElementById('weekSlotCount').textContent = `${totalSlots} slot`;
+    document.getElementById('activeDayCount').textContent = `${activeDays.length} hari aktif`;
+    document.getElementById('slotSummary').textContent = `${activeDays.length} hari · ${totalSlots} slot`;
+  }
+
+  // ── Leave Mode ──
+  let leaveOn = false;
+  function toggleLeave() {
+    leaveOn = !leaveOn;
+    const tog = document.getElementById('leaveToggle');
+    const body = document.getElementById('leaveBody');
+    tog.classList.toggle('on', leaveOn);
+    body.classList.toggle('visible', leaveOn);
+    if (!leaveOn) document.getElementById('leaveBanner').classList.remove('visible');
+  }
+
+  function updateLeaveBanner() {
+    const s = document.getElementById('leaveStart').value;
+    const e = document.getElementById('leaveEnd').value;
+    const banner = document.getElementById('leaveBanner');
+    const txt = document.getElementById('leaveBannerText');
+    if (s && e && s <= e) {
+      const fmt = (d) => new Date(d).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});
+      txt.textContent = `Anda dalam mode cuti ${fmt(s)} – ${fmt(e)}. Semua slot dalam rentang ini diblokir.`;
+      banner.classList.add('visible');
+    } else {
+      banner.classList.remove('visible');
+    }
+  }
+
+  // ── Save ──
+  function saveAvailability() {
+    showToast('Availability diperbarui. Perubahan terlihat oleh user di halaman jadwal expert.');
+  }
+
+  function showToast(msg) {
+    const el = document.getElementById('globalToast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.classList.remove('show'), 3200);
+  }
+
+  function updateTime() {
+    const t = new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',hour12:false});
+    document.getElementById('headerTime').textContent = t;
+  }
+  updateTime(); setInterval(updateTime, 10000);
+
+  renderDays();
+</script>
+</body>
+</html>

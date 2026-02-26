@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Jadwal — Hi-Me Expert</title>
+  <link rel="stylesheet" href="../../css/global.css">
+  <style>
+    /* ─── Page Header ─── */
+    .page-header {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 20;
+    }
+    .header-top {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 20px;
+    }
+    .header-title { 
+      font-size: 17px; 
+      font-weight: 800; 
+      color: var(--text-primary);
+      margin-top: 20px;
+    }
+    .header-actions { 
+      display: flex; 
+      align-items: center; 
+      gap: 8px; 
+      margin-top: 20px;
+    }
+    .btn-avail {
+      display: flex; align-items: center; gap: 6px;
+      padding: 8px 14px; border-radius: var(--r-sm);
+      background: var(--primary-pale); color: var(--primary);
+      font-size: 12px; font-weight: 700; border: none; cursor: pointer;
+      transition: background .15s;
+    }
+    .btn-avail:active { background: var(--primary-xpale); }
+
+    /* ─── View Toggle ─── */
+    .view-toggle {
+      display: flex; margin: 0 20px 14px;
+      background: var(--bg); border-radius: var(--r-sm);
+      padding: 3px; border: 1px solid var(--border);
+    }
+    .view-btn {
+      flex: 1; padding: 8px; border-radius: calc(var(--r-sm) - 2px);
+      font-size: 12px; font-weight: 700;
+      border: none; cursor: pointer;
+      color: var(--text-muted); background: transparent;
+      transition: all .15s; display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .view-btn.active {
+      background: var(--bg-card); color: var(--primary);
+      box-shadow: var(--shadow-xs);
+    }
+
+    /* ─── Week Header Strip ─── */
+    .week-header {
+      display: grid; 
+      grid-template-columns: 8px repeat(7, 1fr);
+      border-bottom: 1px solid var(--border);
+      padding: 0 4px;
+    }
+    .week-day-col {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 8px 2px; gap: 4px; cursor: pointer;
+    }
+    .week-day-name {
+      font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px;
+    }
+    .week-day-num {
+      font-size: 15px; font-weight: 800; color: var(--text-secondary);
+      width: 30px; height: 30px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .week-day-col.today .week-day-name { color: var(--primary); }
+    .week-day-col.today .week-day-num  { background: var(--primary); color: white; }
+    .week-day-col.selected .week-day-num { background: var(--primary-pale); color: var(--primary); }
+    .week-day-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--primary);
+    }
+    .week-time-gutter { width: 48px; }
+
+    /* ─── Timeline View (Hari Ini) ─── */
+    .timeline-wrap {
+      position: relative; overflow-y: auto;
+      padding: 8px 0 20px;
+    }
+    .timeline-row {
+      display: grid; grid-template-columns: 48px 1fr;
+      min-height: 56px; position: relative;
+    }
+    .timeline-time {
+      font-size: 10px; font-weight: 600; color: var(--text-placeholder);
+      padding: 0 8px; line-height: 56px; text-align: right;
+      border-right: 1px solid var(--border);
+    }
+    .timeline-col { position: relative; border-bottom: 1px solid var(--border); }
+    .session-block {
+      position: absolute; left: 4px; right: 4px;
+      border-radius: var(--r-sm); padding: 6px 8px;
+      cursor: pointer; overflow: hidden; z-index: 2;
+      transition: transform .1s, box-shadow .1s;
+    }
+    .session-block:active { transform: scale(.98); box-shadow: var(--shadow-md); }
+    .session-block.chat    { background: rgba(58,134,255,.12); border-left: 3px solid #3A86FF; }
+    .session-block.call    { background: rgba(93,186,132,.12); border-left: 3px solid #5DBA84; }
+    .session-block.offline { background: rgba(244,162,97,.12); border-left: 3px solid #E07B39; }
+    .session-block.pending { background: rgba(100,116,139,.1); border-left: 3px solid #94A3B8; }
+    .session-block.active  { box-shadow: 0 2px 12px rgba(34,197,94,.25); }
+    .sb-name  { font-size: 11px; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sb-type  { font-size: 10px; color: var(--text-muted); font-weight: 600; }
+    .sb-badge {
+      display: inline-block; font-size: 9px; font-weight: 700;
+      padding: 1px 6px; border-radius: 100px; margin-top: 2px;
+    }
+    .sb-badge.active   { background: rgba(34,197,94,.15); color: #16A34A; }
+    .sb-badge.done     { background: var(--border); color: var(--text-muted); }
+    .sb-badge.upcoming { background: var(--primary-pale); color: var(--primary); }
+    .sb-badge.pending  { background: rgba(100,116,139,.12); color: var(--text-muted); }
+
+    /* Now indicator */
+    .now-line {
+      position: absolute; left: 0; right: 0;
+      border-top: 2px solid #EF4444; z-index: 5;
+      pointer-events: none;
+    }
+    .now-line::before {
+      content: '';
+      position: absolute; left: -4px; top: -5px;
+      width: 10px; height: 10px; border-radius: 50%;
+      background: #EF4444;
+    }
+
+    /* ─── Week Grid View ─── */
+    .week-grid {
+      display: grid; grid-template-columns: 48px repeat(7, 1fr);
+      overflow-x: auto; padding: 0 4px 20px;
+    }
+    .wg-hour-col { display: contents; }
+    .wg-gutter { font-size: 9px; color: var(--text-placeholder); font-weight: 600; padding: 4px 4px 0; text-align: right; border-right: 1px solid var(--border); min-height: 36px; }
+    .wg-cell { border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); min-height: 36px; position: relative; }
+    .wg-cell.today-col { background: rgba(15,118,110,.03); }
+    .wg-mini-block {
+      position: absolute; left: 1px; right: 1px; top: 1px;
+      border-radius: 3px; padding: 2px 4px;
+      font-size: 9px; font-weight: 700;
+      overflow: hidden; cursor: pointer;
+      transition: opacity .1s;
+    }
+    .wg-mini-block:active { opacity: .7; }
+    .wg-mini-block.chat    { background: rgba(58,134,255,.18); color: #2563EB; }
+    .wg-mini-block.call    { background: rgba(93,186,132,.18); color: #15803D; }
+    .wg-mini-block.offline { background: rgba(244,162,97,.2);  color: #C2440E; }
+    .wg-mini-block.pending { background: rgba(100,116,139,.12); color: #64748B; }
+    .wg-mini-block.active  { background: rgba(34,197,94,.2); color: #15803D; }
+
+    /* ─── Type Legend ─── */
+    .legend {
+      display: flex; gap: 12px; padding: 10px 20px;
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto; scrollbar-width: none;
+    }
+    .legend::-webkit-scrollbar { display: none; }
+    .legend-item {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 11px; font-weight: 600; color: var(--text-muted);
+      flex-shrink: 0;
+    }
+    .legend-dot { width: 8px; height: 8px; border-radius: 2px;}
+    .legend-dot.chat    { background: #3A86FF; }
+    .legend-dot.call    { background: #5DBA84; }
+    .legend-dot.offline { background: #E07B39; }
+    .legend-dot.pending { background: #94A3B8; }
+    .legend-dot.active  { background: #22C55E; }
+
+    /* ─── Today Summary Bar ─── */
+    .today-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 20px; background: var(--primary-xpale);
+      border-bottom: 1px solid var(--primary-pale);
+    }
+    .today-bar-label { font-size: 12px; font-weight: 700; color: var(--primary); }
+    .today-bar-stats { display: flex; gap: 14px; }
+    .today-stat { font-size: 11px; font-weight: 700; color: var(--text-muted); }
+    .today-stat span { color: var(--text-primary); }
+
+    /* ─── Bottom Sheet ─── */
+    .sheet-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 100;
+      display: none; align-items: flex-end; justify-content: center;
+    }
+    .sheet-overlay.open { display: flex; }
+    .sheet-panel {
+      width: 390px; background: var(--bg-card);
+      border-radius: var(--r-xl) var(--r-xl) 0 0;
+      padding: 0 0 36px; max-height: 80vh; overflow-y: auto;
+      animation: slideUp .25s ease;
+    }
+    @media (max-width: 430px) { .sheet-panel { width: 100%; } }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .sheet-handle { width: 36px; height: 4px; background: var(--border-dark); border-radius: 2px; margin: 12px auto 8px; }
+    .sheet-header { padding: 8px 20px 16px; border-bottom: 1px solid var(--border); }
+    .sheet-body   { padding: 20px; }
+
+    .detail-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 0; border-bottom: 1px solid var(--border);
+    }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-label { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+    .detail-val   { font-size: 13px; font-weight: 700; color: var(--text-primary); text-align: right; max-width: 60%; }
+
+    /* Status badge */
+    .status-pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 10px; border-radius: 100px;
+      font-size: 11px; font-weight: 700;
+    }
+    .status-pill.done     { background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); }
+    .status-pill.active   { background: rgba(34,197,94,.12); color: #16A34A; }
+    .status-pill.upcoming { background: var(--primary-pale); color: var(--primary); }
+    .status-pill.pending  { background: rgba(100,116,139,.1); color: var(--text-muted); }
+    .status-dot-sm { width: 6px; height: 6px; border-radius: 50%; }
+    .status-dot-sm.done     { background: var(--text-muted); }
+    .status-dot-sm.active   { background: #22C55E; }
+    .status-dot-sm.upcoming { background: var(--primary); }
+    .status-dot-sm.pending  { background: #94A3B8; }
+
+    .type-chip-sm {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 8px; border-radius: 100px; font-size: 11px; font-weight: 700;
+    }
+    .type-chip-sm.chat    { background: rgba(58,134,255,.1);  color: #3A86FF; }
+    .type-chip-sm.call    { background: rgba(93,186,132,.1);  color: #5DBA84; }
+    .type-chip-sm.offline { background: rgba(244,162,97,.1);  color: #E07B39; }
+
+    .note-box {
+      background: var(--bg); border-radius: var(--r-sm); padding: 12px;
+      font-size: 12px; color: var(--text-secondary); line-height: 1.6;
+      border-left: 3px solid var(--primary-pale); margin: 12px 0;
+    }
+
+    .sheet-cta-row { display: flex; gap: 10px; margin-top: 20px; }
+
+    /* ─── Bottom Nav ─── */
+    .bottom-nav {
+      position: sticky; bottom: 0;
+      background: var(--bg-card); border-top: 1px solid var(--border);
+      height: var(--nav-h);
+      display: grid; grid-template-columns: repeat(4, 1fr);
+    }
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 3px; cursor: pointer; color: var(--text-muted); padding: 8px 0;
+    }
+    .nav-item.active { color: var(--primary); }
+    .nav-label { font-size: 10px; font-weight: 600; }
+
+    /* ─── Toast ─── */
+    .schedule-toast {
+      position: fixed; bottom: calc(var(--nav-h) + 16px); left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #1F2937; color: white; border-radius: var(--r-sm);
+      padding: 10px 18px; font-size: 13px; font-weight: 600;
+      opacity: 0; transition: all .25s; pointer-events: none; z-index: 200; white-space: nowrap;
+    }
+    .schedule-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="statusbar">
+      <span class="status-time" id="headerTime">09:41</span>
+      <div class="status-icons">
+        <svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3v4M8 3v4M2 11h20"/></svg>
+      </div>
+    </div>
+    <div class="header-top">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button onclick="go('dashboard')" style="background:none;border:none;cursor:pointer;color:var(--text-muted);padding:4px;">
+          <svg class="icon-svg" width="20" height="20" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div>
+          <div class="header-title">Jadwal</div>
+          <div id="weekRangeLabel" style="font-size:11px;color:var(--text-muted);font-weight:600;margin-top:1px;"></div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn-avail" onclick="go('availability')">
+          <svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>
+          Atur Availability
+        </button>
+      </div>
+    </div>
+
+    <!-- View Toggle -->
+    <div class="view-toggle">
+      <button class="view-btn active" id="btnWeek" onclick="setView('week')">
+        <svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h2M14 14h2M8 18h2M14 18h2"/></svg>
+        Minggu
+      </button>
+      <button class="view-btn" id="btnDay" onclick="setView('day')">
+        <svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        Hari Ini
+      </button>
+    </div>
+
+    <!-- Week Day Selector (visible in week view) -->
+    <div id="weekHeaderStrip">
+      <div class="week-header" id="weekDayHeaders"></div>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot chat"></div> Chat</div>
+      <div class="legend-item"><div class="legend-dot call"></div> Call</div>
+      <div class="legend-item"><div class="legend-dot offline"></div> Offline</div>
+      <div class="legend-item"><div class="legend-dot pending"></div> Pending</div>
+      <div class="legend-item"><div class="legend-dot active"></div> Berlangsung</div>
+    </div>
+  </div>
+
+  <!-- Today Summary -->
+  <div class="today-bar" id="todayBar">
+    <div class="today-bar-label" id="todayBarLabel">Kamis, 27 Feb 2025</div>
+    <div class="today-bar-stats">
+      <div class="today-stat">Sesi: <span id="statSesiCount">-</span></div>
+      <div class="today-stat">Pendapatan: <span id="statEarn">-</span></div>
+    </div>
+  </div>
+
+  <!-- Content Area -->
+  <div class="scroll-area" id="contentArea" style="padding-bottom: calc(var(--nav-h) + 8px);"></div>
+
+  <!-- Bottom Nav -->
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="go('dashboard')">
+      <svg class="icon-svg" width="22" height="22" viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5"/><path d="M5 10v9h14v-9"/><path d="M9 19v-6h6v6"/></svg>
+      <span class="nav-label">Home</span>
+    </div>
+    <div class="nav-item active">
+      <svg class="icon-svg" width="22" height="22" viewBox="0 0 24 24"><path d="M7 3v4"/><path d="M17 3v4"/><path d="M4 8h16"/><path d="M5 5h14a1 1 0 0 1 1 1v14H4V6a1 1 0 0 1 1-1z"/></svg>
+      <span class="nav-label">Jadwal</span>
+    </div>
+    <div class="nav-item" onclick="showToast('Halaman Chat — Phase 2.4')">
+      <svg class="icon-svg" width="22" height="22" viewBox="0 0 24 24"><path d="M4 5h16v10H7l-3 3V5z"/></svg>
+      <span class="nav-label">Chat</span>
+    </div>
+    <div class="nav-item" onclick="showToast('Halaman Profil — Phase 2.6')">
+      <svg class="icon-svg" width="22" height="22" viewBox="0 0 24 24"><path d="M20 21a8 8 0 0 0-16 0"/><path d="M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/></svg>
+      <span class="nav-label">Profil</span>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Sheet: Session Detail (quick) -->
+<div class="sheet-overlay" id="sessionSheet" onclick="overlayClick(event,'sessionSheet')">
+  <div class="sheet-panel">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <div id="sheetAvatar"></div>
+        <div>
+          <div style="font-size:15px;font-weight:800;color:var(--text-primary);" id="sheetName"></div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:3px;">
+            <span id="sheetTypePill"></span>
+            <span id="sheetStatusPill"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="sheet-body">
+      <div id="sheetDetails"></div>
+      <div class="note-box" id="sheetNote"></div>
+      <div class="sheet-cta-row" id="sheetActions"></div>
+    </div>
+  </div>
+</div>
+
+<div class="schedule-toast" id="globalToast"></div>
+
+<script src="../../js/app.js"></script>
+<script>
+  // ── Constants ──
+  const HOURS = [7,8,9,10,11,12,13,14,15,16,17,18];
+  const DAY_NAMES = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+  const DAY_FULL  = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+  // "today" = Thursday, day index 3 in MOCK_SESSIONS_WEEK (0=Mon..6=Sun)
+  const TODAY_IDX = 3; // Kamis dalam array (0=Sen)
+  const JS_TODAY  = 4; // JS: 0=Sun,1=Mon..4=Thu
+  const TODAY_DATE = new Date(2025, 1, 27); // 27 Feb 2025
+
+  let currentView = 'week';
+  let selectedDay = TODAY_IDX; // 0=Sen..6=Min
+
+  // Week date labels
+  function getWeekDates() {
+    // week starts Monday. Today = Thursday(4 in JS = index 3 in Mon-based)
+    const dates = [];
+    const base = new Date(TODAY_DATE);
+    const jsDay = base.getDay(); // 4=Thu
+    const diff = jsDay === 0 ? -6 : 1 - jsDay; // offset to Monday
+    const monday = new Date(base); monday.setDate(base.getDate() + diff);
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(monday); d.setDate(monday.getDate() + i);
+      dates.push(d.getDate());
+    }
+    return dates;
+  }
+
+  function setView(v) {
+    currentView = v;
+    document.getElementById('btnWeek').classList.toggle('active', v === 'week');
+    document.getElementById('btnDay').classList.toggle('active', v === 'day');
+    document.getElementById('weekHeaderStrip').style.display = v === 'week' ? '' : 'none';
+    render();
+  }
+
+  // ── Week Day Headers ──
+  function renderWeekHeaders() {
+    const dates = getWeekDates();
+    const DAY_ABBR = ['Sen','Sel','Rab','Kam','Jum','Sab','Min'];
+    let html = '<div class="week-time-gutter"></div>';
+    for (let i = 0; i < 7; i++) {
+      const isToday = i === TODAY_IDX;
+      const isSel   = i === selectedDay;
+      const hasSess = MOCK_SESSIONS_WEEK.some(s => s.day === i);
+      html += `<div class="week-day-col ${isToday?'today':''} ${isSel&&!isToday?'selected':''}" onclick="selectDay(${i})">
+        <div class="week-day-name">${DAY_ABBR[i]}</div>
+        <div class="week-day-num">${dates[i]}</div>
+        ${hasSess ? '<div class="week-day-dot"></div>' : '<div style="height:5px"></div>'}
+      </div>`;
+    }
+    document.getElementById('weekDayHeaders').innerHTML = html;
+  }
+
+  function selectDay(i) {
+    selectedDay = i;
+    renderWeekHeaders();
+    if (currentView === 'week') renderWeekGrid();
+  }
+
+  // ── Week Grid View ──
+  function renderWeekGrid() {
+    const content = document.getElementById('contentArea');
+    let html = '<div class="week-grid" id="wgGrid">';
+    // Render hour rows
+    for (const h of HOURS) {
+      const hStr = `${String(h).padStart(2,'0')}:00`;
+      html += `<div class="wg-gutter">${hStr}</div>`;
+      for (let d = 0; d < 7; d++) {
+        const isToday = d === TODAY_IDX;
+        const sessions = MOCK_SESSIONS_WEEK.filter(s => {
+          if (s.day !== d) return false;
+          const sh = parseInt(s.time.split(':')[0]);
+          return sh === h;
+        });
+        html += `<div class="wg-cell ${isToday?'today-col':''}">`;
+        for (const s of sessions) {
+          const typeClass = s.status === 'active' ? 'active' : (s.status === 'pending' ? 'pending' : s.sessionType.toLowerCase());
+          const pct = Math.min(100, s.duration / 60 * 100);
+          html += `<div class="wg-mini-block ${typeClass}" 
+            style="height:${Math.max(18, s.duration / 60 * 34)}px;"
+            onclick="openSessionSheet('${s.id}')">
+            ${s.userInitials}
+          </div>`;
+        }
+        html += '</div>';
+      }
+    }
+    html += '</div>';
+    content.innerHTML = html;
+    updateTodayBar();
+  }
+
+  // ── Day / Timeline View ──
+  function renderDayView() {
+    const content = document.getElementById('contentArea');
+    const daySessions = MOCK_SESSIONS_WEEK.filter(s => s.day === TODAY_IDX).sort((a,b) => a.time.localeCompare(b.time));
+    // Pixel per hour = 64px
+    const PX_PER_HOUR = 64;
+    const START_HOUR  = 7;
+
+    let html = `<div class="timeline-wrap" style="position:relative;">`;
+
+    // Hour rows
+    for (const h of HOURS) {
+      html += `<div class="timeline-row">
+        <div class="timeline-time">${String(h).padStart(2,'0')}:00</div>
+        <div class="timeline-col" style="height:${PX_PER_HOUR}px;"></div>
+      </div>`;
+    }
+
+    // Session blocks (absolutely positioned over hour rows)
+    // We'll render them as a separate overlay
+    html += `</div>`;
+
+    content.innerHTML = html;
+
+    // Now position blocks
+    const wrap = content.querySelector('.timeline-wrap');
+    wrap.style.position = 'relative';
+
+    for (const s of daySessions) {
+      const [hh, mm] = s.time.split(':').map(Number);
+      const topPx    = (hh - START_HOUR) * PX_PER_HOUR + (mm / 60) * PX_PER_HOUR;
+      const heightPx = Math.max(32, (s.duration / 60) * PX_PER_HOUR - 4);
+
+      const typeClass = s.status === 'active' ? 'chat' : s.sessionType.toLowerCase();
+      const statusClass = s.status;
+      const statusLabel = { done:'Selesai', active:'Berlangsung', upcoming:'Mendatang', pending:'Pending' };
+
+      const el = document.createElement('div');
+      el.className = `session-block ${typeClass} ${s.status === 'active' ? 'active' : ''}`;
+      el.style.cssText = `top:${topPx}px; height:${heightPx}px; left:56px; right:8px; position:absolute;`;
+      el.innerHTML = `
+        <div class="sb-name">${s.userName}</div>
+        <div class="sb-type">${s.sessionType} · ${s.duration} mnt</div>
+        <span class="sb-badge ${statusClass}">${statusLabel[s.status]}</span>
+      `;
+      el.onclick = () => openSessionSheet(s.id);
+      wrap.appendChild(el);
+    }
+
+    // "Now" indicator
+    const now = new Date();
+    // simulate 11:20 (active session time)
+    const simH = 11, simM = 20;
+    const nowTop = (simH - START_HOUR) * PX_PER_HOUR + (simM / 60) * PX_PER_HOUR;
+    const nowLine = document.createElement('div');
+    nowLine.className = 'now-line';
+    nowLine.style.cssText = `top:${nowTop}px; left:48px; right:0; position:absolute;`;
+    wrap.appendChild(nowLine);
+
+    updateTodayBar();
+  }
+
+  function updateTodayBar() {
+    const sesToday = MOCK_SESSIONS_WEEK.filter(s => s.day === TODAY_IDX);
+    const earn = sesToday.filter(s => s.status === 'done' || s.status === 'active').reduce((a,b)=>a+b.price,0);
+    document.getElementById('statSesiCount').textContent = sesToday.length;
+    document.getElementById('statEarn').textContent = formatRupiah(earn);
+    // week label
+    const dates = getWeekDates();
+    const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agt','Sep','Okt','Nov','Des'];
+    const m = months[TODAY_DATE.getMonth()];
+    document.getElementById('weekRangeLabel').textContent = `${dates[0]}–${dates[6]} ${m} 2025`;
+    document.getElementById('todayBarLabel').textContent = `Kamis, 27 Feb 2025`;
+  }
+
+  // ── Session Sheet ──
+  function openSessionSheet(id) {
+    const s = MOCK_SESSIONS_WEEK.find(x => x.id === id);
+    if (!s) return;
+
+    document.getElementById('sheetAvatar').innerHTML = avatarGrad(s.userInitials, 44, 17);
+    document.getElementById('sheetName').textContent = s.userName;
+
+    const typeClass = s.sessionType.toLowerCase();
+    document.getElementById('sheetTypePill').innerHTML =
+      `<span class="type-chip-sm ${typeClass}">${s.sessionType}</span>`;
+
+    const statusLabel = { done:'Selesai', active:'Berlangsung', upcoming:'Mendatang', pending:'Pending' };
+    document.getElementById('sheetStatusPill').innerHTML =
+      `<span class="status-pill ${s.status}">
+        <span class="status-dot-sm ${s.status}"></span>${statusLabel[s.status]}
+      </span>`;
+
+    document.getElementById('sheetDetails').innerHTML = `
+      <div class="detail-row"><div class="detail-label">Tanggal</div><div class="detail-val">Kamis, 27 Feb 2025</div></div>
+      <div class="detail-row"><div class="detail-label">Waktu</div><div class="detail-val">${s.time} · ${s.duration} menit</div></div>
+      <div class="detail-row"><div class="detail-label">Harga</div><div class="detail-val" style="color:var(--primary)">${formatRupiah(s.price)}</div></div>
+      <div class="detail-row"><div class="detail-label">Metode Bayar</div><div class="detail-val">${s.method}</div></div>
+    `;
+
+    document.getElementById('sheetNote').innerHTML = `<b style="font-size:11px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:0.4px;">Catatan Klien</b><br>${s.note}`;
+
+    // Actions by status
+    let actions = '';
+    if (s.status === 'upcoming') {
+      actions = `
+        <button class="btn btn-ghost" style="flex:1" onclick="closeSheet('sessionSheet');showToast('Sesi dibatalkan')">Batalkan</button>
+        <button class="btn btn-primary" style="flex:2" onclick="closeSheet('sessionSheet');go('session-detail',{id:'${s.id}'})">Lihat Detail Penuh</button>
+      `;
+    } else if (s.status === 'active') {
+      actions = `
+        <button class="btn btn-primary" style="flex:1;background:linear-gradient(135deg,#059669,#10B981);" onclick="closeSheet('sessionSheet');showToast('Membuka ruang sesi... (Phase 2.4)')">Masuk ke Sesi</button>
+      `;
+    } else if (s.status === 'pending') {
+      actions = `
+        <button class="btn btn-ghost" style="flex:1;color:var(--danger);border-color:rgba(214,40,40,.25);" onclick="closeSheet('sessionSheet');showToast('Sesi ditolak')">Tolak</button>
+        <button class="btn btn-primary" style="flex:2;" onclick="closeSheet('sessionSheet');showToast('Sesi diterima!')">Terima Sesi</button>
+      `;
+    } else {
+      actions = `
+        <button class="btn btn-primary" style="flex:1;" onclick="closeSheet('sessionSheet');go('session-detail',{id:'${s.id}'})">Lihat Detail Penuh</button>
+      `;
+    }
+    document.getElementById('sheetActions').innerHTML = actions;
+
+    openSheet('sessionSheet');
+  }
+
+  function render() {
+    if (currentView === 'week') renderWeekGrid();
+    else renderDayView();
+  }
+
+  function showToast(msg) {
+    const el = document.getElementById('globalToast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.classList.remove('show'), 2800);
+  }
+
+  // header time
+  function updateTime() {
+    const t = new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',hour12:false});
+    document.getElementById('headerTime').textContent = t;
+  }
+  updateTime(); setInterval(updateTime, 10000);
+
+  // Init
+  renderWeekHeaders();
+  render();
+</script>
+</body>
+</html>

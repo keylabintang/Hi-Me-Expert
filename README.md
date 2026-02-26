@@ -247,7 +247,7 @@ Fokus: Tampilan utama setelah login — command center harian expert untuk meman
 
 ---
 
-### 🔮 Phase 2.3 — Manajemen Jadwal & Availability *(PLANNED)*
+### ✅ Phase 2.3 — Manajemen Jadwal & Availability *(DONE)*
 
 Fokus: Expert mengatur jam kerja dan hari aktif, serta melihat seluruh sesi dalam format kalender.
 
@@ -255,9 +255,9 @@ Fokus: Expert mengatur jam kerja dan hari aktif, serta melihat seluruh sesi dala
 
 | Halaman | Path | Status |
 |---|---|---|
-| Kalender Jadwal | `pages/schedule/index.html` | 🔮 Planned |
-| Availability Setting | `pages/availability/index.html` | 🔮 Planned |
-| Detail Sesi (dari kalender) | `pages/schedule/session-detail.html` | 🔮 Planned |
+| Kalender Jadwal | `pages/schedule/index.html` | ✅ Done |
+| Availability Setting | `pages/availability/index.html` | ✅ Done |
+| Detail Sesi (dari kalender) | `pages/schedule/session-detail.html` | ✅ Done |
 
 **Fitur Phase 2.3:**
 

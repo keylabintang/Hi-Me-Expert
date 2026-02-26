@@ -49,6 +49,8 @@ const CANONICAL_ROUTES = {
   dashboard:     `${APP_ROOT}/pages/dashboard/index.html`,
   notifications: `${APP_ROOT}/pages/notifications/index.html`,
   schedule:      `${APP_ROOT}/pages/schedule/index.html`,
+  'session-detail': `${APP_ROOT}/pages/schedule/session-detail.html`,
+  availability:  `${APP_ROOT}/pages/availability/index.html`,
   'chat-list': `${APP_ROOT}/pages/chat/index.html`,
   profile:   `${APP_ROOT}/pages/profile/index.html`,
 };
@@ -336,6 +338,44 @@ const MOCK_NOTIFICATIONS = [
     route: 'schedule'
   }
 ];
+
+// ── Mock Data (Phase 2.3) ──
+
+const MOCK_SESSIONS_WEEK = [
+  // Senin (index 0)
+  { id: 'w_001', day: 0, userInitials: 'AR', userName: 'A*** R***', sessionType: 'Chat',    time: '09:00', duration: 60,  status: 'done',     price: 140000, method: 'Transfer Bank', note: 'Merasa gelisah setelah kehilangan pekerjaan bulan lalu.' },
+  { id: 'w_002', day: 0, userInitials: 'BW', userName: 'B*** W***', sessionType: 'Call',    time: '14:00', duration: 30,  status: 'done',     price: 85000,  method: 'GoPay',         note: 'Sulit fokus saat bekerja dari rumah.' },
+  // Selasa (index 1)
+  { id: 'w_003', day: 1, userInitials: 'CL', userName: 'C*** L***', sessionType: 'Offline', time: '10:00', duration: 60,  status: 'done',     price: 200000, method: 'Transfer Bank', note: 'Konseling pasca-putus hubungan jangka panjang.' },
+  { id: 'w_004', day: 1, userInitials: 'DM', userName: 'D*** M***', sessionType: 'Chat',    time: '13:00', duration: 60,  status: 'done',     price: 140000, method: 'OVO',           note: 'Insomnia dan rasa cemas berlebihan.' },
+  { id: 'w_005', day: 1, userInitials: 'EP', userName: 'E*** P***', sessionType: 'Call',    time: '16:00', duration: 60,  status: 'done',     price: 160000, method: 'Transfer Bank', note: 'Burnout setelah proyek besar selesai.' },
+  // Rabu (index 2)
+  { id: 'w_006', day: 2, userInitials: 'FH', userName: 'F*** H***', sessionType: 'Chat',    time: '08:00', duration: 30,  status: 'done',     price: 75000,  method: 'GoPay',         note: 'Krisis kepercayaan diri sebelum presentasi.' },
+  // Kamis (index 3) — hari ini
+  { id: 'w_007', day: 3, userInitials: 'DS', userName: 'D*** S***', sessionType: 'Chat',    time: '09:00', duration: 60,  status: 'done',     price: 140000, method: 'OVO',           note: 'Merasa tertekan dengan ekspektasi keluarga.' },
+  { id: 'w_008', day: 3, userInitials: 'MR', userName: 'M*** R***', sessionType: 'Call',    time: '11:00', duration: 30,  status: 'active',   price: 85000,  method: 'Transfer Bank', note: 'Stres pekerjaan akumulatif. Sulit istirahat.' },
+  { id: 'w_009', day: 3, userInitials: 'FS', userName: 'F*** S***', sessionType: 'Chat',    time: '14:00', duration: 60,  status: 'upcoming', price: 140000, method: 'GoPay',         note: 'Self-esteem rendah setelah gagal CPNS.' },
+  { id: 'w_010', day: 3, userInitials: 'KP', userName: 'K*** P***', sessionType: 'Offline', time: '16:30', duration: 60,  status: 'upcoming', price: 200000, method: 'Transfer Bank', note: 'Konseling hubungan dengan orang tua.' },
+  // Jumat (index 4)
+  { id: 'w_011', day: 4, userInitials: 'AN', userName: 'A*** N***', sessionType: 'Chat',    time: '10:00', duration: 60,  status: 'upcoming', price: 140000, method: 'OVO',           note: 'Kecemasan sosial yang menghambat aktivitas.' },
+  { id: 'w_012', day: 4, userInitials: 'BY', userName: 'B*** Y***', sessionType: 'Call',    time: '14:00', duration: 30,  status: 'pending',  price: 85000,  method: 'Transfer Bank', note: 'Burnout kerja. Tidak bisa menikmati waktu luang.' },
+  // Sabtu (index 5)
+  { id: 'w_013', day: 5, userInitials: 'GN', userName: 'G*** N***', sessionType: 'Chat',    time: '09:30', duration: 60,  status: 'upcoming', price: 140000, method: 'GoPay',         note: 'Trauma masa kecil yang mulai mengganggu kehidupan.' },
+];
+
+const MOCK_AVAILABILITY = {
+  leaveStart: null,
+  leaveEnd: null,
+  days: [
+    { name: 'Senin',  active: true,  maxSessions: 4, types: ['Chat','Call'],         slots: [{ start:'08:00', end:'12:00' }, { start:'13:00', end:'17:00' }] },
+    { name: 'Selasa', active: true,  maxSessions: 5, types: ['Chat','Call','Offline'],slots: [{ start:'08:00', end:'17:00' }] },
+    { name: 'Rabu',   active: true,  maxSessions: 3, types: ['Chat'],                 slots: [{ start:'08:00', end:'12:00' }] },
+    { name: 'Kamis',  active: true,  maxSessions: 4, types: ['Chat','Call','Offline'],slots: [{ start:'08:00', end:'12:00' }, { start:'13:00', end:'18:00' }] },
+    { name: 'Jumat',  active: true,  maxSessions: 3, types: ['Chat','Call'],          slots: [{ start:'09:00', end:'16:00' }] },
+    { name: 'Sabtu',  active: true,  maxSessions: 2, types: ['Chat'],                 slots: [{ start:'09:00', end:'13:00' }] },
+    { name: 'Minggu', active: false, maxSessions: 2, types: [],                       slots: [] },
+  ]
+};
 
 // ── Register State (cross-page) ──
 const RegState = {
