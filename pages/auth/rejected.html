@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Revisi Diperlukan — Hi-Me Expert</title>
+  <link rel="stylesheet" href="../../css/global.css">
+  <style>
+    .rejected-hero {
+      background: linear-gradient(155deg, #450A0A, #991B1B);
+      padding: 52px 24px 64px;
+      position: relative; overflow: hidden; text-align: center;
+    }
+    .rejected-hero::before {
+      content: ''; position: absolute; top: -60px; left: 50%; transform: translateX(-50%);
+      width: 280px; height: 280px;
+      background: radial-gradient(circle, rgba(248,113,113,.1) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .rejected-hero::after {
+      content: ''; position: absolute; bottom: -1px; left: 0; right: 0;
+      height: 40px; background: var(--bg); border-radius: 40px 40px 0 0;
+    }
+
+    .rejected-icon {
+      width: 88px; height: 88px; border-radius: 50%;
+      background: rgba(255,255,255,.1); border: 2px solid rgba(255,255,255,.2);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px; color: white;
+    }
+    .rejected-title { font-family: 'DM Serif Display', serif; font-size: 28px; color: white; line-height: 1.2; margin-bottom: 8px; }
+    .rejected-desc  { font-size: 13px; color: rgba(255,255,255,.7); line-height: 1.7; }
+
+    .body-section { padding: 24px 20px 0; }
+
+    /* Rejection reasons */
+    .reasons-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+    .reason-card {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 14px; border-radius: var(--r-md);
+      background: #FEF2F2; border: 1px solid #FECACA;
+    }
+    .reason-icon {
+      width: 34px; height: 34px; border-radius: var(--r-xs); flex-shrink: 0;
+      background: #FEE2E2; color: var(--danger);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .reason-doc   { font-size: 12px; font-weight: 800; color: var(--danger); margin-bottom: 3px; }
+    .reason-issue { font-size: 12px; color: #7F1D1D; line-height: 1.5; }
+
+    /* Info */
+    .info-card {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 13px 14px; border-radius: var(--r-md);
+      background: var(--primary-xpale); border: 1px solid var(--primary-pale);
+      margin-bottom: 20px;
+    }
+    .info-text { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+
+    /* What's ok */
+    .ok-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+    .ok-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 11px 14px; border-radius: var(--r-md);
+      background: #F0FDF4; border: 1px solid #BBF7D0;
+    }
+    .ok-icon { color: #16A34A; flex-shrink: 0; }
+    .ok-text { font-size: 13px; font-weight: 600; color: #14532D; }
+
+    .cta-section { padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+    .support-link {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      font-size: 13px; font-weight: 700; color: var(--text-muted); cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+<div class="phone">
+  <div class="scroll-area">
+
+    <!-- Hero -->
+    <div class="rejected-hero">
+      <div class="rejected-icon anim-scale-in">
+        <svg class="icon-svg" width="40" height="40" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+      </div>
+      <div class="anim-fade-up d1">
+        <h1 class="rejected-title">Revisi<br>Diperlukan</h1>
+        <p class="rejected-desc">Pendaftaran Anda belum dapat disetujui karena ada dokumen yang perlu diperbarui.</p>
+      </div>
+      <div style="height: 40px;"></div>
+    </div>
+
+    <!-- Reasons -->
+    <div class="body-section anim-fade-up d1">
+      <div style="font-size:13px;font-weight:800;color:var(--text-primary);margin-bottom:12px;">Alasan Penolakan</div>
+      <div class="reasons-list" id="reasonsList">
+        <!-- populated by JS -->
+      </div>
+    </div>
+
+    <!-- What's ok -->
+    <div class="body-section anim-fade-up d2">
+      <div style="font-size:13px;font-weight:800;color:var(--text-primary);margin-bottom:12px;">Dokumen yang Sudah Diterima</div>
+      <div class="ok-list" id="okList">
+        <!-- populated by JS -->
+      </div>
+    </div>
+
+    <!-- Info -->
+    <div class="body-section anim-fade-up d2">
+      <div class="info-card">
+        <svg class="icon-svg" width="18" height="18" viewBox="0 0 24 24" style="color:var(--primary);flex-shrink:0;margin-top:1px;"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        <div class="info-text">
+          Setelah memperbarui dokumen yang bermasalah, pendaftaran Anda akan <strong>ditinjau ulang dalam 2–3 hari kerja</strong> tanpa perlu mengulang seluruh proses.
+        </div>
+      </div>
+    </div>
+
+    <!-- CTAs -->
+    <div class="cta-section anim-fade-up d3">
+      <button class="btn btn-primary" onclick="go('register-documents')">
+        <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24"><path d="M12 16V4"/><path d="M7 9l5-5 5 5"/><path d="M4 20h16"/></svg>
+        Perbarui Dokumen
+      </button>
+      <div class="support-link" onclick="handleSupport()">
+        <svg class="icon-svg" width="15" height="15" viewBox="0 0 24 24"><path d="M4 5h16v10H7l-3 3V5z"/></svg>
+        Hubungi Support untuk Bantuan
+      </div>
+      <div style="text-align:center;">
+        <span onclick="handleLogout()" style="font-size:12px;color:var(--text-muted);cursor:pointer;">Keluar dari akun ini</span>
+      </div>
+    </div>
+
+    <div style="height: 24px;"></div>
+  </div>
+</div>
+
+<script src="../../js/app.js"></script>
+<script>
+  Object.assign(ROUTES, {
+    landing:             '../../index.html',
+    login:               'login.html',
+    'register-documents':'register-documents.html',
+  });
+
+  // Mock rejection reasons
+  const MOCK_REASONS = [
+    { doc: 'STR Psikolog', issue: 'Dokumen tidak terbaca dengan jelas. Mohon upload ulang dengan resolusi lebih tinggi atau foto ulang dalam kondisi pencahayaan yang cukup.' },
+    { doc: 'SIP Psikolog', issue: 'Tanggal berlaku sudah kedaluwarsa. Pastikan SIP yang diunggah masih aktif dan valid.' },
+  ];
+  const MOCK_OK = ['KTP / e-KTP', 'Foto Profesional', 'Curriculum Vitae'];
+
+  const REASON_ICONS = {
+    'STR': '<path d="M12 3l7 3v6c0 5-3.5 8-7 9-3.5-1-7-4-7-9V6z"/>',
+    'SIP': '<path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5"/><path d="M9 15l2 2 4-4"/>',
+    default: '<path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5"/>',
+  };
+
+  function buildReasons() {
+    const list = document.getElementById('reasonsList');
+    MOCK_REASONS.forEach(r => {
+      const iconKey = Object.keys(REASON_ICONS).find(k => r.doc.includes(k)) || 'default';
+      list.innerHTML += `
+        <div class="reason-card">
+          <div class="reason-icon">
+            <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24">${REASON_ICONS[iconKey]}</svg>
+          </div>
+          <div>
+            <div class="reason-doc">${r.doc}</div>
+            <div class="reason-issue">${r.issue}</div>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  function buildOkList() {
+    const list = document.getElementById('okList');
+    MOCK_OK.forEach(name => {
+      list.innerHTML += `
+        <div class="ok-item">
+          <div class="ok-icon">
+            <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24" style="stroke-width:3;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
+          </div>
+          <div class="ok-text">${name}</div>
+        </div>
+      `;
+    });
+  }
+
+  function handleSupport() {
+    toast('Menghubungi tim support Hi-Me...');
+  }
+
+  function handleLogout() {
+    App.logout();
+    go('landing');
+  }
+
+  buildReasons();
+  buildOkList();
+</script>
+</body>
+</html>

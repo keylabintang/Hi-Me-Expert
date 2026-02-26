@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Menunggu Verifikasi — Hi-Me Expert</title>
+  <link rel="stylesheet" href="../../css/global.css">
+  <style>
+    .pending-hero {
+      background: linear-gradient(155deg, var(--teal-900), var(--teal-700));
+      padding: 52px 24px 64px;
+      position: relative; overflow: hidden;
+      text-align: center;
+    }
+    .pending-hero::before {
+      content: ''; position: absolute; top: -60px; left: 50%; transform: translateX(-50%);
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(94,234,212,.12) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .pending-hero::after {
+      content: ''; position: absolute; bottom: -1px; left: 0; right: 0;
+      height: 40px; background: var(--bg); border-radius: 40px 40px 0 0;
+    }
+
+    /* Animated illustration */
+    .pending-illustration {
+      width: 100px; height: 100px;
+      margin: 0 auto 20px;
+      position: relative;
+    }
+    .pend-ring {
+      width: 100px; height: 100px; border-radius: 50%;
+      border: 3px solid rgba(255,255,255,.15);
+      position: absolute; inset: 0;
+    }
+    .pend-ring-spin {
+      width: 100px; height: 100px; border-radius: 50%;
+      border: 3px solid transparent;
+      border-top-color: rgba(255,255,255,.6);
+      position: absolute; inset: 0;
+      animation: spin 2s linear infinite;
+    }
+    .pend-inner {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: rgba(255,255,255,.12);
+      position: absolute; inset: 14px;
+      display: flex; align-items: center; justify-content: center;
+      color: white;
+    }
+    .pend-dot-pulse {
+      position: absolute; bottom: -4px; right: -4px;
+      width: 24px; height: 24px; border-radius: 50%;
+      background: #FCD34D; border: 3px solid var(--teal-800);
+      display: flex; align-items: center; justify-content: center;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.15);} }
+
+    .pending-title { font-family: 'DM Serif Display', serif; font-size: 28px; color: white; line-height: 1.2; margin-bottom: 8px; }
+    .pending-desc  { font-size: 13px; color: rgba(255,255,255,.7); line-height: 1.7; }
+    .pending-est   {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 100px;
+      background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2);
+      font-size: 12px; font-weight: 700; color: white; margin-top: 12px;
+    }
+
+    .body-section  { padding: 24px 20px 0; }
+
+    /* Info banner */
+    .info-banner {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 14px; border-radius: var(--r-md);
+      background: var(--primary-xpale); border: 1px solid var(--primary-pale);
+      margin-bottom: 20px;
+    }
+    .info-banner-text { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+    /* Doc checklist */
+    .doc-check-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+    .doc-check-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px; border-radius: var(--r-md);
+      background: var(--bg-card); border: 1px solid var(--border);
+    }
+    .doc-check-icon {
+      width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+      background: #DCFCE7; color: #16A34A;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .doc-check-name { font-size: 13px; font-weight: 600; color: var(--text-primary); flex: 1; min-width: 0; }
+    .doc-check-ts   { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+
+    /* Steps timeline */
+    .timeline { position: relative; padding-left: 28px; }
+    .timeline::before {
+      content: ''; position: absolute; left: 9px; top: 12px; bottom: 0;
+      width: 2px; background: var(--border);
+    }
+    .timeline-item { position: relative; margin-bottom: 18px; }
+    .timeline-item:last-child { margin-bottom: 0; }
+    .timeline-dot {
+      position: absolute; left: -28px; top: 2px;
+      width: 20px; height: 20px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg-card); border: 2px solid var(--border);
+      z-index: 1;
+    }
+    .timeline-dot.done   { background: var(--success); border-color: var(--success); color: white; }
+    .timeline-dot.active { background: #FCD34D; border-color: #F59E0B; }
+    .timeline-dot.wait   { background: var(--bg); border-color: var(--border); }
+    .timeline-title { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+    .timeline-desc  { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+    .cta-section { padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+    .support-link {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      font-size: 13px; font-weight: 700; color: var(--text-muted); cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+<div class="phone">
+  <div class="scroll-area">
+
+    <!-- Hero -->
+    <div class="pending-hero">
+      <div class="pending-illustration anim-scale-in">
+        <div class="pend-ring"></div>
+        <div class="pend-ring-spin"></div>
+        <div class="pend-inner">
+          <svg class="icon-svg" width="32" height="32" viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5"/><path d="M9 13h6"/><path d="M9 17h4"/></svg>
+        </div>
+        <div class="pend-dot-pulse">
+          <svg class="icon-svg" width="12" height="12" viewBox="0 0 24 24" style="color:#92400E;stroke-width:3;"><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+        </div>
+      </div>
+      <div class="anim-fade-up d2">
+        <h1 class="pending-title">Pendaftaran<br>Sedang Ditinjau</h1>
+        <p class="pending-desc">Tim verifikasi Hi-Me sedang memeriksa dokumen dan informasi yang Anda kirimkan.</p>
+        <div class="pending-est">
+          <svg class="icon-svg" width="13" height="13" viewBox="0 0 24 24"><path d="M12 6v6l4 2"/><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0"/></svg>
+          Estimasi 2–5 hari kerja
+        </div>
+      </div>
+      <div style="height: 40px;"></div>
+    </div>
+
+    <!-- Info -->
+    <div class="body-section anim-fade-up d2">
+      <div class="info-banner">
+        <svg class="icon-svg" width="18" height="18" viewBox="0 0 24 24" style="color:var(--primary);flex-shrink:0;margin-top:1px;"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        <div class="info-banner-text">Anda akan mendapat notifikasi melalui <strong>email</strong> setelah proses verifikasi selesai. Pastikan email Anda aktif dan periksa folder spam.</div>
+      </div>
+    </div>
+
+    <!-- Documents received -->
+    <div class="body-section">
+      <div style="font-size:13px;font-weight:800;color:var(--text-primary);margin-bottom:12px;">Dokumen Diterima</div>
+      <div class="doc-check-list" id="docCheckList">
+        <!-- populated by JS -->
+      </div>
+    </div>
+
+    <!-- Timeline -->
+    <div class="body-section" style="padding-bottom:8px;">
+      <div style="font-size:13px;font-weight:800;color:var(--text-primary);margin-bottom:14px;">Status Proses</div>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot done">
+            <svg class="icon-svg" width="10" height="10" viewBox="0 0 24 24" style="stroke-width:3;"><path d="M20 6L9 17l-5-5"/></svg>
+          </div>
+          <div class="timeline-title">Pendaftaran Dikirim</div>
+          <div class="timeline-desc">Formulir dan dokumen berhasil diterima oleh sistem</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot active"></div>
+          <div class="timeline-title">Tinjauan Dokumen</div>
+          <div class="timeline-desc">Tim Hi-Me memverifikasi keaslian dan kelengkapan dokumen</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot wait"></div>
+          <div class="timeline-title">Wawancara Singkat <span style="font-size:10px;color:var(--text-muted);font-weight:400;">(jika diperlukan)</span></div>
+          <div class="timeline-desc">Tim kami mungkin menghubungi untuk konfirmasi lebih lanjut</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot wait"></div>
+          <div class="timeline-title">Akun Diaktifkan</div>
+          <div class="timeline-desc">Anda bisa mulai menerima klien dan menjalankan sesi</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTAs -->
+    <div class="cta-section anim-fade-up d3">
+      <button class="btn btn-secondary" onclick="handleRefresh()">
+        <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        Cek Status
+      </button>
+      <div class="support-link" onclick="handleSupport()">
+        <svg class="icon-svg" width="15" height="15" viewBox="0 0 24 24"><path d="M4 5h16v10H7l-3 3V5z"/></svg>
+        Hubungi Support
+      </div>
+      <div style="text-align:center;">
+        <span onclick="handleLogout()" style="font-size:12px;color:var(--text-muted);cursor:pointer;">Keluar dari akun ini</span>
+      </div>
+    </div>
+
+    <div style="height: 24px;"></div>
+  </div>
+</div>
+
+<script src="../../js/app.js"></script>
+<script>
+  Object.assign(ROUTES, {
+    landing:  '../../index.html',
+    login:    'login.html',
+  });
+
+  function buildDocList() {
+    const docs = [
+      'KTP / e-KTP','Foto Profesional','Curriculum Vitae',
+      'Dokumen Keahlian','Ijazah',
+    ];
+    const reg = RegState.load();
+    const uploadedDocs = reg?.docs ? Object.keys(reg.docs) : docs.slice(0, 3);
+
+    const list = document.getElementById('docCheckList');
+    docs.slice(0, uploadedDocs.length || 3).forEach((name, i) => {
+      const times = ['Baru saja','Baru saja','Baru saja','1 menit lalu','2 menit lalu'];
+      list.innerHTML += `
+        <div class="doc-check-item">
+          <div class="doc-check-icon">
+            <svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" style="stroke-width:3;"><path d="M20 6L9 17l-5-5"/></svg>
+          </div>
+          <div class="doc-check-name">${name}</div>
+          <div class="doc-check-ts">${times[i] || 'Diterima'}</div>
+        </div>
+      `;
+    });
+  }
+
+  function handleRefresh() {
+    const btn = document.querySelector('.btn-secondary');
+    btn.innerHTML = '<div class="spinner dark"></div> Memeriksa...';
+    btn.disabled = true;
+    setTimeout(() => {
+      btn.innerHTML = '<svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Cek Status';
+      btn.disabled = false;
+      toast('Status belum berubah. Tim kami masih meninjau dokumen Anda.');
+    }, 1600);
+  }
+
+  function handleSupport() {
+    toast('Membuka layanan support...');
+  }
+
+  function handleLogout() {
+    App.logout();
+    go('landing');
+  }
+
+  buildDocList();
+</script>
+</body>
+</html>

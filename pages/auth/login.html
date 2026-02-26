@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Masuk — Hi-Me Expert</title>
+  <link rel="stylesheet" href="../../css/global.css">
+  <style>
+    .auth-hero {
+      background: linear-gradient(155deg, var(--teal-900), var(--teal-700));
+      padding: 0 24px 52px;
+      position: relative; overflow: hidden;
+    }
+    .auth-hero::before {
+      content: '';
+      position: absolute; top: -60px; right: -60px;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(94,234,212,.15) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .auth-hero::after {
+      content: ''; position: absolute; bottom: -1px; left: 0; right: 0;
+      height: 40px; background: var(--bg); border-radius: 40px 40px 0 0;
+    }
+    .hero-back {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.2);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: white; transition: all .15s;
+    }
+    .hero-back:active { transform: scale(.92); background: rgba(255,255,255,.25); }
+    .portal-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px; border-radius: 100px;
+      background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.18);
+      font-size: 11px; font-weight: 700; color: rgba(255,255,255,.85);
+      margin-bottom: 14px;
+    }
+    .auth-title { font-family: 'DM Serif Display', serif; font-size: 32px; color: white; line-height: 1.15; }
+    .auth-title em { color: var(--teal-300); font-style: italic; }
+    .auth-desc { font-size: 13px; color: rgba(255,255,255,.65); margin-top: 6px; }
+
+    .auth-body { padding: 28px 20px 20px; }
+    .forgot-row { text-align: right; margin-bottom: 20px; margin-top: -8px; }
+    .forgot-link { font-size: 12px; font-weight: 700; color: var(--primary); cursor: pointer; }
+    .register-prompt { text-align: center; font-size: 13px; color: var(--text-muted); margin-top: 20px; }
+    .register-prompt span { color: var(--primary); font-weight: 700; cursor: pointer; }
+
+    .status-card {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 14px; border-radius: var(--r-md);
+      margin-bottom: 16px;
+    }
+    .status-card.warning { background: #FFF7ED; border: 1px solid #FDBA74; }
+    .status-card.danger  { background: #FEF2F2; border: 1px solid #FCA5A5; }
+    .status-card-text { font-size: 13px; line-height: 1.55; }
+    .status-card-title { font-weight: 700; margin-bottom: 2px; }
+  </style>
+</head>
+<body>
+<div class="phone">
+  <div class="scroll-area">
+    <div class="auth-hero">
+      <div style="height: 24px;"></div>
+      <div style="margin-bottom: 22px;">
+        <div class="hero-back" onclick="go('landing')">
+          <svg class="icon-svg" width="18" height="18" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+        </div>
+      </div>
+      <div class="anim-fade-up">
+        <div class="portal-badge">
+          <svg class="icon-svg" width="12" height="12" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 5-3.5 8-7 9-3.5-1-7-4-7-9V6z"/></svg>
+          Expert Portal
+        </div>
+        <h1 class="auth-title">Masuk ke<br><em>Hi-Me Expert</em></h1>
+        <p class="auth-desc">Selamat datang kembali, mitra profesional</p>
+      </div>
+      <div style="height: 40px;"></div>
+    </div>
+
+    <div class="auth-body anim-fade-up">
+      <!-- Status alerts (hidden by default, shown via JS) -->
+      <div id="pendingAlert" class="status-card warning" style="display:none;">
+        <svg class="icon-svg" width="20" height="20" viewBox="0 0 24 24" style="color:#C2410C;flex-shrink:0;margin-top:1px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+        <div class="status-card-text">
+          <div class="status-card-title" style="color:#C2410C;">Akun sedang dalam proses verifikasi</div>
+          Tim Hi-Me sedang meninjau dokumen Anda. Estimasi 2–5 hari kerja.
+        </div>
+      </div>
+      <div id="rejectedAlert" class="status-card danger" style="display:none;">
+        <svg class="icon-svg" width="20" height="20" viewBox="0 0 24 24" style="color:var(--danger);flex-shrink:0;margin-top:1px;"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/><path d="M15 9l-6 6"/><path d="M9 9l6 6"/></svg>
+        <div class="status-card-text">
+          <div class="status-card-title" style="color:var(--danger);">Pendaftaran memerlukan revisi</div>
+          Ada dokumen yang perlu diperbarui. <span style="color:var(--primary);font-weight:700;cursor:pointer;" onclick="go('rejected')">Lihat detail</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-input" id="emailInput" placeholder="nama@email.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Kata Sandi</label>
+        <div class="input-wrap">
+          <input type="password" class="form-input" id="passInput" placeholder="Kata sandi Anda" autocomplete="current-password">
+          <span class="input-trail" id="eyeToggle" onclick="togglePass()">
+            <svg class="icon-svg" id="eyeIcon" width="18" height="18" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </span>
+        </div>
+      </div>
+      <div class="forgot-row">
+        <span class="forgot-link" onclick="handleForgot()">Lupa kata sandi?</span>
+      </div>
+
+      <button class="btn btn-primary" id="loginBtn" onclick="handleLogin()">Masuk</button>
+
+      <p class="register-prompt">
+        Belum terdaftar? <span onclick="go('register')">Daftar sebagai Expert</span>
+      </p>
+      <div style="height: 20px;"></div>
+    </div>
+  </div>
+</div>
+
+<script src="../../js/app.js"></script>
+<script>
+  Object.assign(ROUTES, {
+    landing:   '../../index.html',
+    register:  'register.html',
+    pending:   'pending.html',
+    rejected:  'rejected.html',
+    dashboard: '../dashboard/index.html',
+  });
+
+  let passVisible = false;
+  function togglePass() {
+    const inp = document.getElementById('passInput');
+    passVisible = !passVisible;
+    inp.type = passVisible ? 'text' : 'password';
+    document.getElementById('eyeIcon').innerHTML = passVisible
+      ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><path d="M1 1l22 22"/>'
+      : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+  }
+
+  function handleLogin() {
+    const email = document.getElementById('emailInput').value.trim();
+    const pass  = document.getElementById('passInput').value;
+
+    if (!email) { toast('Masukkan email Anda'); return; }
+    if (!pass)  { toast('Masukkan kata sandi'); return; }
+    if (pass.length < 6) { toast('Kata sandi terlalu pendek'); return; }
+
+    const btn = document.getElementById('loginBtn');
+    btn.innerHTML = '<div class="spinner"></div> Memverifikasi...';
+    btn.disabled = true;
+
+    setTimeout(() => {
+      // Simulate different login outcomes for demo
+      const emailLower = email.toLowerCase();
+      if (emailLower.includes('pending')) {
+        btn.innerHTML = 'Masuk'; btn.disabled = false;
+        document.getElementById('pendingAlert').style.display = 'flex';
+        return;
+      }
+      if (emailLower.includes('rejected')) {
+        btn.innerHTML = 'Masuk'; btn.disabled = false;
+        document.getElementById('rejectedAlert').style.display = 'flex';
+        return;
+      }
+      // Normal login
+      const name = email.split('@')[0].replace(/[^a-zA-Z]/g,' ').trim();
+      const initials = name.slice(0,2).toUpperCase();
+      App.login({
+        id: 'exp_001',
+        name: name || 'Expert',
+        email,
+        initials,
+        type: 'Psikolog',
+        status: 'active',
+        specializations: ['Kecemasan', 'Burnout'],
+        rating: 4.9,
+        totalSessions: 142,
+        experience: 6,
+        onlineStatus: 'online',
+      });
+      go('dashboard');
+    }, 1400);
+  }
+
+  function handleForgot() {
+    toast('Tautan reset kata sandi dikirim ke email Anda');
+  }
+</script>
+</body>
+</html>

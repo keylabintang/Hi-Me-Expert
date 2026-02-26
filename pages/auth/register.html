@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Daftar Expert — Hi-Me</title>
+  <link rel="stylesheet" href="../../css/global.css">
+  <style>
+    .auth-hero {
+      background: linear-gradient(155deg, var(--teal-900), var(--teal-700));
+      padding: 0 24px 52px;
+      position: relative; overflow: hidden;
+    }
+    .auth-hero::before {
+      content: '';
+      position: absolute; top: -80px; right: -80px;
+      width: 240px; height: 240px;
+      background: radial-gradient(circle, rgba(94,234,212,.12) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .auth-hero::after {
+      content: ''; position: absolute; bottom: -1px; left: 0; right: 0;
+      height: 40px; background: var(--bg); border-radius: 40px 40px 0 0;
+    }
+    .hero-back {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.2);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: white; transition: all .15s;
+    }
+    .hero-back:active { transform: scale(.92); }
+
+    /* Step dots */
+    .step-dots { display: flex; gap: 6px; margin-bottom: 18px; }
+    .step-dot {
+      height: 4px; border-radius: 100px;
+      background: rgba(255,255,255,.25); transition: all .3s; flex: 1;
+    }
+    .step-dot.active { background: white; }
+
+    .step-label {
+      font-size: 11px; font-weight: 700; color: rgba(255,255,255,.7);
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;
+    }
+    .auth-title { font-family: 'DM Serif Display', serif; font-size: 30px; color: white; line-height: 1.2; }
+    .auth-desc  { font-size: 13px; color: rgba(255,255,255,.65); margin-top: 6px; }
+
+    .auth-body { padding: 24px 20px 20px; }
+    .step-footer { display: flex; gap: 10px; margin-top: 24px; }
+    .login-prompt { text-align: center; font-size: 13px; color: var(--text-muted); margin-top: 20px; }
+    .login-prompt span { color: var(--primary); font-weight: 700; cursor: pointer; }
+
+    /* Password strength */
+    .strength-bars { display: flex; gap: 4px; margin-bottom: 4px; }
+    .strength-bar  { flex: 1; height: 4px; border-radius: 100px; background: var(--border); transition: background .2s; }
+
+    /* Checkbox */
+    .check-row {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 14px; border-radius: var(--r-md);
+      background: var(--primary-xpale); border: 1px solid var(--primary-pale);
+      cursor: pointer;
+    }
+    .check-box {
+      width: 18px; height: 18px; border-radius: 4px;
+      border: 2px solid var(--border); background: white;
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      transition: all .15s; margin-top: 1px;
+    }
+    .check-box.checked { background: var(--primary); border-color: var(--primary); }
+    .check-text { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+    .check-text a { color: var(--primary); font-weight: 700; }
+  </style>
+</head>
+<body>
+<div class="phone">
+  <div class="scroll-area">
+    <div class="auth-hero">
+      <div style="height: 24px;"></div>
+      <div style="margin-bottom: 22px;">
+        <div class="hero-back" onclick="go('landing')">
+          <svg class="icon-svg" width="18" height="18" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+        </div>
+      </div>
+      <div class="step-dots">
+        <div class="step-dot active"></div>
+        <div class="step-dot"></div>
+        <div class="step-dot"></div>
+        <div class="step-dot"></div>
+      </div>
+      <div class="step-label">Langkah 1 dari 4</div>
+      <h1 class="auth-title" id="heroTitle">Buat Akun<br>Expert</h1>
+      <p class="auth-desc" id="heroDesc">Mulai proses pendaftaran sebagai mitra profesional</p>
+      <div style="height: 40px;"></div>
+    </div>
+
+    <div class="auth-body anim-fade-up">
+      <div class="form-group">
+        <label class="form-label">Nama Lengkap</label>
+        <input type="text" class="form-input" id="nameInput" placeholder="Nama lengkap beserta gelar" autocomplete="name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-input" id="emailInput" placeholder="nama@email.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nomor HP Aktif</label>
+        <input type="tel" class="form-input" id="phoneInput" placeholder="08xx-xxxx-xxxx" autocomplete="tel">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Kata Sandi</label>
+        <div class="input-wrap">
+          <input type="password" class="form-input" id="passInput" placeholder="Minimal 8 karakter" oninput="checkStrength(this.value)">
+          <span class="input-trail" onclick="togglePass('passInput', this)">
+            <svg class="icon-svg" width="18" height="18" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </span>
+        </div>
+        <div style="margin-top: 8px;">
+          <div class="strength-bars">
+            <div class="strength-bar" id="sb1"></div>
+            <div class="strength-bar" id="sb2"></div>
+            <div class="strength-bar" id="sb3"></div>
+            <div class="strength-bar" id="sb4"></div>
+          </div>
+          <p id="strengthLabel" style="font-size:11px;color:var(--text-muted);">Masukkan kata sandi untuk memeriksa kekuatan</p>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Konfirmasi Kata Sandi</label>
+        <div class="input-wrap">
+          <input type="password" class="form-input" id="pass2Input" placeholder="Ulangi kata sandi">
+          <span class="input-trail" onclick="togglePass('pass2Input', this)">
+            <svg class="icon-svg" width="18" height="18" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </span>
+        </div>
+      </div>
+
+      <div class="check-row" onclick="toggleConsent()" style="margin-bottom:4px;">
+        <div class="check-box" id="consentBox">
+          <svg class="icon-svg" id="consentCheck" width="12" height="12" viewBox="0 0 24 24" style="display:none;color:white;stroke-width:3;"><path d="M20 6L9 17l-5-5"/></svg>
+        </div>
+        <div class="check-text">
+          Saya menyetujui <a href="#">Syarat &amp; Ketentuan Mitra</a> serta <a href="#">Kebijakan Privasi</a> Hi-Me Expert
+        </div>
+      </div>
+
+      <div class="step-footer">
+        <button class="btn btn-primary" id="nextBtn" onclick="handleNext()" disabled>
+          Lanjutkan
+          <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+      </div>
+      <p class="login-prompt">Sudah punya akun? <span onclick="go('login')">Masuk</span></p>
+      <div style="height: 20px;"></div>
+    </div>
+  </div>
+</div>
+
+<script src="../../js/app.js"></script>
+<script>
+  Object.assign(ROUTES, {
+    landing:                '../../index.html',
+    login:                  'login.html',
+    'register-professional':'register-professional.html',
+  });
+
+  let consentChecked = false;
+
+  function toggleConsent() {
+    consentChecked = !consentChecked;
+    const box = document.getElementById('consentBox');
+    const chk = document.getElementById('consentCheck');
+    box.classList.toggle('checked', consentChecked);
+    chk.style.display = consentChecked ? 'block' : 'none';
+    updateNextBtn();
+  }
+
+  function updateNextBtn() {
+    const name  = document.getElementById('nameInput').value.trim();
+    const email = document.getElementById('emailInput').value.trim();
+    const phone = document.getElementById('phoneInput').value.trim();
+    const pass  = document.getElementById('passInput').value;
+    const pass2 = document.getElementById('pass2Input').value;
+    const ok = name && email && phone && pass.length >= 8 && pass === pass2 && consentChecked;
+    document.getElementById('nextBtn').disabled = !ok;
+  }
+
+  // Live validation triggers
+  ['nameInput','emailInput','phoneInput','pass2Input'].forEach(id => {
+    document.getElementById(id).addEventListener('input', updateNextBtn);
+  });
+  document.getElementById('passInput').addEventListener('input', updateNextBtn);
+
+  const STRENGTH_COLORS = ['var(--danger)', '#F97316', '#EAB308', 'var(--success)'];
+  const STRENGTH_LABELS = ['Sangat lemah', 'Lemah', 'Cukup kuat', 'Kuat'];
+
+  function checkStrength(val) {
+    let score = 0;
+    if (val.length >= 8)         score++;
+    if (/[A-Z]/.test(val))       score++;
+    if (/[0-9]/.test(val))       score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+    for (let i = 1; i <= 4; i++) {
+      const bar = document.getElementById('sb' + i);
+      bar.style.background = i <= score ? STRENGTH_COLORS[score - 1] : 'var(--border)';
+    }
+    document.getElementById('strengthLabel').textContent =
+      val.length === 0 ? 'Masukkan kata sandi untuk memeriksa kekuatan'
+      : STRENGTH_LABELS[score - 1] || STRENGTH_LABELS[0];
+    document.getElementById('strengthLabel').style.color =
+      val.length === 0 ? 'var(--text-muted)' : STRENGTH_COLORS[Math.max(score-1,0)];
+  }
+
+  function togglePass(id, btn) {
+    const inp = document.getElementById(id);
+    const isText = inp.type === 'text';
+    inp.type = isText ? 'password' : 'text';
+    btn.innerHTML = isText
+      ? '<svg class="icon-svg" width="18" height="18" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>'
+      : '<svg class="icon-svg" width="18" height="18" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><path d="M1 1l22 22"/></svg>';
+  }
+
+  function handleNext() {
+    const email = document.getElementById('emailInput').value.trim();
+    if (!/\S+@\S+\.\S+/.test(email)) { toast('Format email tidak valid'); return; }
+    const pass  = document.getElementById('passInput').value;
+    const pass2 = document.getElementById('pass2Input').value;
+    if (pass !== pass2) { toast('Konfirmasi kata sandi tidak cocok'); return; }
+
+    RegState.save({
+      name:  document.getElementById('nameInput').value.trim(),
+      email,
+      phone: document.getElementById('phoneInput').value.trim(),
+      pass,
+      step:  1,
+    });
+    go('register-professional');
+  }
+</script>
+</body>
+</html>

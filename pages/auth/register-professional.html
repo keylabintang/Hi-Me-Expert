@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Profil Profesional — Hi-Me Expert</title>
+  <link rel="stylesheet" href="../../css/global.css">
+  <style>
+    .auth-hero {
+      background: linear-gradient(155deg, var(--teal-900), var(--teal-700));
+      padding: 0 24px 52px; position: relative; overflow: hidden;
+    }
+    .auth-hero::before {
+      content: ''; position: absolute; bottom: -60px; left: -60px;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(124,58,237,.15) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .auth-hero::after {
+      content: ''; position: absolute; bottom: -1px; left: 0; right: 0;
+      height: 40px; background: var(--bg); border-radius: 40px 40px 0 0;
+    }
+    .hero-back {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.2);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: white; transition: all .15s;
+    }
+    .hero-back:active { transform: scale(.92); }
+    .step-dots { display: flex; gap: 6px; margin-bottom: 18px; }
+    .step-dot { height: 4px; border-radius: 100px; background: rgba(255,255,255,.25); transition: all .3s; flex: 1; }
+    .step-dot.active { background: white; }
+    .step-dot.done   { background: var(--teal-300); }
+    .step-label { font-size: 11px; font-weight: 700; color: rgba(255,255,255,.7); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .auth-title { font-family: 'DM Serif Display', serif; font-size: 30px; color: white; line-height: 1.2; }
+    .auth-desc  { font-size: 13px; color: rgba(255,255,255,.65); margin-top: 6px; }
+    .auth-body  { padding: 24px 20px 20px; }
+    .step-footer { display: flex; gap: 10px; margin-top: 24px; }
+
+    /* Role selector */
+    .role-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 4px; }
+    .role-opt {
+      padding: 12px 8px; border-radius: var(--r-md);
+      border: 1.5px solid var(--border); background: var(--bg-card);
+      text-align: center; cursor: pointer; transition: all .15s;
+    }
+    .role-opt:active { transform: scale(.96); }
+    .role-opt.selected { border-color: var(--primary); background: var(--primary-pale); }
+    .role-opt-icon {
+      width: 36px; height: 36px; border-radius: var(--r-sm);
+      background: var(--border); color: var(--text-muted);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 8px; transition: all .15s;
+    }
+    .role-opt.selected .role-opt-icon { background: var(--primary-pale); color: var(--primary); }
+    .role-opt-label { font-size: 11px; font-weight: 700; color: var(--text-secondary); transition: color .15s; }
+    .role-opt.selected .role-opt-label { color: var(--primary); }
+
+    /* Dynamic form sections */
+    .form-section { display: none; }
+    .form-section.show { display: block; }
+
+    /* Spec chips */
+    .spec-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+    .spec-chip {
+      padding: 7px 13px; border-radius: 100px;
+      border: 1.5px solid var(--border); background: var(--bg-card);
+      font-size: 12px; font-weight: 700; color: var(--text-secondary);
+      cursor: pointer; transition: all .15s;
+    }
+    .spec-chip.selected { border-color: var(--primary); background: var(--primary-pale); color: var(--primary); }
+    .spec-chip:active { transform: scale(.95); }
+    .spec-hint { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; }
+
+    /* Experience auto-label */
+    .exp-label {
+      display: inline-block; font-size: 11px; font-weight: 700;
+      color: var(--primary); background: var(--primary-pale);
+      padding: 3px 10px; border-radius: 100px; margin-top: 6px;
+    }
+
+    /* Lang chips */
+    .lang-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+    .lang-chip {
+      padding: 7px 13px; border-radius: 100px;
+      border: 1.5px solid var(--border); background: var(--bg-card);
+      font-size: 12px; font-weight: 700; color: var(--text-secondary);
+      cursor: pointer; transition: all .15s;
+    }
+    .lang-chip.selected { border-color: var(--teal-400); background: var(--teal-50); color: var(--teal-700); }
+    .lang-chip:active { transform: scale(.95); }
+
+    .char-counter { font-size: 11px; color: var(--text-muted); text-align: right; margin-top: 4px; }
+  </style>
+</head>
+<body>
+<div class="phone">
+  <div class="scroll-area">
+    <div class="auth-hero">
+      <div style="height: 24px;"></div>
+      <div style="margin-bottom: 22px;">
+        <div class="hero-back" onclick="goBack()">
+          <svg class="icon-svg" width="18" height="18" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+        </div>
+      </div>
+      <div class="step-dots">
+        <div class="step-dot done"></div>
+        <div class="step-dot active"></div>
+        <div class="step-dot"></div>
+        <div class="step-dot"></div>
+      </div>
+      <div class="step-label">Langkah 2 dari 4</div>
+      <h1 class="auth-title">Profil<br>Profesional</h1>
+      <p class="auth-desc">Informasi ini ditampilkan kepada calon klien Anda</p>
+      <div style="height: 40px;"></div>
+    </div>
+
+    <div class="auth-body anim-fade-up">
+
+      <!-- Role selector -->
+      <div class="form-group">
+        <label class="form-label">Jenis Keahlian</label>
+        <div class="role-grid">
+          <div class="role-opt" id="role-psikolog" onclick="selectRole('psikolog')">
+            <div class="role-opt-icon">
+              <svg class="icon-svg" width="18" height="18" viewBox="0 0 24 24"><path d="M8 4v5a4 4 0 0 0 8 0V4"/><path d="M16 13a4 4 0 0 0 4 4"/><path d="M20 17a2 2 0 1 1-4 0"/></svg>
+            </div>
+            <div class="role-opt-label">Psikolog</div>
+          </div>
+          <div class="role-opt" id="role-konsultan" onclick="selectRole('konsultan')">
+            <div class="role-opt-icon">
+              <svg class="icon-svg" width="18" height="18" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="role-opt-label">Konsultan</div>
+          </div>
+          <div class="role-opt" id="role-analyst" onclick="selectRole('analyst')">
+            <div class="role-opt-icon">
+              <svg class="icon-svg" width="18" height="18" viewBox="0 0 24 24"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+            </div>
+            <div class="role-opt-label">Analyst</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fields per role: Psikolog -->
+      <div class="form-section" id="section-psikolog">
+        <div class="form-group">
+          <label class="form-label">Nomor STR <span style="font-size:11px;font-weight:400;color:var(--text-muted);">(Surat Tanda Registrasi)</span></label>
+          <input type="text" class="form-input" id="strInput" placeholder="Contoh: 12.07.1.1.12345">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nomor SIP <span style="font-size:11px;font-weight:400;color:var(--text-muted);">(Surat Izin Praktik, aktif)</span></label>
+          <input type="text" class="form-input" id="sipInput" placeholder="Contoh: 503/SIP/2024/0012">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nomor Anggota HIMPSI <span style="font-size:11px;font-weight:400;color:var(--text-muted);">(opsional)</span></label>
+          <input type="text" class="form-input" id="himpsiInput" placeholder="Contoh: 0012345-XII">
+        </div>
+      </div>
+
+      <!-- Fields per role: Konsultan -->
+      <div class="form-section" id="section-konsultan">
+        <div class="form-group">
+          <label class="form-label">Nama Sertifikasi</label>
+          <input type="text" class="form-input" id="certNameInput" placeholder="Contoh: Certified Life Coach (CLC)">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Lembaga Penerbit</label>
+          <input type="text" class="form-input" id="certIssuerInput" placeholder="Contoh: ICF Indonesia">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tahun Diterbitkan</label>
+          <input type="number" class="form-input" id="certYearInput" placeholder="Contoh: 2021" min="2000" max="2025">
+        </div>
+      </div>
+
+      <!-- Fields per role: Analyst -->
+      <div class="form-section" id="section-analyst">
+        <div class="form-group">
+          <label class="form-label">Gelar Akademik</label>
+          <input type="text" class="form-input" id="degreeInput" placeholder="Contoh: S.Psi., M.Psi.T.">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Institusi Asal</label>
+          <input type="text" class="form-input" id="institutionInput" placeholder="Contoh: Universitas Indonesia">
+        </div>
+      </div>
+
+      <!-- Common fields -->
+      <div id="commonFields" style="display:none;">
+        <div class="form-group">
+          <label class="form-label">Tahun Mulai Berpraktik</label>
+          <input type="number" class="form-input" id="startYearInput" placeholder="Contoh: 2018" min="1990" max="2025" oninput="updateExp(this.value)">
+          <div id="expLabel" class="exp-label" style="display:none;"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Spesialisasi <span class="spec-hint">(Pilih 1–5 bidang)</span></label>
+          <div class="spec-grid" id="specGrid">
+            <div class="spec-chip" onclick="toggleSpec(this)">Kecemasan</div>
+            <div class="spec-chip" onclick="toggleSpec(this)">Depresi</div>
+            <div class="spec-chip" onclick="toggleSpec(this)">Stres Kerja</div>
+            <div class="spec-chip" onclick="toggleSpec(this)">Burnout</div>
+            <div class="spec-chip" onclick="toggleSpec(this)">Trauma</div>
+            <div class="spec-chip" onclick="toggleSpec(this)">Relationship</div>
+            <div class="spec-chip" onclick="toggleSpec(this)">Self-esteem</div>
+            <div class="spec-chip" onclick="toggleSpec(this)">Gangguan Tidur</div>
+            <div class="spec-chip" onclick="toggleSpec(this)">Anak &amp; Remaja</div>
+            <div class="spec-chip" onclick="toggleSpec(this)">Pasangan</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Bio / Deskripsi Diri</label>
+          <textarea class="form-input" id="bioInput" rows="4" placeholder="Ceritakan tentang pendekatan, pengalaman, dan cara Anda bekerja bersama klien..." maxlength="300" oninput="updateCounter(this.value)"></textarea>
+          <div class="char-counter"><span id="charCount">0</span>/300 karakter</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Bahasa yang Dikuasai</label>
+          <div class="lang-grid">
+            <div class="lang-chip" onclick="this.classList.toggle('selected')">Indonesia</div>
+            <div class="lang-chip" onclick="this.classList.toggle('selected')">Inggris</div>
+            <div class="lang-chip" onclick="this.classList.toggle('selected')">Jawa</div>
+            <div class="lang-chip" onclick="this.classList.toggle('selected')">Sunda</div>
+            <div class="lang-chip" onclick="this.classList.toggle('selected')">Mandarin</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step-footer" id="stepFooter" style="display:none;">
+        <button class="btn btn-ghost" onclick="goBack()" style="width:auto;padding:14px 20px;">
+          <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <button class="btn btn-primary" id="nextBtn" onclick="handleNext()" disabled>
+          Lanjutkan
+          <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+      </div>
+      <div style="height: 20px;"></div>
+    </div>
+  </div>
+</div>
+
+<script src="../../js/app.js"></script>
+<script>
+  Object.assign(ROUTES, {
+    landing:              '../../index.html',
+    'register':           'register.html',
+    'register-documents': 'register-documents.html',
+  });
+
+  let selectedRole = '';
+  let selectedSpecs = [];
+
+  function selectRole(role) {
+    selectedRole = role;
+    ['psikolog','konsultan','analyst'].forEach(r => {
+      document.getElementById('role-' + r).classList.toggle('selected', r === role);
+      document.getElementById('section-' + r).classList.toggle('show', r === role);
+    });
+    document.getElementById('commonFields').style.display = 'block';
+    document.getElementById('stepFooter').style.display   = 'flex';
+    updateNextBtn();
+  }
+
+  function toggleSpec(el) {
+    const max = 5;
+    if (!el.classList.contains('selected') && selectedSpecs.length >= max) {
+      toast('Maksimal 5 spesialisasi'); return;
+    }
+    el.classList.toggle('selected');
+    selectedSpecs = [...document.querySelectorAll('.spec-chip.selected')].map(c => c.textContent);
+    updateNextBtn();
+  }
+
+  function updateExp(val) {
+    const yr = parseInt(val);
+    const now = new Date().getFullYear();
+    const lbl = document.getElementById('expLabel');
+    if (yr >= 1990 && yr <= now) {
+      const exp = now - yr;
+      lbl.textContent = exp + ' tahun pengalaman';
+      lbl.style.display = 'inline-block';
+    } else {
+      lbl.style.display = 'none';
+    }
+    updateNextBtn();
+  }
+
+  function updateCounter(val) {
+    document.getElementById('charCount').textContent = val.length;
+  }
+
+  function updateNextBtn() {
+    const yearOk = (() => {
+      const v = parseInt(document.getElementById('startYearInput')?.value);
+      return v >= 1990 && v <= new Date().getFullYear();
+    })();
+    const specOk = selectedSpecs.length >= 1;
+    const roleOk = !!selectedRole;
+
+    let roleFieldsOk = false;
+    if (selectedRole === 'psikolog') {
+      roleFieldsOk = !!document.getElementById('strInput').value.trim()
+                  && !!document.getElementById('sipInput').value.trim();
+    } else if (selectedRole === 'konsultan') {
+      roleFieldsOk = !!document.getElementById('certNameInput').value.trim()
+                  && !!document.getElementById('certIssuerInput').value.trim();
+    } else if (selectedRole === 'analyst') {
+      roleFieldsOk = !!document.getElementById('degreeInput').value.trim();
+    }
+
+    document.getElementById('nextBtn').disabled = !(roleOk && roleFieldsOk && yearOk && specOk);
+  }
+
+  // Hook all inputs
+  document.addEventListener('input', updateNextBtn);
+
+  function handleNext() {
+    const data = {
+      role:       selectedRole,
+      specs:      selectedSpecs,
+      startYear:  document.getElementById('startYearInput').value,
+      bio:        document.getElementById('bioInput').value.trim(),
+      langs:      [...document.querySelectorAll('.lang-chip.selected')].map(c => c.textContent),
+      step: 2,
+    };
+    if (selectedRole === 'psikolog') {
+      data.str   = document.getElementById('strInput').value.trim();
+      data.sip   = document.getElementById('sipInput').value.trim();
+      data.himpsi = document.getElementById('himpsiInput').value.trim();
+    } else if (selectedRole === 'konsultan') {
+      data.certName   = document.getElementById('certNameInput').value.trim();
+      data.certIssuer = document.getElementById('certIssuerInput').value.trim();
+      data.certYear   = document.getElementById('certYearInput').value;
+    } else {
+      data.degree      = document.getElementById('degreeInput').value.trim();
+      data.institution = document.getElementById('institutionInput').value.trim();
+    }
+    RegState.save(data);
+    go('register-documents');
+  }
+</script>
+</body>
+</html>

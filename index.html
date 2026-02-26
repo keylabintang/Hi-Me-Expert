@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Hi-Me Expert — Portal Mitra Profesional</title>
+  <link rel="stylesheet" href="css/global.css">
+  <style>
+    /* ─── Hero ─── */
+    .hero {
+      background: linear-gradient(155deg, var(--teal-900) 0%, var(--teal-700) 60%, var(--teal-600) 100%);
+      padding: 52px 24px 64px;
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; top: -80px; right: -80px;
+      width: 260px; height: 260px;
+      background: radial-gradient(circle, rgba(94,234,212,.15) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .hero::after {
+      content: ''; position: absolute; bottom: -1px; left: 0; right: 0;
+      height: 40px; background: var(--bg); border-radius: 40px 40px 0 0;
+    }
+    .hero-logo {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 36px;
+    }
+    .hero-logo-mark {
+      width: 36px; height: 36px; border-radius: var(--r-sm);
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.2);
+      display: flex; align-items: center; justify-content: center;
+      color: white;
+    }
+    .hero-logo-text {
+      font-family: 'DM Serif Display', serif;
+      font-size: 20px; color: white; letter-spacing: -0.3px;
+    }
+    .hero-logo-text span { color: var(--teal-300); }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px; border-radius: 100px;
+      background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.18);
+      font-size: 11px; font-weight: 700; color: rgba(255,255,255,.85);
+      margin-bottom: 14px;
+    }
+    .hero-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 34px; color: white; line-height: 1.15; margin-bottom: 10px;
+    }
+    .hero-title em { color: var(--teal-300); font-style: italic; }
+    .hero-desc { font-size: 13px; color: rgba(255,255,255,.65); line-height: 1.7; margin-bottom: 28px; }
+    .hero-ctas { display: flex; flex-direction: column; gap: 10px; }
+    .btn-hero-primary {
+      background: white; color: var(--teal-800);
+      font-size: 15px; font-weight: 800;
+      padding: 14px 20px; border-radius: var(--r-md);
+      border: none; cursor: pointer; transition: all .15s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.18);
+    }
+    .btn-hero-primary:active { transform: scale(.97); }
+    .btn-hero-ghost {
+      background: rgba(255,255,255,.1); color: white;
+      font-size: 14px; font-weight: 700;
+      padding: 13px 20px; border-radius: var(--r-md);
+      border: 1.5px solid rgba(255,255,255,.25); cursor: pointer; transition: all .15s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-hero-ghost:active { background: rgba(255,255,255,.18); }
+
+    /* ─── Stats strip ─── */
+    .stats-strip {
+      display: flex; gap: 0;
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .stat-item {
+      flex: 1; text-align: center;
+      border-right: 1px solid var(--border);
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-num { font-size: 22px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; }
+    .stat-desc { font-size: 10px; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
+
+    /* ─── Section ─── */
+    .section { padding: 24px 20px; border-bottom: 1px solid var(--border); }
+    .section:last-child { border-bottom: none; }
+    .section-title {
+      font-size: 13px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.6px; color: var(--text-muted); margin-bottom: 16px;
+    }
+
+    /* ─── Benefits ─── */
+    .benefit-item {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 14px 0; border-bottom: 1px solid var(--border);
+    }
+    .benefit-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .benefit-icon {
+      width: 40px; height: 40px; border-radius: var(--r-sm); flex-shrink: 0;
+      background: var(--primary-pale); color: var(--primary);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .benefit-title { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 3px; }
+    .benefit-desc  { font-size: 12px; color: var(--text-muted); line-height: 1.6; }
+
+    /* ─── Requirements ─── */
+    .req-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 0; border-bottom: 1px solid var(--border);
+    }
+    .req-row:last-child { border-bottom: none; }
+    .req-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--primary); flex-shrink: 0;
+    }
+    .req-text { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+
+    /* ─── Testimonial ─── */
+    .testimonial {
+      background: var(--primary-xpale); border: 1px solid var(--primary-pale);
+      border-radius: var(--r-lg); padding: 16px;
+    }
+    .testimonial-quote {
+      font-size: 13px; color: var(--text-secondary); line-height: 1.7;
+      font-style: italic; margin-bottom: 12px;
+    }
+    .testimonial-author { display: flex; align-items: center; gap: 10px; }
+    .testimonial-name  { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+    .testimonial-role  { font-size: 11px; color: var(--text-muted); }
+
+    /* ─── CTA Footer ─── */
+    .cta-footer {
+      padding: 24px 20px 36px;
+      text-align: center;
+    }
+    .cta-footer p { font-size: 12px; color: var(--text-muted); margin-top: 14px; }
+    .cta-footer a { color: var(--primary); font-weight: 700; }
+  </style>
+</head>
+<body>
+<div class="phone">
+  <div class="scroll-area">
+
+    <!-- Hero -->
+    <div class="hero">
+      <div class="hero-logo anim-fade-in">
+        <div class="hero-logo-mark">
+          <svg class="icon-svg" width="18" height="18" viewBox="0 0 24 24"><path d="M8 4v5a4 4 0 0 0 8 0V4"/><path d="M16 13a4 4 0 0 0 4 4"/><path d="M20 17a2 2 0 1 1-4 0"/></svg>
+        </div>
+        <div class="hero-logo-text">Hi-Me <span>Expert</span></div>
+      </div>
+      <div class="anim-fade-up d1">
+        <div class="hero-badge">
+          <svg class="icon-svg" width="12" height="12" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 5-3.5 8-7 9-3.5-1-7-4-7-9V6z"/></svg>
+          Portal Mitra Profesional
+        </div>
+        <h1 class="hero-title">Bergabung &amp;<br>Bantu Lebih<br><em>Banyak Klien</em></h1>
+        <p class="hero-desc">Platform kesehatan mental terpercaya untuk psikolog, konsultan, dan analyst. Jadwal fleksibel, insentif kompetitif.</p>
+        <div class="hero-ctas">
+          <button class="btn-hero-primary" onclick="go('register')">
+            <svg class="icon-svg" width="18" height="18" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><path d="M8.5 7a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/><path d="M20 8v6"/><path d="M23 11h-6"/></svg>
+            Daftar sebagai Mitra Expert
+          </button>
+          <button class="btn-hero-ghost" onclick="go('login')">
+            <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
+            Masuk ke Portal
+          </button>
+        </div>
+      </div>
+      <div style="height: 40px;"></div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-strip anim-fade-up d2">
+      <div class="stat-item">
+        <div class="stat-num">12K+</div>
+        <div class="stat-desc">Pengguna Aktif</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">340+</div>
+        <div class="stat-desc">Mitra Expert</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">4.8</div>
+        <div class="stat-desc">Rating Platform</div>
+      </div>
+    </div>
+
+    <!-- Benefits -->
+    <div class="section anim-fade-up d2">
+      <div class="section-title">Keunggulan Bergabung</div>
+      <div class="benefit-item">
+        <div class="benefit-icon">
+          <svg class="icon-svg" width="20" height="20" viewBox="0 0 24 24"><path d="M7 3v4"/><path d="M17 3v4"/><path d="M4 8h16"/><path d="M5 5h14a1 1 0 0 1 1 1v14H4V6a1 1 0 0 1 1-1z"/></svg>
+        </div>
+        <div>
+          <div class="benefit-title">Jadwal Sepenuhnya Fleksibel</div>
+          <div class="benefit-desc">Tentukan sendiri hari aktif, jam kerja, dan jumlah sesi per hari sesuai kapasitasmu.</div>
+        </div>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon">
+          <svg class="icon-svg" width="20" height="20" viewBox="0 0 24 24"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <div>
+          <div class="benefit-title">Insentif Kompetitif</div>
+          <div class="benefit-desc">Tetapkan harga layananmu sendiri. Dana cair langsung ke rekening dalam 1×24 jam.</div>
+        </div>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon">
+          <svg class="icon-svg" width="20" height="20" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div>
+          <div class="benefit-title">Jangkauan Klien Lebih Luas</div>
+          <div class="benefit-desc">Akses ribuan pengguna aktif yang sudah siap berkonsultasi. Tidak perlu investasi marketing.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Requirements -->
+    <div class="section anim-fade-up d3">
+      <div class="section-title">Persyaratan Umum</div>
+      <div class="req-row">
+        <div class="req-dot"></div>
+        <div class="req-text">Warga Negara Indonesia, minimal 21 tahun</div>
+      </div>
+      <div class="req-row">
+        <div class="req-dot"></div>
+        <div class="req-text">Psikolog: STR aktif dari KKI + SIP dari Dinkes setempat</div>
+      </div>
+      <div class="req-row">
+        <div class="req-dot"></div>
+        <div class="req-text">Konsultan: Sertifikasi konseling/coaching dari lembaga terakreditasi</div>
+      </div>
+      <div class="req-row">
+        <div class="req-dot"></div>
+        <div class="req-text">Analyst: Ijazah Psikologi S1 minimal + pengalaman praktik</div>
+      </div>
+      <div class="req-row">
+        <div class="req-dot"></div>
+        <div class="req-text">Bersedia mengikuti proses verifikasi dokumen (2–5 hari kerja)</div>
+      </div>
+    </div>
+
+    <!-- Testimonial -->
+    <div class="section anim-fade-up d3">
+      <div class="section-title">Kata Mitra Expert</div>
+      <div class="testimonial">
+        <p class="testimonial-quote">"Hi-Me memberi saya kebebasan menentukan jadwal tanpa mengorbankan kualitas sesi. Sistem verifikasinya juga memberikan rasa aman bagi klien."</p>
+        <div class="testimonial-author">
+          <div class="avatar av-sm" style="background:linear-gradient(135deg,#0F766E,#14B8A6);color:white;font-size:14px;">RK</div>
+          <div>
+            <div class="testimonial-name">Rina Kusuma, M.Psi.</div>
+            <div class="testimonial-role">Psikolog Klinis · 6 tahun pengalaman</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA Footer -->
+    <div class="cta-footer anim-fade-up d4">
+      <button class="btn btn-primary" onclick="go('register')">Mulai Proses Pendaftaran</button>
+      <p>Sudah terdaftar? <a onclick="go('login')">Masuk ke Portal</a><br>
+      <a href="#" style="color:var(--text-muted);">Syarat &amp; Ketentuan</a> · <a href="#" style="color:var(--text-muted);">Bantuan</a></p>
+    </div>
+
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  // If already logged in & active, go straight to dashboard
+  if (App.isActive()) go('dashboard');
+  else if (App.isPending()) go('pending');
+  else if (App.isRejected()) go('rejected');
+</script>
+</body>
+</html>
