@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Chat Room — Hi-Me Expert</title>
+  <link rel="stylesheet" href="../../css/global.css">
+  <style>
+    body { background: var(--bg); }
+    .phone {
+      display: flex; flex-direction: column;
+      height: 844px; min-height: 100dvh; overflow: hidden;
+      background: #F0FDFA;
+    }
+
+    /* ─── Topbar ─── */
+    .topbar {
+      background: var(--bg-card); border-bottom: 1px solid var(--border);
+      padding: 10px 16px; flex-shrink: 0;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .back-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--text-muted); padding: 4px; flex-shrink: 0;
+    }
+    .topbar-info { flex: 1; min-width: 0; }
+    .topbar-name { font-size: 14px; font-weight: 800; color: var(--text-primary); }
+    .topbar-sub  {
+      font-size: 11px; color: var(--text-muted); font-weight: 600;
+      display: flex; align-items: center; gap: 6px; margin-top: 1px;
+    }
+    .online-dot { width: 6px; height: 6px; border-radius: 50%; background: #22C55E; }
+    .session-timer-top {
+      font-size: 13px; font-weight: 800; color: var(--primary);
+      background: var(--primary-pale); border-radius: var(--r-xs);
+      padding: 4px 10px; flex-shrink: 0;
+      font-variant-numeric: tabular-nums;
+    }
+    .btn-end-session {
+      padding: 7px 12px; background: rgba(214,40,40,.08); color: var(--danger);
+      border: 1.5px solid rgba(214,40,40,.2); border-radius: var(--r-sm);
+      font-size: 12px; font-weight: 700; cursor: pointer; flex-shrink: 0;
+      display: flex; align-items: center; gap: 5px;
+      transition: background .15s;
+    }
+    .btn-end-session:active { background: rgba(214,40,40,.15); }
+
+    /* ─── Chat Body ─── */
+    .chat-body {
+      flex: 1; overflow-y: auto; overflow-x: hidden;
+      -webkit-overflow-scrolling: touch; scrollbar-width: none;
+      padding: 16px 16px 8px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .chat-body::-webkit-scrollbar { display: none; }
+
+    /* Date separator */
+    .chat-date-sep {
+      text-align: center; font-size: 11px; font-weight: 700;
+      color: var(--text-muted); margin: 4px 0;
+    }
+    .chat-date-sep span {
+      background: rgba(0,0,0,.06); padding: 4px 12px; border-radius: 100px;
+    }
+
+    /* Bubble */
+    .bubble-row {
+      display: flex; align-items: flex-end; gap: 8px;
+    }
+    .bubble-row.expert { flex-direction: row-reverse; }
+    .bubble {
+      max-width: 72%; padding: 10px 13px; border-radius: 18px;
+      font-size: 13px; line-height: 1.6; position: relative;
+    }
+    .bubble.user {
+      background: var(--bg-card); color: var(--text-primary);
+      border-radius: 4px 18px 18px 18px;
+      box-shadow: var(--shadow-xs); border: 1px solid var(--border);
+    }
+    .bubble.expert {
+      background: linear-gradient(135deg, var(--teal-700), var(--teal-600));
+      color: white; border-radius: 18px 4px 18px 18px;
+    }
+    .bubble-time {
+      font-size: 10px; font-weight: 600; margin-top: 4px;
+      text-align: right;
+    }
+    .bubble.user   .bubble-time { color: var(--text-placeholder); }
+    .bubble.expert .bubble-time { color: rgba(255,255,255,.55); }
+
+    /* Typing indicator */
+    .typing-bubble {
+      display: flex; align-items: center; gap: 4px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 4px 18px 18px 18px;
+      padding: 12px 16px; box-shadow: var(--shadow-xs);
+      max-width: 80px;
+    }
+    .typing-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--text-placeholder);
+      animation: typingBounce 1.2s infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: .2s; }
+    .typing-dot:nth-child(3) { animation-delay: .4s; }
+    @keyframes typingBounce {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-6px); background: var(--primary); }
+    }
+
+    /* ─── Quick Note Sticky ─── */
+    .sticky-note {
+      position: absolute; right: 16px; bottom: 140px;
+      width: 220px; background: #FFF9C4;
+      border-radius: var(--r-md); box-shadow: var(--shadow-md);
+      border: 1px solid rgba(0,0,0,.08); z-index: 50;
+      display: none;
+      animation: fadeIn .2s ease;
+    }
+    .sticky-note.open { display: block; }
+    @keyframes fadeIn { from { opacity:0; transform:scale(.95); } to { opacity:1; transform:scale(1); } }
+    .sticky-note-header {
+      padding: 10px 12px 6px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .sticky-note-title { font-size: 11px; font-weight: 700; color: #78610A; text-transform: uppercase; letter-spacing: 0.4px; }
+    .sticky-note-close { background: none; border: none; cursor: pointer; color: #78610A; padding: 2px; }
+    .sticky-note textarea {
+      width: 100%; border: none; background: transparent;
+      padding: 4px 12px 12px; font-size: 12px; color: #3D2E00;
+      resize: none; outline: none; line-height: 1.6;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 90px;
+    }
+
+    /* ─── Expert Toolbar ─── */
+    .expert-toolbar {
+      flex-shrink: 0;
+      background: var(--bg-card); border-top: 1px solid var(--border);
+      padding: 8px 12px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .toolbar-btn {
+      width: 38px; height: 38px; border-radius: var(--r-sm);
+      background: var(--bg); border: 1.5px solid var(--border);
+      color: var(--text-muted); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .15s; flex-shrink: 0;
+    }
+    .toolbar-btn:active { background: var(--primary-pale); border-color: var(--primary); color: var(--primary); }
+    .toolbar-btn.active-note { background: #FFF9C4; border-color: #D4A017; color: #78610A; }
+    .toolbar-btn.crisis { border-color: rgba(214,40,40,.3); color: var(--danger); }
+
+    /* ─── Message Input Bar ─── */
+    .input-bar {
+      flex-shrink: 0; background: var(--bg-card);
+      padding: 8px 12px 12px;
+      display: flex; align-items: flex-end; gap: 8px;
+    }
+    .msg-input-wrap { flex: 1; position: relative; }
+    .msg-input {
+      width: 100%; padding: 10px 14px; border-radius: 22px;
+      border: 1.5px solid var(--border); background: var(--bg);
+      font-size: 13px; color: var(--text-primary); resize: none;
+      outline: none; max-height: 100px; line-height: 1.5;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: border-color .15s;
+    }
+    .msg-input:focus { border-color: var(--primary); background: var(--bg-card); }
+    .btn-send {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: var(--primary); color: white;
+      border: none; cursor: pointer; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s, transform .1s;
+    }
+    .btn-send:active { background: var(--primary-hover); transform: scale(.93); }
+    .btn-send:disabled { background: var(--border-dark); cursor: not-allowed; }
+
+    /* ─── Sheets ─── */
+    .sheet-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 100;
+      display: none; align-items: flex-end; justify-content: center;
+    }
+    .sheet-overlay.open { display: flex; }
+    .sheet-panel {
+      width: 390px; background: var(--bg-card);
+      border-radius: var(--r-xl) var(--r-xl) 0 0;
+      padding: 0 0 36px; max-height: 80vh; overflow-y: auto;
+      animation: slideUp .25s ease;
+    }
+    @media (max-width: 430px) { .sheet-panel { width: 100%; } }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .sheet-handle { width: 36px; height: 4px; background: var(--border-dark); border-radius: 2px; margin: 12px auto 8px; }
+    .sheet-title  { font-size: 16px; font-weight: 800; padding: 8px 20px 16px; border-bottom: 1px solid var(--border); }
+    .sheet-body   { padding: 16px 20px 0; }
+
+    /* Template items */
+    .template-item {
+      padding: 13px 0; border-bottom: 1px solid var(--border); cursor: pointer;
+      transition: background .1s;
+    }
+    .template-item:last-child { border-bottom: none; }
+    .template-item:active { background: var(--bg); border-radius: var(--r-sm); padding: 13px 8px; margin: 0 -8px; }
+    .template-label { font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 3px; }
+    .template-preview { font-size: 12px; color: var(--text-muted); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+    /* Crisis sheet */
+    .crisis-step {
+      display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border);
+    }
+    .crisis-step:last-of-type { border-bottom: none; }
+    .crisis-num {
+      width: 28px; height: 28px; border-radius: 50%; background: rgba(214,40,40,.1);
+      color: var(--danger); font-size: 13px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .crisis-text { font-size: 13px; color: var(--text-primary); line-height: 1.6; padding-top: 4px; }
+    .hotline-card {
+      background: rgba(214,40,40,.06); border: 1px solid rgba(214,40,40,.15);
+      border-radius: var(--r-md); padding: 12px 14px; margin: 12px 0;
+    }
+    .hotline-title { font-size: 11px; font-weight: 700; color: var(--danger); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .hotline-row   { font-size: 12px; color: var(--text-secondary); padding: 4px 0; }
+    .hotline-name  { font-weight: 700; color: var(--text-primary); }
+    .crisis-flag-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 0; border-top: 1px solid var(--border); margin-top: 4px;
+    }
+    .crisis-flag-label { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+    .crisis-flag-sub   { font-size: 11px; color: var(--text-muted); }
+
+    /* End session confirm */
+    .end-warn {
+      background: rgba(214,40,40,.06); border: 1px solid rgba(214,40,40,.15);
+      border-radius: var(--r-md); padding: 12px 14px;
+      font-size: 13px; color: #7F1D1D; line-height: 1.6; margin: 12px 0;
+    }
+
+    /* Extend time */
+    .extend-info {
+      background: var(--primary-xpale); border: 1px solid var(--primary-pale);
+      border-radius: var(--r-md); padding: 12px 14px;
+      font-size: 13px; color: var(--teal-800); line-height: 1.6; margin-bottom: 12px;
+    }
+
+    /* Toggle switch */
+    .toggle-sw {
+      width: 42px; height: 24px; border-radius: 100px; cursor: pointer;
+      background: var(--border-dark); transition: background .2s; position: relative;
+    }
+    .toggle-sw.on { background: var(--primary); }
+    .toggle-sw::after {
+      content: ''; position: absolute; top: 3px; left: 3px;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: white; box-shadow: var(--shadow-xs); transition: transform .2s;
+    }
+    .toggle-sw.on::after { transform: translateX(18px); }
+
+    /* ─── Toast ─── */
+    .toast {
+      position: absolute; bottom: 90px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #1F2937; color: white; border-radius: var(--r-sm);
+      padding: 10px 18px; font-size: 13px; font-weight: 600;
+      opacity: 0; transition: all .25s; pointer-events: none; z-index: 200; white-space: nowrap;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+<div class="phone" style="position:relative;">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <button class="back-btn" onclick="go('chat-list')">
+      <svg class="icon-svg" width="22" height="22" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div id="clientAvatar"></div>
+    <div class="topbar-info">
+      <div class="topbar-name" id="clientName">M*** R***</div>
+      <div class="topbar-sub">
+        <span class="online-dot"></span>
+        Terhubung
+        <span style="color:var(--border-dark)">·</span>
+        Chat · 30 mnt
+      </div>
+    </div>
+    <div class="session-timer-top" id="sessionTimer">23:41</div>
+    <button class="btn-end-session" onclick="openSheet('endSheet')">
+      <svg class="icon-svg" width="13" height="13" viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+      Akhiri
+    </button>
+  </div>
+
+  <!-- Chat Body -->
+  <div class="chat-body" id="chatBody"></div>
+
+  <!-- Sticky Note -->
+  <div class="sticky-note" id="stickyNote">
+    <div class="sticky-note-header">
+      <div class="sticky-note-title">Catatan Cepat</div>
+      <button class="sticky-note-close" onclick="toggleNote()">
+        <svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <textarea id="noteText" placeholder="Tulis catatan selama sesi...&#10;(tersimpan sebagai draft Post-Session)"></textarea>
+  </div>
+
+  <!-- Expert Toolbar -->
+  <div class="expert-toolbar">
+    <!-- Template -->
+    <button class="toolbar-btn" onclick="openSheet('templateSheet')" title="Template Respons">
+      <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+    </button>
+    <!-- Note -->
+    <button class="toolbar-btn" id="noteBtnRef" onclick="toggleNote()" title="Catatan Cepat">
+      <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+    </button>
+    <!-- Extend -->
+    <button class="toolbar-btn" onclick="openSheet('extendSheet')" title="Perpanjang Waktu">
+      <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/><path d="M20 6v2M22 7h-4"/></svg>
+    </button>
+    <!-- Crisis -->
+    <button class="toolbar-btn crisis" onclick="openSheet('crisisSheet')" title="Protokol Krisis">
+      <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+    </button>
+    <div style="flex:1;"></div>
+    <span style="font-size:11px;color:var(--text-muted);font-weight:600;">Template · Catatan · Perpanjang · Krisis</span>
+  </div>
+
+  <!-- Input Bar -->
+  <div class="input-bar">
+    <div class="msg-input-wrap">
+      <textarea class="msg-input" id="msgInput" rows="1"
+        placeholder="Ketik pesan..."
+        oninput="autoResize(this); toggleSend(this.value)"
+        onkeydown="handleEnter(event)"></textarea>
+    </div>
+    <button class="btn-send" id="sendBtn" onclick="sendMessage()" disabled>
+      <svg class="icon-svg" width="18" height="18" viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg>
+    </button>
+  </div>
+
+</div>
+
+<!-- Template Sheet -->
+<div class="sheet-overlay" id="templateSheet" onclick="overlayClick(event,'templateSheet')">
+  <div class="sheet-panel">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Template Respons Cepat</div>
+    <div class="sheet-body">
+      <div id="templateList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Extend Time Sheet -->
+<div class="sheet-overlay" id="extendSheet" onclick="overlayClick(event,'extendSheet')">
+  <div class="sheet-panel">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Perpanjang Waktu Sesi</div>
+    <div class="sheet-body">
+      <div class="extend-info">
+        Perpanjangan +15 menit dapat dilakukan maksimal <strong>2×</strong> per sesi. Sisa kuota: <strong id="extendQuota">2×</strong>
+      </div>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">Perpanjangan akan dikenakan biaya tambahan kepada klien (proporsional).</p>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-ghost" style="flex:1" onclick="closeSheet('extendSheet')">Batal</button>
+        <button class="btn btn-primary" style="flex:2;" onclick="doExtend()">+15 Menit</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Crisis Sheet -->
+<div class="sheet-overlay" id="crisisSheet" onclick="overlayClick(event,'crisisSheet')">
+  <div class="sheet-panel">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" style="color:var(--danger);">
+      <svg class="icon-svg" style="display:inline;vertical-align:middle;margin-right:6px;" width="16" height="16" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+      Protokol Krisis
+    </div>
+    <div class="sheet-body">
+      <div class="crisis-step">
+        <div class="crisis-num">1</div>
+        <div class="crisis-text"><strong>Tetap tenang</strong> dan jangan tinggalkan klien. Validasi perasaan mereka tanpa meminimalkan situasi.</div>
+      </div>
+      <div class="crisis-step">
+        <div class="crisis-num">2</div>
+        <div class="crisis-text"><strong>Nilai tingkat risiko</strong>: Tanyakan apakah mereka memiliki rencana, akses ke alat, atau niat yang spesifik.</div>
+      </div>
+      <div class="crisis-step">
+        <div class="crisis-num">3</div>
+        <div class="crisis-text"><strong>Hubungkan ke layanan darurat</strong> jika risiko tinggi. Minta mereka menghubungi hotline atau pergi ke IGD terdekat.</div>
+      </div>
+      <div class="crisis-step">
+        <div class="crisis-num">4</div>
+        <div class="crisis-text"><strong>Dokumentasikan</strong> situasi dalam catatan klinis dan laporkan ke supervisor jika diperlukan.</div>
+      </div>
+      <div class="hotline-card">
+        <div class="hotline-title">Hotline Kesehatan Jiwa</div>
+        <div class="hotline-row"><span class="hotline-name">Into The Light Indonesia</span> — 119 ext 8</div>
+        <div class="hotline-row"><span class="hotline-name">Yayasan Pulih</span> — (021) 788-42580</div>
+        <div class="hotline-row"><span class="hotline-name">RSJ Soeharto Heerdjan</span> — (021) 560-8008</div>
+      </div>
+      <div class="crisis-flag-row">
+        <div>
+          <div class="crisis-flag-label">Tandai sebagai Situasi Darurat</div>
+          <div class="crisis-flag-sub">Flag akan ditambahkan di ringkasan sesi</div>
+        </div>
+        <div class="toggle-sw" id="crisisToggle" onclick="this.classList.toggle('on')"></div>
+      </div>
+      <div style="padding: 0 0 4px;">
+        <button class="btn btn-primary" style="width:100%" onclick="closeSheet('crisisSheet')">Tutup Panduan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- End Session Sheet -->
+<div class="sheet-overlay" id="endSheet" onclick="overlayClick(event,'endSheet')">
+  <div class="sheet-panel">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Akhiri Sesi?</div>
+    <div class="sheet-body">
+      <div class="end-warn">
+        Sesi akan diakhiri dan klien akan diberitahu. Anda akan diarahkan ke form Post-Session untuk mengisi catatan klinis dan tugas mandiri.
+      </div>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">Durasi aktual: <strong id="endDuration">24 menit</strong></p>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-ghost" style="flex:1" onclick="closeSheet('endSheet')">Batal</button>
+        <button class="btn" style="flex:2;background:var(--danger);color:white;border-radius:var(--r-sm);" onclick="endSession()">Akhiri Sesi</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="globalToast"></div>
+
+<script src="../../js/app.js"></script>
+<script>
+  const params = getParams();
+  const chatId = params.id || 'chat_002';
+  const chatInfo = MOCK_CHAT_LIST.find(c => c.id === chatId) || MOCK_CHAT_LIST[0];
+
+  // ── Setup ──
+  document.getElementById('clientName').textContent = chatInfo.userName;
+  document.getElementById('clientAvatar').innerHTML = avatarGrad(chatInfo.userInitials, 38, 15);
+
+  let messages = [...(MOCK_CHAT_MESSAGES[chatId] || MOCK_CHAT_MESSAGES['chat_002'])];
+  let timerSecs = 23*60+41;
+  let extendCount = 0;
+  let addedMinutes = 0;
+  let noteOpen = false;
+  let crisisFlagged = false;
+
+  // ── Timer ──
+  function tick() {
+    timerSecs++;
+    const m = String(Math.floor(timerSecs/60)).padStart(2,'0');
+    const s = String(timerSecs%60).padStart(2,'0');
+    const el = document.getElementById('sessionTimer');
+    if (el) el.textContent = `${m}:${s}`;
+    document.getElementById('endDuration').textContent = `${m} menit`;
+  }
+  setInterval(tick, 1000);
+
+  // ── Render messages ──
+  function renderMessages(scroll = true) {
+    const body = document.getElementById('chatBody');
+    let html = `<div class="chat-date-sep"><span>Kamis, 27 Feb 2025</span></div>`;
+    for (const msg of messages) {
+      const isExpert = msg.from === 'expert';
+      const av = isExpert ? '' : `${avatarGrad(chatInfo.userInitials, 30, 12)}`;
+      html += `
+        <div class="bubble-row ${isExpert ? 'expert' : ''}">
+          ${!isExpert ? av : ''}
+          <div class="bubble ${isExpert ? 'expert' : 'user'}">
+            ${msg.text}
+            <div class="bubble-time">${msg.time}</div>
+          </div>
+        </div>
+      `;
+    }
+    // Typing indicator if last msg is from expert
+    if (messages[messages.length-1]?.from === 'expert') {
+      html += `
+        <div class="bubble-row" id="typingRow">
+          ${avatarGrad(chatInfo.userInitials, 30, 12)}
+          <div class="typing-bubble">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+          </div>
+        </div>`;
+    }
+    body.innerHTML = html;
+    if (scroll) body.scrollTop = body.scrollHeight;
+  }
+
+  // Auto-type user response after expert sends
+  function scheduleUserResponse() {
+    const responses = [
+      'Iya dok, saya akan coba. Terima kasih.',
+      'Saya belum pernah melihatnya dari sudut pandang itu sebelumnya.',
+      'Kadang memang susah untuk menghentikan pikiran negatif itu.',
+      'Saya akan coba teknik yang dokter ajarkan tadi.',
+    ];
+    setTimeout(() => {
+      const typingRow = document.getElementById('typingRow');
+      if (typingRow) typingRow.remove();
+      const now = new Date();
+      const t = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+      messages.push({ from: 'user', text: responses[Math.floor(Math.random()*responses.length)], time: t });
+      renderMessages();
+    }, 3000 + Math.random()*2000);
+  }
+
+  // ── Send Message ──
+  function sendMessage() {
+    const input = document.getElementById('msgInput');
+    const text = input.value.trim();
+    if (!text) return;
+    const now = new Date();
+    const t = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    messages.push({ from: 'expert', text, time: t });
+    input.value = '';
+    input.style.height = 'auto';
+    document.getElementById('sendBtn').disabled = true;
+    renderMessages();
+    scheduleUserResponse();
+  }
+
+  function handleEnter(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  }
+  function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 100) + 'px'; }
+  function toggleSend(v) { document.getElementById('sendBtn').disabled = !v.trim(); }
+
+  // ── Note Toggle ──
+  function toggleNote() {
+    noteOpen = !noteOpen;
+    document.getElementById('stickyNote').classList.toggle('open', noteOpen);
+    document.getElementById('noteBtnRef').classList.toggle('active-note', noteOpen);
+  }
+
+  // ── Templates ──
+  document.getElementById('templateList').innerHTML = RESPONSE_TEMPLATES.map(t => `
+    <div class="template-item" onclick="useTemplate('${t.text.replace(/'/g,"\\'")}')">
+      <div class="template-label">${t.label}</div>
+      <div class="template-preview">${t.text}</div>
+    </div>
+  `).join('');
+
+  function useTemplate(text) {
+    closeSheet('templateSheet');
+    document.getElementById('msgInput').value = text;
+    document.getElementById('msgInput').focus();
+    toggleSend(text);
+    autoResize(document.getElementById('msgInput'));
+  }
+
+  // ── Extend ──
+  function doExtend() {
+    if (extendCount >= 2) { showToast('Batas perpanjangan sudah tercapai (2×)'); return; }
+    extendCount++;
+    addedMinutes += 15;
+    timerSecs = Math.max(0, timerSecs); // keep timer running
+    document.getElementById('extendQuota').textContent = `${2 - extendCount}×`;
+    closeSheet('extendSheet');
+    showToast(`Sesi diperpanjang +15 menit. Total tambahan: ${addedMinutes} menit.`);
+  }
+
+  // ── End Session ──
+  function endSession() {
+    closeSheet('endSheet');
+    showToast('Sesi diakhiri. Mengarahkan ke Post-Session...');
+    setTimeout(() => { showToast('Post-Session Form — Phase 2.5'); }, 1800);
+  }
+
+  function showToast(msg) {
+    const el = document.getElementById('globalToast');
+    el.textContent = msg; el.classList.add('show');
+    clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), 3000);
+  }
+
+  renderMessages();
+</script>
+</body>
+</html>

@@ -278,7 +278,7 @@
 
     /* ─── Bottom Nav ─── */
     .bottom-nav {
-      position: sticky; bottom: 0;
+      flex-shrink: 0;
       background: var(--bg-card); border-top: 1px solid var(--border);
       height: var(--nav-h);
       display: grid; grid-template-columns: repeat(4, 1fr);
@@ -377,7 +377,7 @@
   </style>
 </head>
 <body>
-<div class="phone">
+<div class="phone phone-layout">
 
   <!-- Header -->
   <div class="dash-header">
@@ -420,7 +420,7 @@
   </div>
 
   <!-- Scroll Content -->
-  <div class="scroll-area" style="padding-bottom: calc(var(--nav-h) + 20px);">
+  <div class="scroll-area" class="has-nav">
 
     <!-- Stats Strip -->
     <div class="stats-row anim-fade-up d1">
@@ -499,7 +499,7 @@
   </div>
 
   <!-- Bottom Nav -->
-  <div class="bottom-nav">
+  <div class="bottom-nav nav-fixed">
     <div class="nav-item active">
       <svg class="icon-svg" width="22" height="22" viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5"/><path d="M5 10v9h14v-9"/><path d="M9 19v-6h6v6"/></svg>
       <span class="nav-label">Home</span>
@@ -735,7 +735,7 @@
   setInterval(updateTimer, 1000);
 
   function goToSession() {
-    showToast('Membuka ruang sesi... (Phase 2.4)');
+    go('chat-list');
   }
 
   // ── Toast ──

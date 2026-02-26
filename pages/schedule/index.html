@@ -247,7 +247,7 @@
 
     /* ─── Bottom Nav ─── */
     .bottom-nav {
-      position: sticky; bottom: 0;
+      flex-shrink: 0;
       background: var(--bg-card); border-top: 1px solid var(--border);
       height: var(--nav-h);
       display: grid; grid-template-columns: repeat(4, 1fr);
@@ -271,7 +271,7 @@
   </style>
 </head>
 <body>
-<div class="phone">
+<div class="phone phone-layout">
 
   <!-- Page Header -->
   <div class="page-header">
@@ -336,7 +336,7 @@
   </div>
 
   <!-- Content Area -->
-  <div class="scroll-area" id="contentArea" style="padding-bottom: calc(var(--nav-h) + 8px);"></div>
+  <div class="scroll-area has-nav" id="contentArea"></div>
 
   <!-- Bottom Nav -->
   <div class="bottom-nav">
@@ -348,7 +348,7 @@
       <svg class="icon-svg" width="22" height="22" viewBox="0 0 24 24"><path d="M7 3v4"/><path d="M17 3v4"/><path d="M4 8h16"/><path d="M5 5h14a1 1 0 0 1 1 1v14H4V6a1 1 0 0 1 1-1z"/></svg>
       <span class="nav-label">Jadwal</span>
     </div>
-    <div class="nav-item" onclick="showToast('Halaman Chat — Phase 2.4')">
+    <div class="nav-item" onclick="go('chat-list')">
       <svg class="icon-svg" width="22" height="22" viewBox="0 0 24 24"><path d="M4 5h16v10H7l-3 3V5z"/></svg>
       <span class="nav-label">Chat</span>
     </div>
@@ -590,7 +590,7 @@
       `;
     } else if (s.status === 'active') {
       actions = `
-        <button class="btn btn-primary" style="flex:1;background:linear-gradient(135deg,#059669,#10B981);" onclick="closeSheet('sessionSheet');showToast('Membuka ruang sesi... (Phase 2.4)')">Masuk ke Sesi</button>
+        <button class="btn btn-primary" style="flex:1;background:linear-gradient(135deg,#059669,#10B981);" onclick="closeSheet('sessionSheet');go('chat-list')">Masuk ke Sesi</button>
       `;
     } else if (s.status === 'pending') {
       actions = `

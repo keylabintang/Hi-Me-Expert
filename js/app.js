@@ -51,7 +51,10 @@ const CANONICAL_ROUTES = {
   schedule:      `${APP_ROOT}/pages/schedule/index.html`,
   'session-detail': `${APP_ROOT}/pages/schedule/session-detail.html`,
   availability:  `${APP_ROOT}/pages/availability/index.html`,
+  requests:    `${APP_ROOT}/pages/requests/index.html`,
   'chat-list': `${APP_ROOT}/pages/chat/index.html`,
+  'chat-room': `${APP_ROOT}/pages/chat/room.html`,
+  'call-room': `${APP_ROOT}/pages/chat/call.html`,
   profile:   `${APP_ROOT}/pages/profile/index.html`,
 };
 
@@ -376,6 +379,136 @@ const MOCK_AVAILABILITY = {
     { name: 'Minggu', active: false, maxSessions: 2, types: [],                       slots: [] },
   ]
 };
+
+// ── Mock Data (Phase 2.4) ──
+
+const MOCK_CHAT_LIST = [
+  {
+    id: 'chat_002',
+    userInitials: 'MR',
+    userName: 'M*** R***',
+    sessionType: 'Call',
+    status: 'active',
+    time: '11:00',
+    duration: 30,
+    price: 85000,
+    lastMessage: 'Sesi berlangsung sekarang',
+    lastTime: 'Sekarang',
+    unread: 0,
+    timerStart: Date.now() - (23 * 60 + 41) * 1000,
+  },
+  {
+    id: 'chat_003',
+    userInitials: 'FS',
+    userName: 'F*** S***',
+    sessionType: 'Chat',
+    status: 'upcoming',
+    time: '14:00',
+    duration: 60,
+    price: 140000,
+    lastMessage: 'Sesi dimulai pukul 14:00',
+    lastTime: '14:00',
+    unread: 0,
+    timerStart: null,
+  },
+  {
+    id: 'chat_001',
+    userInitials: 'DS',
+    userName: 'D*** S***',
+    sessionType: 'Chat',
+    status: 'done',
+    time: '09:00',
+    duration: 60,
+    price: 140000,
+    lastMessage: 'Terima kasih dok, saya merasa jauh lebih tenang sekarang.',
+    lastTime: '10:02',
+    unread: 0,
+    timerStart: null,
+  },
+  {
+    id: 'chat_004',
+    userInitials: 'KP',
+    userName: 'K*** P***',
+    sessionType: 'Offline',
+    status: 'upcoming',
+    time: '16:30',
+    duration: 60,
+    price: 200000,
+    lastMessage: 'Sesi tatap muka pukul 16:30',
+    lastTime: '16:30',
+    unread: 0,
+    timerStart: null,
+  },
+];
+
+const MOCK_CHAT_MESSAGES = {
+  chat_001: [
+    { from: 'user',   text: 'Selamat pagi dokter, saya D***. Terima kasih sudah meluangkan waktu.', time: '09:01' },
+    { from: 'expert', text: 'Selamat pagi! Senang bisa bertemu. Ceritakan, apa yang sedang Anda rasakan belakangan ini?', time: '09:02' },
+    { from: 'user',   text: 'Saya merasa tertekan sekali dengan ekspektasi keluarga. Rasanya seperti tidak pernah cukup.', time: '09:04' },
+    { from: 'expert', text: 'Saya mendengar Anda. Perasaan itu sangat wajar dan banyak orang mengalaminya. Bisakah Anda ceritakan lebih detail — ekspektasi seperti apa yang terasa paling berat?', time: '09:05' },
+    { from: 'user',   text: 'Soal karier dan pernikahan. Umur saya 28 dan mereka terus bertanya kapan naik jabatan, kapan menikah.', time: '09:08' },
+    { from: 'expert', text: 'Tekanan ganda itu memang menguras energi. Mari kita petakan dulu mana yang paling mengganggu keseharian Anda saat ini.', time: '09:10' },
+    { from: 'user',   text: 'Karier dulu kali ya dok. Setiap hari saya berangkat kerja tapi sudah merasa lelah sebelum sampai.', time: '09:13' },
+    { from: 'expert', text: 'Itu tanda burnout yang perlu kita perhatikan. Bagus Anda menyadarinya. Apa satu hal kecil yang masih bisa membuat Anda tersenyum hari ini?', time: '09:16' },
+    { from: 'user',   text: 'Hmm... kopi pagi saya? 😅', time: '09:17' },
+    { from: 'expert', text: 'Pegang itu! Hal-hal kecil seperti itu adalah jangkar keseimbangan. Kita akan bangun lebih banyak dari sana. Sesi ini sangat produktif.', time: '09:55' },
+    { from: 'user',   text: 'Terima kasih dok, saya merasa jauh lebih tenang sekarang.', time: '10:02' },
+  ],
+  chat_002: [
+    { from: 'user',   text: 'Dok, saya sudah siap untuk sesinya.', time: '11:01' },
+    { from: 'expert', text: 'Baik M***, mari kita mulai. Bagaimana kondisi Anda hari ini secara keseluruhan, dari skala 1–10?', time: '11:02' },
+    { from: 'user',   text: 'Mungkin 4 dok. Semalam kurang tidur karena deadline.', time: '11:03' },
+    { from: 'expert', text: 'Terima kasih sudah jujur. Tidur yang buruk sangat memengaruhi cara kita memproses stres. Ceritakan lebih lanjut tentang deadline ini.', time: '11:05' },
+  ],
+};
+
+const MOCK_CHAT_REQUESTS = [
+  {
+    id: 'req_001',
+    userInitials: 'AN',
+    userName: 'A*** N***',
+    sessionType: 'Chat',
+    date: 'Kamis, 27 Feb 2025',
+    time: '14:00',
+    duration: 60,
+    price: 140000,
+    requestedAt: '2 jam lalu',
+    note: 'Saya sering merasa cemas berlebihan sebelum presentasi kerja dan sulit tidur setelahnya.'
+  },
+  {
+    id: 'req_002',
+    userInitials: 'BY',
+    userName: 'B*** Y***',
+    sessionType: 'Call',
+    date: 'Jumat, 28 Feb 2025',
+    time: '10:00',
+    duration: 30,
+    price: 85000,
+    requestedAt: '5 jam lalu',
+    note: 'Butuh bantuan mengelola stres karena deadline pekerjaan yang menumpuk terus-menerus.'
+  },
+  {
+    id: 'req_003',
+    userInitials: 'HR',
+    userName: 'H*** R***',
+    sessionType: 'Offline',
+    date: 'Senin, 3 Mar 2025',
+    time: '09:00',
+    duration: 60,
+    price: 200000,
+    requestedAt: '1 jam lalu',
+    note: 'Ingin konseling tentang hubungan dengan pasangan yang sudah berjalan 3 tahun tapi stagnan.'
+  },
+];
+
+const RESPONSE_TEMPLATES = [
+  { label: 'Sapaan Pembuka', text: 'Selamat datang di sesi kita hari ini. Saya senang Anda meluangkan waktu untuk diri sendiri. Bagaimana kondisi Anda hari ini?' },
+  { label: 'Validasi Emosi', text: 'Saya mendengar Anda, dan perasaan yang Anda rasakan itu sangat valid. Banyak orang dalam situasi serupa merasakannya. Kita akan hadapi ini bersama.' },
+  { label: 'Teknik Napas', text: 'Mari kita coba teknik pernapasan sederhana: tarik napas dalam selama 4 hitungan, tahan 4 hitungan, hembuskan perlahan selama 6 hitungan. Ulangi 3 kali.' },
+  { label: 'Saran Relaksasi', text: 'Saya sarankan Anda mencoba teknik grounding 5-4-3-2-1: sebutkan 5 hal yang bisa Anda lihat, 4 yang bisa disentuh, 3 yang bisa didengar, 2 yang bisa dicium, 1 yang bisa dirasakan.' },
+  { label: 'Penutup Sesi', text: 'Kita sudah melakukan pekerjaan yang sangat baik hari ini. Ingat, perjalanan pemulihan tidak linear — setiap langkah kecil berarti. Saya bangga dengan keberanian Anda.' },
+];
 
 // ── Register State (cross-page) ──
 const RegState = {

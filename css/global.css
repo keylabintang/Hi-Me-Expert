@@ -491,3 +491,23 @@ textarea.form-input { resize: none; line-height: 1.6; }
 .w-full     { width: 100%; }
 .min-w-0    { min-width: 0; }
 .truncate   { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ─── Fixed Nav Layout Helper ─── */
+/* Use .phone-layout on .phone to make nav always stick to bottom */
+.phone-layout {
+  height: 844px;
+  min-height: unset;
+  overflow: hidden;
+}
+@media (max-width: 430px) {
+  .phone-layout { height: 100dvh; }
+}
+.phone-layout .scroll-area { flex: 1; min-height: 0; }
+.nav-fixed {
+  flex-shrink: 0;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border);
+  height: var(--nav-h);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}

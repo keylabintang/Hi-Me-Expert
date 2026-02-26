@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Call — Hi-Me Expert</title>
+  <link rel="stylesheet" href="../../css/global.css">
+  <style>
+    body { background: #0A1628; }
+    .phone {
+      display: flex; flex-direction: column;
+      height: 844px; min-height: 100dvh; overflow: hidden;
+      background: linear-gradient(160deg, #0C1F3A 0%, #0A1628 50%, #042F2E 100%);
+      position: relative;
+    }
+
+    /* ─── Background texture ─── */
+    .bg-orb {
+      position: absolute; border-radius: 50%; pointer-events: none;
+    }
+    .bg-orb-1 {
+      width: 280px; height: 280px;
+      background: radial-gradient(circle, rgba(15,118,110,.18) 0%, transparent 70%);
+      top: 80px; left: 50%; transform: translateX(-50%);
+    }
+    .bg-orb-2 {
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(124,58,237,.1) 0%, transparent 70%);
+      bottom: 160px; right: -40px;
+    }
+
+    /* ─── Status bar ─── */
+    .call-statusbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 24px 0; flex-shrink: 0; position: relative; z-index: 10;
+    }
+    .call-statusbar-time { font-size: 14px; font-weight: 700; color: rgba(255,255,255,.8); }
+    .call-statusbar-icons { display: flex; gap: 8px; }
+
+    /* ─── Top Controls ─── */
+    .call-topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 24px 0; flex-shrink: 0; position: relative; z-index: 10;
+    }
+    .btn-icon-circle {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15);
+      color: rgba(255,255,255,.8); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s;
+    }
+    .btn-icon-circle:active { background: rgba(255,255,255,.2); }
+    .call-session-info {
+      text-align: center;
+    }
+    .call-session-type {
+      font-size: 11px; font-weight: 700; color: rgba(255,255,255,.5);
+      text-transform: uppercase; letter-spacing: 0.6px;
+    }
+    .call-session-dur { font-size: 12px; font-weight: 600; color: rgba(255,255,255,.6); }
+
+    /* ─── Center: Client Avatar ─── */
+    .call-center {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 0; position: relative; z-index: 5;
+    }
+    .pulse-ring {
+      position: relative; margin-bottom: 24px;
+    }
+    .pulse-ring::before, .pulse-ring::after {
+      content: ''; position: absolute; border-radius: 50%;
+      animation: pulse 2.5s ease-out infinite;
+    }
+    .pulse-ring::before {
+      inset: -16px; border: 1.5px solid rgba(20,184,166,.25);
+      animation-delay: 0s;
+    }
+    .pulse-ring::after {
+      inset: -32px; border: 1px solid rgba(20,184,166,.12);
+      animation-delay: .5s;
+    }
+    @keyframes pulse {
+      0%   { transform: scale(.9); opacity: 1; }
+      100% { transform: scale(1.1); opacity: 0; }
+    }
+    .client-avatar-lg {
+      width: 100px; height: 100px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--teal-700), var(--teal-500));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 38px; font-weight: 800; color: white;
+      border: 3px solid rgba(255,255,255,.2);
+      box-shadow: 0 0 40px rgba(20,184,166,.3);
+    }
+    .client-name-lg {
+      font-family: 'DM Serif Display', serif;
+      font-size: 24px; color: white; font-weight: 400; margin-bottom: 4px;
+    }
+    .call-status-label {
+      font-size: 13px; color: rgba(255,255,255,.5); font-weight: 600;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .call-status-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: #22C55E;
+      box-shadow: 0 0 6px rgba(34,197,94,.6);
+      animation: blink 1.5s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+    /* Timer */
+    .call-timer {
+      font-size: 42px; font-weight: 800; color: white; letter-spacing: -1px;
+      font-variant-numeric: tabular-nums; margin: 20px 0 0;
+    }
+
+    /* ─── Notepad Slide-up ─── */
+    .notepad-overlay {
+      position: absolute; inset: 0; z-index: 50;
+      background: rgba(0,0,0,.5);
+      display: none; align-items: flex-end; justify-content: center;
+    }
+    .notepad-overlay.open { display: flex; }
+    .notepad-panel {
+      width: 100%; background: #1E293B; border-radius: var(--r-xl) var(--r-xl) 0 0;
+      padding: 0 0 20px; animation: slideUp .25s ease;
+    }
+    @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+    .notepad-handle { width: 36px; height: 4px; background: rgba(255,255,255,.2); border-radius: 2px; margin: 12px auto 8px; }
+    .notepad-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 20px 12px; border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .notepad-title { font-size: 14px; font-weight: 800; color: white; }
+    .notepad-close-btn {
+      background: rgba(255,255,255,.1); border: none; border-radius: var(--r-xs);
+      color: rgba(255,255,255,.6); cursor: pointer; padding: 6px 10px;
+      font-size: 12px; font-weight: 600;
+    }
+    .notepad-textarea {
+      width: 100%; background: transparent; border: none; outline: none;
+      padding: 14px 20px; font-size: 13px; color: rgba(255,255,255,.85);
+      line-height: 1.7; resize: none; min-height: 140px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      placeholder-color: rgba(255,255,255,.3);
+    }
+    .notepad-textarea::placeholder { color: rgba(255,255,255,.3); }
+    .notepad-save-row { padding: 8px 20px 0; }
+
+    /* ─── Bottom Controls ─── */
+    .call-controls {
+      flex-shrink: 0; padding: 16px 24px 28px;
+      display: flex; align-items: center; justify-content: center;
+      gap: 20px; position: relative; z-index: 10;
+    }
+    .ctrl-btn {
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      cursor: pointer;
+    }
+    .ctrl-btn-icon {
+      width: 56px; height: 56px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform .1s, background .15s;
+    }
+    .ctrl-btn-icon:active { transform: scale(.93); }
+    .ctrl-btn-label { font-size: 10px; font-weight: 600; color: rgba(255,255,255,.5); }
+
+    .ctrl-btn.mute .ctrl-btn-icon { background: rgba(255,255,255,.12); color: white; border: 1.5px solid rgba(255,255,255,.2); }
+    .ctrl-btn.mute.active .ctrl-btn-icon { background: rgba(255,255,255,.25); }
+    .ctrl-btn.speaker .ctrl-btn-icon { background: rgba(255,255,255,.12); color: white; border: 1.5px solid rgba(255,255,255,.2); }
+    .ctrl-btn.speaker.active .ctrl-btn-icon { background: rgba(255,255,255,.25); }
+    .ctrl-btn.note .ctrl-btn-icon { background: rgba(255,249,196,.12); color: #FFF9C4; border: 1.5px solid rgba(255,249,196,.2); }
+    .ctrl-btn.end .ctrl-btn-icon { background: #DC2626; color: white; width: 68px; height: 68px; border: none; box-shadow: 0 4px 20px rgba(220,38,38,.4); }
+
+    /* ─── Sheet (End Call Confirm) ─── */
+    .sheet-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 100;
+      display: none; align-items: flex-end; justify-content: center;
+    }
+    .sheet-overlay.open { display: flex; }
+    .sheet-panel {
+      width: 390px; background: #1E293B; border-radius: var(--r-xl) var(--r-xl) 0 0;
+      padding: 0 0 36px; animation: slideUp .25s ease;
+    }
+    @media (max-width: 430px) { .sheet-panel { width: 100%; } }
+    .sheet-handle { width: 36px; height: 4px; background: rgba(255,255,255,.15); border-radius: 2px; margin: 12px auto 8px; }
+    .sheet-title  { font-size: 16px; font-weight: 800; padding: 8px 20px 16px; color: white; border-bottom: 1px solid rgba(255,255,255,.08); }
+    .sheet-body   { padding: 20px; }
+    .sheet-warn {
+      background: rgba(220,38,38,.1); border: 1px solid rgba(220,38,38,.2);
+      border-radius: var(--r-md); padding: 12px 14px;
+      font-size: 13px; color: #FCA5A5; line-height: 1.6; margin-bottom: 20px;
+    }
+    .sheet-info { font-size: 13px; color: rgba(255,255,255,.5); margin-bottom: 20px; }
+    .sheet-info strong { color: rgba(255,255,255,.8); }
+    .sheet-btn-row { display: flex; gap: 10px; }
+    .btn-dark-ghost {
+      flex: 1; padding: 13px; background: rgba(255,255,255,.08);
+      color: rgba(255,255,255,.7); border: 1.5px solid rgba(255,255,255,.12);
+      border-radius: var(--r-sm); font-size: 13px; font-weight: 700; cursor: pointer;
+    }
+    .btn-end-call {
+      flex: 2; padding: 13px; background: #DC2626; color: white;
+      border: none; border-radius: var(--r-sm); font-size: 13px; font-weight: 700;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+  </style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- BG Orbs -->
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+
+  <!-- Status Bar -->
+  <div class="call-statusbar">
+    <div class="call-statusbar-time" id="statusTime">09:41</div>
+    <div class="call-statusbar-icons">
+      <svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" stroke="rgba(255,255,255,.6)"><path d="M1 6l5.5 5.5L12 6l5.5 5.5L23 6"/></svg>
+      <svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" stroke="rgba(255,255,255,.6)"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3v4M8 3v4"/></svg>
+    </div>
+  </div>
+
+  <!-- Top Bar -->
+  <div class="call-topbar">
+    <button class="btn-icon-circle" onclick="go('chat-list')">
+      <svg class="icon-svg" width="18" height="18" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="call-session-info">
+      <div class="call-session-type">Sesi Audio Call</div>
+      <div class="call-session-dur" id="sessionDurLabel">30 menit</div>
+    </div>
+    <button class="btn-icon-circle" onclick="openNotepad()">
+      <svg class="icon-svg" width="18" height="18" viewBox="0 0 24 24" stroke="rgba(255,255,255,.8)"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+    </button>
+  </div>
+
+  <!-- Center: Client Info -->
+  <div class="call-center">
+    <div class="pulse-ring">
+      <div class="client-avatar-lg" id="clientAvatarText">MR</div>
+    </div>
+    <div class="client-name-lg" id="clientNameLg">M*** R***</div>
+    <div class="call-status-label">
+      <div class="call-status-dot"></div>
+      Terhubung
+    </div>
+    <div class="call-timer" id="callTimer">23:41</div>
+  </div>
+
+  <!-- Bottom Controls -->
+  <div class="call-controls">
+    <div class="ctrl-btn mute" id="muteBtn" onclick="toggleMute()">
+      <div class="ctrl-btn-icon">
+        <svg class="icon-svg" width="22" height="22" viewBox="0 0 24 24" id="muteIcon"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v4M8 23h8"/></svg>
+      </div>
+      <span class="ctrl-btn-label" id="muteLabel">Bisukan</span>
+    </div>
+
+    <div class="ctrl-btn end" onclick="openSheet('endCallSheet')">
+      <div class="ctrl-btn-icon">
+        <svg class="icon-svg" width="26" height="26" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.13 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.07 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/><line x1="1" y1="1" x2="23" y2="23" stroke="white" stroke-width="2"/></svg>
+      </div>
+      <span class="ctrl-btn-label" style="color:rgba(255,255,255,.6);">Akhiri</span>
+    </div>
+
+    <div class="ctrl-btn speaker" id="speakerBtn" onclick="toggleSpeaker()">
+      <div class="ctrl-btn-icon">
+        <svg class="icon-svg" width="22" height="22" viewBox="0 0 24 24" id="speakerIcon"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07" id="speakerWave"/></svg>
+      </div>
+      <span class="ctrl-btn-label" id="speakerLabel">Pengeras</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- Notepad Overlay -->
+<div class="notepad-overlay" id="notepadOverlay" onclick="closeNotepadOutside(event)">
+  <div class="notepad-panel">
+    <div class="notepad-handle"></div>
+    <div class="notepad-header">
+      <div class="notepad-title">Catatan Selama Call</div>
+      <button class="notepad-close-btn" onclick="closeNotepad()">Selesai</button>
+    </div>
+    <textarea class="notepad-textarea" id="callNote" placeholder="Tulis poin penting yang muncul selama sesi call...&#10;&#10;(Catatan ini akan menjadi draft di Post-Session form)"></textarea>
+    <div class="notepad-save-row">
+      <button onclick="saveNote()" style="background:var(--primary);color:white;border:none;border-radius:var(--r-sm);padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;width:100%;">Simpan Catatan</button>
+    </div>
+  </div>
+</div>
+
+<!-- End Call Sheet -->
+<div class="sheet-overlay" id="endCallSheet" onclick="overlayClickDark(event,'endCallSheet')">
+  <div class="sheet-panel">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Akhiri Call?</div>
+    <div class="sheet-body">
+      <div class="sheet-warn">Sesi call akan diakhiri dan klien akan diberitahu. Anda akan diarahkan ke form Post-Session untuk mengisi catatan klinis.</div>
+      <div class="sheet-info">Durasi aktual: <strong id="endCallDur">24 menit</strong></div>
+      <div class="sheet-btn-row">
+        <button class="btn-dark-ghost" onclick="closeSheet('endCallSheet')">Batal</button>
+        <button class="btn-end-call" onclick="endCall()">
+          <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+          Akhiri Call
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../../js/app.js"></script>
+<script>
+  const params = getParams();
+  const chatId = params.id || 'chat_002';
+  const chatInfo = MOCK_CHAT_LIST.find(c => c.id === chatId) || MOCK_CHAT_LIST[0];
+
+  // Setup client info
+  document.getElementById('clientAvatarText').textContent = chatInfo.userInitials;
+  document.getElementById('clientNameLg').textContent = chatInfo.userName;
+  document.getElementById('sessionDurLabel').textContent = `${chatInfo.duration} menit`;
+
+  let timerSecs = 23*60+41;
+  let muted = false;
+  let speakerOn = true;
+
+  function tick() {
+    timerSecs++;
+    const m = String(Math.floor(timerSecs/60)).padStart(2,'0');
+    const s = String(timerSecs%60).padStart(2,'0');
+    document.getElementById('callTimer').textContent = `${m}:${s}`;
+    document.getElementById('endCallDur').textContent = `${m} menit`;
+  }
+  setInterval(tick, 1000);
+
+  function updateTime() {
+    const t = new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',hour12:false});
+    document.getElementById('statusTime').textContent = t;
+  }
+  updateTime(); setInterval(updateTime, 10000);
+
+  // ── Mute ──
+  function toggleMute() {
+    muted = !muted;
+    const btn = document.getElementById('muteBtn');
+    btn.classList.toggle('active', muted);
+    document.getElementById('muteLabel').textContent = muted ? 'Mikrofon Mati' : 'Bisukan';
+    document.getElementById('muteIcon').style.opacity = muted ? '.5' : '1';
+  }
+
+  // ── Speaker ──
+  function toggleSpeaker() {
+    speakerOn = !speakerOn;
+    const btn = document.getElementById('speakerBtn');
+    btn.classList.toggle('active', !speakerOn);
+    document.getElementById('speakerLabel').textContent = speakerOn ? 'Pengeras' : 'Earpiece';
+    document.getElementById('speakerWave').style.opacity = speakerOn ? '1' : '0.3';
+  }
+
+  // ── Notepad ──
+  function openNotepad() {
+    document.getElementById('notepadOverlay').classList.add('open');
+  }
+  function closeNotepad() {
+    document.getElementById('notepadOverlay').classList.remove('open');
+  }
+  function closeNotepadOutside(e) {
+    if (e.target === document.getElementById('notepadOverlay')) closeNotepad();
+  }
+  function saveNote() {
+    closeNotepad();
+    // note saved to session storage as draft
+    const note = document.getElementById('callNote').value;
+    sessionStorage.setItem('hime_call_note', note);
+  }
+
+  // ── Sheet helpers ──
+  function overlayClickDark(e, id) {
+    if (e.target === document.getElementById(id)) closeSheet(id);
+  }
+
+  // ── End Call ──
+  function endCall() {
+    closeSheet('endCallSheet');
+    // show a brief overlay then navigate
+    document.getElementById('callTimer').textContent = 'Selesai';
+    setTimeout(() => { go('chat-list'); }, 1200);
+  }
+</script>
+</body>
+</html>

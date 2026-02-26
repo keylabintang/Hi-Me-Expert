@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Chat — Hi-Me Expert</title>
+  <link rel="stylesheet" href="../../css/global.css">
+  <style>
+    body { background: var(--bg); }
+    .phone {
+      display: flex; flex-direction: column;
+      height: 844px; min-height: 100dvh; overflow: hidden;
+    }
+
+    /* ─── Header ─── */
+    .page-header { background: var(--bg-card); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .header-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 20px;
+    }
+    .header-left { display: flex; align-items: center; gap: 10px; }
+    .header-title { font-size: 17px; font-weight: 800; color: var(--text-primary); }
+
+    /* ─── Filter Tabs ─── */
+    .filter-tabs {
+      display: flex; padding: 0 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .filter-tab {
+      flex: 1; padding: 11px 0; text-align: center;
+      font-size: 13px; font-weight: 700; color: var(--text-muted);
+      border-bottom: 2px solid transparent; cursor: pointer;
+      transition: all .15s;
+    }
+    .filter-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+    /* ─── Active Session Banner ─── */
+    .active-banner {
+      margin: 12px 16px 0;
+      background: linear-gradient(135deg, #065F46, #059669);
+      border-radius: var(--r-lg); padding: 14px 16px;
+      display: flex; align-items: center; gap: 12px;
+      box-shadow: 0 4px 20px rgba(5,150,105,.25);
+      cursor: pointer; flex-shrink: 0;
+    }
+    .active-banner-icon {
+      width: 40px; height: 40px; border-radius: var(--r-sm);
+      background: rgba(255,255,255,.15); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; color: white;
+    }
+    .active-banner-info { flex: 1; }
+    .active-banner-label { font-size: 10px; font-weight: 700; color: rgba(255,255,255,.6); text-transform: uppercase; letter-spacing: 0.5px; }
+    .active-banner-name  { font-size: 14px; font-weight: 700; color: white; margin: 2px 0; }
+    .active-banner-timer { font-size: 18px; font-weight: 800; color: white; font-variant-numeric: tabular-nums; letter-spacing: -0.3px; }
+    .active-banner-cta {
+      padding: 8px 14px; background: white; color: #065F46;
+      border-radius: var(--r-sm); font-size: 12px; font-weight: 800;
+      border: none; cursor: pointer; flex-shrink: 0;
+    }
+
+    /* ─── Content Scroll ─── */
+    .content-scroll {
+      flex: 1; overflow-y: auto; overflow-x: hidden;
+      -webkit-overflow-scrolling: touch; scrollbar-width: none;
+      padding: 8px 0 4px;
+    }
+    .content-scroll::-webkit-scrollbar { display: none; }
+
+    /* ─── Chat List Item ─── */
+    .chat-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 20px; border-bottom: 1px solid var(--border);
+      cursor: pointer; transition: background .1s;
+    }
+    .chat-item:active { background: var(--bg); }
+    .chat-item:last-child { border-bottom: none; }
+
+    .chat-avatar-wrap { position: relative; flex-shrink: 0; }
+    .session-status-dot {
+      position: absolute; bottom: -1px; right: -1px;
+      width: 12px; height: 12px; border-radius: 50%;
+      border: 2px solid var(--bg-card);
+    }
+    .session-status-dot.active   { background: #22C55E; }
+    .session-status-dot.upcoming { background: var(--primary); }
+    .session-status-dot.done     { background: var(--border-dark); }
+
+    .chat-info { flex: 1; min-width: 0; }
+    .chat-top-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 3px; }
+    .chat-name  { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+    .chat-time  { font-size: 11px; color: var(--text-placeholder); font-weight: 600; }
+    .chat-bottom-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .chat-preview {
+      font-size: 12px; color: var(--text-muted);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;
+    }
+    .chat-preview.active { color: #15803D; font-weight: 600; }
+
+    .type-badge {
+      display: inline-flex; align-items: center; gap: 3px;
+      padding: 2px 7px; border-radius: 100px; font-size: 10px; font-weight: 700; flex-shrink: 0;
+    }
+    .type-badge.chat    { background: rgba(58,134,255,.1);  color: #3A86FF; }
+    .type-badge.call    { background: rgba(93,186,132,.1);  color: #5DBA84; }
+    .type-badge.offline { background: rgba(244,162,97,.12); color: #E07B39; }
+
+    .status-pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px; border-radius: 100px; font-size: 10px; font-weight: 700; flex-shrink: 0;
+    }
+    .status-pill.active   { background: rgba(34,197,94,.12); color: #16A34A; }
+    .status-pill.upcoming { background: var(--primary-pale); color: var(--primary); }
+    .status-pill.done     { background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); }
+
+    /* ─── Empty State ─── */
+    .empty-state {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 60px 32px; text-align: center; height: 100%;
+    }
+    .empty-icon {
+      width: 64px; height: 64px; border-radius: var(--r-lg);
+      background: var(--primary-pale); color: var(--primary);
+      display: flex; align-items: center; justify-content: center; margin-bottom: 16px;
+    }
+    .empty-title { font-size: 15px; font-weight: 800; color: var(--text-primary); margin-bottom: 6px; }
+    .empty-sub   { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+
+    /* ─── Bottom Nav ─── */
+    .bottom-nav {
+      flex-shrink: 0; background: var(--bg-card); border-top: 1px solid var(--border);
+      height: var(--nav-h); display: grid; grid-template-columns: repeat(4, 1fr);
+    }
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 3px; cursor: pointer; color: var(--text-muted); position: relative;
+    }
+    .nav-item.active { color: var(--primary); }
+    .nav-label { font-size: 10px; font-weight: 600; }
+    .nav-badge {
+      position: absolute; top: 6px; right: 18%;
+      min-width: 16px; height: 16px; border-radius: 100px;
+      background: var(--danger); color: white;
+      font-size: 9px; font-weight: 700; padding: 0 4px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ─── Toast ─── */
+    .toast {
+      position: fixed; bottom: calc(var(--nav-h) + 16px); left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #1F2937; color: white; border-radius: var(--r-sm);
+      padding: 10px 18px; font-size: 13px; font-weight: 600;
+      opacity: 0; transition: all .25s; pointer-events: none; z-index: 200; white-space: nowrap;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-row">
+      <div class="header-left">
+        <button onclick="go('dashboard')" style="background:none;border:none;cursor:pointer;color:var(--text-muted);padding:4px;">
+          <svg class="icon-svg" width="22" height="22" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div class="header-title">Chat</div>
+      </div>
+      <button onclick="go('requests')" style="background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:6px;color:var(--primary);font-size:12px;font-weight:700;padding:8px 12px;background:var(--primary-pale);border-radius:var(--r-sm);">
+        <svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/><path d="M20 8v6"/><path d="M23 11h-6"/></svg>
+        Request
+        <span style="background:var(--danger);color:white;border-radius:100px;padding:1px 6px;font-size:10px;">3</span>
+      </button>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="filter-tabs">
+      <div class="filter-tab active" data-f="active"   onclick="setFilter('active')">Berlangsung</div>
+      <div class="filter-tab"        data-f="upcoming" onclick="setFilter('upcoming')">Mendatang</div>
+      <div class="filter-tab"        data-f="done"     onclick="setFilter('done')">Selesai</div>
+    </div>
+  </div>
+
+  <!-- Active Banner (shown only on "Berlangsung" tab) -->
+  <div class="active-banner" id="activeBanner" onclick="go('chat-room', {id:'chat_002'})">
+    <div class="active-banner-icon">
+      <svg class="icon-svg" width="20" height="20" viewBox="0 0 24 24" stroke="white"><path d="M4 5h16v10H7l-3 3V5z"/></svg>
+    </div>
+    <div class="active-banner-info">
+      <div class="active-banner-label">Sesi Berlangsung</div>
+      <div class="active-banner-name">M*** R*** · Call</div>
+      <div class="active-banner-timer" id="bannerTimer">23:41</div>
+    </div>
+    <button class="active-banner-cta" onclick="event.stopPropagation();go('chat-room',{id:'chat_002'})">Masuk</button>
+  </div>
+
+  <!-- Content -->
+  <div class="content-scroll" id="chatList"></div>
+
+  <!-- Bottom Nav -->
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="go('dashboard')">
+      <svg class="icon-svg" width="22" height="22" viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5"/><path d="M5 10v9h14v-9"/><path d="M9 19v-6h6v6"/></svg>
+      <span class="nav-label">Home</span>
+    </div>
+    <div class="nav-item" onclick="go('schedule')">
+      <svg class="icon-svg" width="22" height="22" viewBox="0 0 24 24"><path d="M7 3v4"/><path d="M17 3v4"/><path d="M4 8h16"/><path d="M5 5h14a1 1 0 0 1 1 1v14H4V6a1 1 0 0 1 1-1z"/></svg>
+      <span class="nav-label">Jadwal</span>
+    </div>
+    <div class="nav-item active" style="position:relative;">
+      <svg class="icon-svg" width="22" height="22" viewBox="0 0 24 24"><path d="M4 5h16v10H7l-3 3V5z"/></svg>
+      <span class="nav-label">Chat</span>
+      <div class="nav-badge">1</div>
+    </div>
+    <div class="nav-item" onclick="showToast('Profil — Phase 2.6')">
+      <svg class="icon-svg" width="22" height="22" viewBox="0 0 24 24"><path d="M20 21a8 8 0 0 0-16 0"/><path d="M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/></svg>
+      <span class="nav-label">Profil</span>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="globalToast"></div>
+
+<script src="../../js/app.js"></script>
+<script>
+  let currentFilter = 'active';
+  const TYPE_MAP = { Chat:'chat', Call:'call', Offline:'offline' };
+  const STATUS_LBL = { active:'Berlangsung', upcoming:'Mendatang', done:'Selesai' };
+
+  function setFilter(f) {
+    currentFilter = f;
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.toggle('active', t.dataset.f === f));
+    document.getElementById('activeBanner').style.display = (f === 'active') ? 'flex' : 'none';
+    render();
+  }
+
+  function render() {
+    const items = currentFilter === 'all' ? MOCK_CHAT_LIST : MOCK_CHAT_LIST.filter(c => c.status === currentFilter);
+    const el = document.getElementById('chatList');
+
+    if (!items.length) {
+      el.innerHTML = `<div class="empty-state">
+        <div class="empty-icon">
+          <svg class="icon-svg" width="28" height="28" viewBox="0 0 24 24"><path d="M4 5h16v10H7l-3 3V5z"/></svg>
+        </div>
+        <div class="empty-title">Tidak Ada Sesi ${STATUS_LBL[currentFilter] || ''}</div>
+        <div class="empty-sub">Sesi dengan status ini tidak ditemukan.</div>
+      </div>`;
+      return;
+    }
+
+    el.innerHTML = items.map(c => {
+      const tc = TYPE_MAP[c.sessionType];
+      const isActive = c.status === 'active';
+      return `
+        <div class="chat-item" onclick="openChat('${c.id}','${c.sessionType}')">
+          <div class="chat-avatar-wrap">
+            ${avatarGrad(c.userInitials, 48, 18)}
+            <div class="session-status-dot ${c.status}"></div>
+          </div>
+          <div class="chat-info">
+            <div class="chat-top-row">
+              <div class="chat-name">${c.userName}</div>
+              <div class="chat-time">${c.lastTime}</div>
+            </div>
+            <div class="chat-bottom-row">
+              <div class="chat-preview ${isActive?'active':''}">${isActive ? '● Sedang berlangsung' : c.lastMessage}</div>
+              <span class="type-badge ${tc}">${c.sessionType}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function openChat(id, type) {
+    const c = MOCK_CHAT_LIST.find(x => x.id === id);
+    if (!c) return;
+    if (type === 'Call') { go('call-room', { id }); }
+    else                 { go('chat-room', { id }); }
+  }
+
+  // Timer for active banner
+  let timerSecs = 23*60+41;
+  function tick() {
+    timerSecs++;
+    const m = String(Math.floor(timerSecs/60)).padStart(2,'0');
+    const s = String(timerSecs%60).padStart(2,'0');
+    const el = document.getElementById('bannerTimer');
+    if (el) el.textContent = `${m}:${s}`;
+  }
+  setInterval(tick, 1000);
+
+  function showToast(msg) {
+    const el = document.getElementById('globalToast');
+    el.textContent = msg; el.classList.add('show');
+    clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), 2800);
+  }
+
+  render();
+</script>
+</body>
+</html>

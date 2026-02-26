@@ -289,7 +289,7 @@ Fokus: Expert mengatur jam kerja dan hari aktif, serta melihat seluruh sesi dala
 
 ---
 
-### 🔮 Phase 2.4 — Terima Request & Ruang Konsultasi *(PLANNED)*
+### ✅ Phase 2.4 — Terima Request & Ruang Konsultasi *(DONE)*
 
 Fokus: Alur menerima request masuk dan menjalankan sesi konsultasi live dari sisi expert — chat maupun call.
 
@@ -297,10 +297,10 @@ Fokus: Alur menerima request masuk dan menjalankan sesi konsultasi live dari sis
 
 | Halaman | Path | Status |
 |---|---|---|
-| Daftar Request Masuk | `pages/requests/index.html` | 🔮 Planned |
-| Chat List Expert | `pages/chat/index.html` | 🔮 Planned |
-| Chat Room Expert | `pages/chat/room.html` | 🔮 Planned |
-| Call Room Expert | `pages/chat/call.html` | 🔮 Planned |
+| Daftar Request Masuk | `pages/requests/index.html` | ✅ Done |
+| Chat List Expert | `pages/chat/index.html` | ✅ Done |
+| Chat Room Expert | `pages/chat/room.html` | ✅ Done |
+| Call Room Expert | `pages/chat/call.html` | ✅ Done |
 
 **Fitur Phase 2.4:**
 

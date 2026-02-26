@@ -112,7 +112,7 @@
 
     /* ─── Bottom Nav ─── */
     .bottom-nav {
-      position: sticky; bottom: 0;
+      flex-shrink: 0;
       background: var(--bg-card); border-top: 1px solid var(--border);
       height: var(--nav-h);
       display: grid; grid-template-columns: repeat(4, 1fr);
@@ -144,7 +144,7 @@
   </style>
 </head>
 <body>
-<div class="phone">
+<div class="phone phone-layout">
 
   <!-- Header -->
   <div class="page-header">
@@ -197,7 +197,7 @@
   </div>
 
   <!-- Scroll Area -->
-  <div class="scroll-area" style="padding-bottom: calc(var(--nav-h) + 12px);">
+  <div class="scroll-area" class="has-nav">
     <div class="notif-list" id="notifList"></div>
   </div>
 
@@ -211,7 +211,7 @@
       <svg class="icon-svg" width="22" height="22" viewBox="0 0 24 24"><path d="M7 3v4"/><path d="M17 3v4"/><path d="M4 8h16"/><path d="M5 5h14a1 1 0 0 1 1 1v14H4V6a1 1 0 0 1 1-1z"/></svg>
       <span class="nav-label">Jadwal</span>
     </div>
-    <div class="nav-item" onclick="showToast('Halaman Chat — Phase 2.4')" style="position:relative;">
+    <div class="nav-item" onclick="go('chat-list')" style="position:relative;">
       <svg class="icon-svg" width="22" height="22" viewBox="0 0 24 24"><path d="M4 5h16v10H7l-3 3V5z"/></svg>
       <span class="nav-label">Chat</span>
       <div class="nav-badge">1</div>

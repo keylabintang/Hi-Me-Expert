@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Request Masuk — Hi-Me Expert</title>
+  <link rel="stylesheet" href="../../css/global.css">
+  <style>
+    /* ─── Layout: full-height flex column ─── */
+    body { background: var(--bg); }
+    .phone {
+      display: flex; flex-direction: column;
+      height: 844px; min-height: 100dvh;
+      overflow: hidden;
+    }
+
+    /* ─── Header ─── */
+    .page-header {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .header-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 20px;
+    }
+    .header-left { display: flex; align-items: center; gap: 10px; }
+    .header-title { font-size: 17px; font-weight: 800; color: var(--text-primary); }
+    .badge-count {
+      background: var(--danger); color: white;
+      font-size: 11px; font-weight: 700;
+      border-radius: 100px; padding: 2px 8px;
+      min-width: 22px; text-align: center;
+    }
+
+    /* ─── Filter Chips ─── */
+    .filter-row {
+      display: flex; gap: 7px; padding: 0 20px 12px;
+      overflow-x: auto; scrollbar-width: none;
+    }
+    .filter-row::-webkit-scrollbar { display: none; }
+    .filter-chip {
+      flex-shrink: 0; padding: 7px 16px; border-radius: 100px;
+      font-size: 12px; font-weight: 700;
+      border: 1.5px solid var(--border);
+      background: transparent; color: var(--text-muted);
+      cursor: pointer; transition: all .15s;
+    }
+    .filter-chip.active {
+      background: var(--primary-pale); border-color: var(--primary); color: var(--primary);
+    }
+
+    /* ─── Scroll content ─── */
+    .content-scroll {
+      flex: 1; overflow-y: auto; overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding: 12px 0 8px;
+    }
+    .content-scroll::-webkit-scrollbar { display: none; }
+
+    /* ─── Request Card ─── */
+    .request-card {
+      margin: 0 16px 12px;
+      background: var(--bg-card); border-radius: var(--r-lg);
+      border: 1px solid var(--border); box-shadow: var(--shadow-xs);
+      overflow: hidden;
+    }
+    .request-card-top {
+      padding: 14px 16px 0;
+    }
+    .req-user-row {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+    }
+    .req-user-info { flex: 1; }
+    .req-user-name { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+    .req-user-meta {
+      font-size: 11px; color: var(--text-muted); margin-top: 2px;
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .req-price { font-size: 15px; font-weight: 800; color: var(--primary); }
+
+    .type-chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 8px; border-radius: 100px;
+      font-size: 10px; font-weight: 700;
+    }
+    .type-chip.chat    { background: rgba(58,134,255,.1);  color: #3A86FF; }
+    .type-chip.call    { background: rgba(93,186,132,.1);  color: #5DBA84; }
+    .type-chip.offline { background: rgba(244,162,97,.12); color: #E07B39; }
+
+    /* Time info row */
+    .req-time-row {
+      display: flex; align-items: center; gap: 6px;
+      padding: 10px 16px; background: var(--bg);
+      font-size: 12px; color: var(--text-muted); font-weight: 600;
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    }
+    .req-time-row svg { color: var(--text-placeholder); flex-shrink: 0; }
+    .req-time-sep { color: var(--border-dark); }
+
+    /* Note */
+    .req-note {
+      padding: 10px 16px;
+      font-size: 12px; color: var(--text-muted); line-height: 1.6;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+      font-style: italic;
+    }
+    .req-note::before { content: '"'; }
+    .req-note::after  { content: '"'; }
+
+    /* Actions */
+    .req-actions {
+      display: flex; gap: 0;
+      border-top: 1px solid var(--border);
+    }
+    .btn-req-accept {
+      flex: 1; padding: 13px;
+      background: rgba(93,186,132,.08); color: #15803D;
+      font-size: 13px; font-weight: 700;
+      border: none; border-right: 1px solid var(--border);
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px;
+      transition: background .15s;
+    }
+    .btn-req-accept:active { background: rgba(93,186,132,.18); }
+    .btn-req-reject {
+      flex: 1; padding: 13px;
+      background: transparent; color: var(--danger);
+      font-size: 13px; font-weight: 700; border: none;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px;
+      transition: background .15s;
+    }
+    .btn-req-reject:active { background: rgba(214,40,40,.06); }
+
+    /* ─── Empty State ─── */
+    .empty-state {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 60px 32px; text-align: center; height: 100%;
+    }
+    .empty-icon {
+      width: 64px; height: 64px; border-radius: var(--r-lg);
+      background: var(--primary-pale); color: var(--primary);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 16px;
+    }
+    .empty-title { font-size: 15px; font-weight: 800; color: var(--text-primary); margin-bottom: 6px; }
+    .empty-sub   { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+
+    /* ─── Bottom Nav ─── */
+    .bottom-nav {
+      flex-shrink: 0;
+      background: var(--bg-card); border-top: 1px solid var(--border);
+      height: var(--nav-h);
+      display: grid; grid-template-columns: repeat(4, 1fr);
+    }
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 3px; cursor: pointer; color: var(--text-muted); position: relative;
+    }
+    .nav-item.active { color: var(--primary); }
+    .nav-label { font-size: 10px; font-weight: 600; }
+    .nav-badge {
+      position: absolute; top: 6px; right: 18%;
+      min-width: 16px; height: 16px; border-radius: 100px;
+      background: var(--danger); color: white;
+      font-size: 9px; font-weight: 700; padding: 0 4px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ─── Sheet ─── */
+    .sheet-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 100;
+      display: none; align-items: flex-end; justify-content: center;
+    }
+    .sheet-overlay.open { display: flex; }
+    .sheet-panel {
+      width: 390px; background: var(--bg-card);
+      border-radius: var(--r-xl) var(--r-xl) 0 0;
+      padding: 0 0 36px; max-height: 80vh; overflow-y: auto;
+      animation: slideUp .25s ease;
+    }
+    @media (max-width: 430px) { .sheet-panel { width: 100%; } }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .sheet-handle { width: 36px; height: 4px; background: var(--border-dark); border-radius: 2px; margin: 12px auto 8px; }
+    .sheet-title  { font-size: 16px; font-weight: 800; padding: 8px 20px 16px; border-bottom: 1px solid var(--border); }
+    .sheet-body   { padding: 20px; }
+
+    .detail-row {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      padding: 10px 0; border-bottom: 1px solid var(--border);
+    }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-key { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+    .detail-val { font-size: 13px; font-weight: 700; color: var(--text-primary); text-align: right; max-width: 60%; }
+
+    .note-box {
+      background: var(--bg); border-radius: var(--r-sm);
+      padding: 12px 14px; font-size: 12px; color: var(--text-secondary);
+      line-height: 1.6; border-left: 3px solid var(--primary-pale);
+      margin: 12px 0;
+    }
+
+    /* Reason options */
+    .reason-option {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 0; border-bottom: 1px solid var(--border); cursor: pointer;
+    }
+    .reason-option:last-child { border-bottom: none; }
+    .reason-radio {
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 2px solid var(--border-dark); flex-shrink: 0; position: relative;
+    }
+    .reason-option.sel .reason-radio { border-color: var(--primary); background: var(--primary); }
+    .reason-option.sel .reason-radio::after {
+      content: ''; width: 7px; height: 7px; border-radius: 50%;
+      background: white; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    }
+    .reason-text { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .reason-input {
+      width: 100%; margin-top: 10px; padding: 10px 12px;
+      border: 1.5px solid var(--border); border-radius: var(--r-sm);
+      font-size: 13px; color: var(--text-primary); background: var(--bg); resize: none;
+      display: none;
+    }
+    .reason-input.show { display: block; }
+    .sheet-btn-row { display: flex; gap: 10px; margin-top: 20px; }
+
+    /* ─── Toast ─── */
+    .toast {
+      position: fixed; bottom: calc(var(--nav-h) + 16px); left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #1F2937; color: white; border-radius: var(--r-sm);
+      padding: 10px 18px; font-size: 13px; font-weight: 600;
+      opacity: 0; transition: all .25s; pointer-events: none; z-index: 200; white-space: nowrap;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-row">
+      <div class="header-left">
+        <button onclick="go('dashboard')" style="background:none;border:none;cursor:pointer;color:var(--text-muted);padding:4px;">
+          <svg class="icon-svg" width="22" height="22" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div class="header-title">Request Masuk</div>
+        <span class="badge-count" id="reqBadge">3</span>
+      </div>
+    </div>
+
+    <!-- Filter -->
+    <div class="filter-row">
+      <button class="filter-chip active" data-f="all"    onclick="setFilter('all')">Semua</button>
+      <button class="filter-chip"        data-f="Chat"   onclick="setFilter('Chat')">
+        <svg class="icon-svg" style="display:inline;vertical-align:middle;" width="11" height="11" viewBox="0 0 24 24"><path d="M4 5h16v10H7l-3 3V5z"/></svg>
+        Chat
+      </button>
+      <button class="filter-chip"        data-f="Call"   onclick="setFilter('Call')">
+        <svg class="icon-svg" style="display:inline;vertical-align:middle;" width="11" height="11" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        Call
+      </button>
+      <button class="filter-chip"        data-f="Offline" onclick="setFilter('Offline')">
+        <svg class="icon-svg" style="display:inline;vertical-align:middle;" width="11" height="11" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Offline
+      </button>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content-scroll" id="requestList"></div>
+
+  <!-- Bottom Nav -->
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="go('dashboard')">
+      <svg class="icon-svg" width="22" height="22" viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5"/><path d="M5 10v9h14v-9"/><path d="M9 19v-6h6v6"/></svg>
+      <span class="nav-label">Home</span>
+    </div>
+    <div class="nav-item" onclick="go('schedule')">
+      <svg class="icon-svg" width="22" height="22" viewBox="0 0 24 24"><path d="M7 3v4"/><path d="M17 3v4"/><path d="M4 8h16"/><path d="M5 5h14a1 1 0 0 1 1 1v14H4V6a1 1 0 0 1 1-1z"/></svg>
+      <span class="nav-label">Jadwal</span>
+    </div>
+    <div class="nav-item active" style="position:relative;">
+      <svg class="icon-svg" width="22" height="22" viewBox="0 0 24 24"><path d="M4 5h16v10H7l-3 3V5z"/></svg>
+      <span class="nav-label">Chat</span>
+      <div class="nav-badge" id="navBadge">3</div>
+    </div>
+    <div class="nav-item" onclick="showToast('Profil — Phase 2.6')">
+      <svg class="icon-svg" width="22" height="22" viewBox="0 0 24 24"><path d="M20 21a8 8 0 0 0-16 0"/><path d="M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/></svg>
+      <span class="nav-label">Profil</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- Accept Sheet -->
+<div class="sheet-overlay" id="acceptSheet" onclick="overlayClick(event,'acceptSheet')">
+  <div class="sheet-panel">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Konfirmasi Terima Sesi</div>
+    <div class="sheet-body">
+      <div id="acceptContent"></div>
+      <div class="sheet-btn-row">
+        <button class="btn btn-ghost" style="flex:1" onclick="closeSheet('acceptSheet')">Batal</button>
+        <button class="btn btn-primary" style="flex:2" onclick="doAccept()">
+          <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+          Ya, Terima Sesi
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Reject Sheet -->
+<div class="sheet-overlay" id="rejectSheet" onclick="overlayClick(event,'rejectSheet')">
+  <div class="sheet-panel">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Alasan Penolakan</div>
+    <div class="sheet-body">
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">Pilih alasan. Klien akan mendapat notifikasi beserta alasannya.</p>
+      <div id="reasonList"></div>
+      <textarea class="reason-input" id="reasonInput" rows="3" placeholder="Tulis alasan lainnya..."></textarea>
+      <div class="sheet-btn-row">
+        <button class="btn btn-ghost" style="flex:1" onclick="closeSheet('rejectSheet')">Batal</button>
+        <button class="btn" style="flex:2;background:var(--danger);color:white;border-radius:var(--r-sm);" onclick="doReject()">Tolak Sesi</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="globalToast"></div>
+
+<script src="../../js/app.js"></script>
+<script>
+  let requests = JSON.parse(JSON.stringify(MOCK_CHAT_REQUESTS));
+  let currentFilter = 'all';
+  let activeId = null;
+  let selectedReason = null;
+  const REASONS = ['Jadwal Sudah Penuh','Tidak Sesuai Spesialisasi','Darurat Pribadi','Lainnya'];
+
+  const TYPE_MAP = { Chat:'chat', Call:'call', Offline:'offline' };
+
+  function filtered() {
+    return currentFilter === 'all' ? requests : requests.filter(r => r.sessionType === currentFilter);
+  }
+
+  function setFilter(f) {
+    currentFilter = f;
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.toggle('active', c.dataset.f === f));
+    render();
+  }
+
+  function render() {
+    const list = filtered();
+    const el = document.getElementById('requestList');
+    document.getElementById('reqBadge').textContent = requests.length;
+    document.getElementById('navBadge').textContent = requests.length;
+    if (!requests.length) {
+      el.innerHTML = `<div class="empty-state">
+        <div class="empty-icon">
+          <svg class="icon-svg" width="28" height="28" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="empty-title">Belum Ada Request Masuk</div>
+        <div class="empty-sub">Ketika ada klien yang melakukan booking, request akan muncul di sini.</div>
+      </div>`;
+      return;
+    }
+    if (!list.length) {
+      el.innerHTML = `<div class="empty-state">
+        <div class="empty-icon">
+          <svg class="icon-svg" width="28" height="28" viewBox="0 0 24 24"><path d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16z"/><path d="M21 21l-4.3-4.3"/></svg>
+        </div>
+        <div class="empty-title">Tidak Ada Request ${currentFilter}</div>
+        <div class="empty-sub">Tidak ada request dengan tipe sesi ini saat ini.</div>
+      </div>`;
+      return;
+    }
+    el.innerHTML = list.map(r => `
+      <div class="request-card" id="rc-${r.id}">
+        <div class="request-card-top">
+          <div class="req-user-row">
+            ${avatarGrad(r.userInitials, 44, 16)}
+            <div class="req-user-info">
+              <div class="req-user-name">${r.userName}</div>
+              <div class="req-user-meta">
+                <span class="type-chip ${TYPE_MAP[r.sessionType]}">${r.sessionType}</span>
+                <span>${r.duration} menit</span>
+                <span style="color:var(--border-dark)">·</span>
+                <span>${r.requestedAt}</span>
+              </div>
+            </div>
+            <div class="req-price">${formatRupiah(r.price)}</div>
+          </div>
+        </div>
+        <div class="req-time-row">
+          <svg class="icon-svg" width="13" height="13" viewBox="0 0 24 24"><path d="M7 3v4"/><path d="M17 3v4"/><path d="M4 8h16"/><path d="M5 5h14a1 1 0 0 1 1 1v14H4V6a1 1 0 0 1 1-1z"/></svg>
+          ${r.date}
+          <span class="req-time-sep">·</span>
+          <svg class="icon-svg" width="13" height="13" viewBox="0 0 24 24"><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="10"/></svg>
+          ${r.time} WIB
+        </div>
+        <div class="req-note">${r.note}</div>
+        <div class="req-actions">
+          <button class="btn-req-accept" onclick="openAccept('${r.id}')">
+            <svg class="icon-svg" width="15" height="15" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+            Terima
+          </button>
+          <button class="btn-req-reject" onclick="openReject('${r.id}')">
+            <svg class="icon-svg" width="15" height="15" viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+            Tolak
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function openAccept(id) {
+    activeId = id;
+    const r = requests.find(x => x.id === id);
+    document.getElementById('acceptContent').innerHTML = `
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+        ${avatarGrad(r.userInitials, 44, 17)}
+        <div>
+          <div style="font-size:15px;font-weight:800;">${r.userName}</div>
+          <div style="font-size:12px;color:var(--text-muted);">${r.sessionType} · ${r.duration} mnt · ${formatRupiah(r.price)}</div>
+        </div>
+      </div>
+      <div class="detail-row"><div class="detail-key">Tanggal</div><div class="detail-val">${r.date}</div></div>
+      <div class="detail-row"><div class="detail-key">Waktu</div><div class="detail-val">${r.time} WIB</div></div>
+      <div class="detail-row"><div class="detail-key">Harga</div><div class="detail-val" style="color:var(--primary)">${formatRupiah(r.price)}</div></div>
+      <div class="note-box">${r.note}</div>
+    `;
+    openSheet('acceptSheet');
+  }
+
+  function doAccept() {
+    closeSheet('acceptSheet');
+    requests = requests.filter(x => x.id !== activeId);
+    render();
+    showToast('Sesi diterima. Klien telah dinotifikasi.');
+  }
+
+  function openReject(id) {
+    activeId = id;
+    selectedReason = null;
+    document.getElementById('reasonInput').classList.remove('show');
+    document.getElementById('reasonList').innerHTML = REASONS.map((r,i) =>
+      `<div class="reason-option" onclick="selectReason(this,'${r}')">
+        <div class="reason-radio"></div>
+        <div class="reason-text">${r}</div>
+      </div>`
+    ).join('');
+    openSheet('rejectSheet');
+  }
+
+  function selectReason(el, text) {
+    selectedReason = text;
+    document.querySelectorAll('.reason-option').forEach(o => o.classList.remove('sel'));
+    el.classList.add('sel');
+    document.getElementById('reasonInput').classList.toggle('show', text === 'Lainnya');
+  }
+
+  function doReject() {
+    if (!selectedReason) { showToast('Pilih alasan terlebih dahulu'); return; }
+    closeSheet('rejectSheet');
+    requests = requests.filter(x => x.id !== activeId);
+    render();
+    showToast('Sesi ditolak. Klien telah dinotifikasi.');
+  }
+
+  function showToast(msg) {
+    const el = document.getElementById('globalToast');
+    el.textContent = msg; el.classList.add('show');
+    clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), 2800);
+  }
+
+  render();
+</script>
+</body>
+</html>
