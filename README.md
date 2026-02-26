@@ -340,50 +340,59 @@ Fokus: Alur menerima request masuk dan menjalankan sesi konsultasi live dari sis
 
 ---
 
-### 🔮 Phase 2.5 — Post-Session: Ringkasan & Catatan Klinis *(PLANNED)*
+### ✅ Phase 2.5 — Post-Session: Ringkasan & Catatan Klinis *(DONE)*
 
 Fokus: Form yang diisi expert setelah sesi selesai — hasilnya langsung tampil di `prescriptions.html` dan `session-history.html` milik User.
 
-**Halaman yang akan dibuat:**
+**Halaman yang dibuat:**
 
 | Halaman | Path | Status |
 |---|---|---|
-| Post-Session Form | `pages/session/summary.html` | 🔮 Planned |
-| Riwayat Sesi Expert | `pages/session/history.html` | 🔮 Planned |
+| Post-Session Form | `pages/session/summary.html` | ✅ Done |
+| Riwayat Sesi Expert | `pages/session/history.html` | ✅ Done |
 
 **Fitur Phase 2.5:**
 
-- **Post-Session Form:**
-  - Header: avatar inisial user, nama (disamarkan), tipe sesi, durasi aktual, tanggal sesi
-  - Jika ada Catatan Cepat dari chat/call, ditampilkan sebagai draft kuning di atas form
+- **Post-Session Form (`summary.html`):**
+  - Header gradient teal: avatar inisial user, nama disamarkan, chip meta (tanggal, durasi, tipe sesi)
+  - Jika ada Catatan Cepat dari chat/call room, tampil sebagai draft banner kuning yang bisa di-expand di atas form
+  - Flag situasi darurat dari Protokol Krisis tampil sebagai chip merah di header meta
   - **Tab 1 — Catatan Klinis:**
-    - Textarea "Observasi" — apa yang disampaikan dan ditunjukkan user selama sesi
-    - Textarea "Insight & Analisis" — penilaian expert, pola yang teridentifikasi
-    - Textarea "Kekuatan yang Teridentifikasi" — aspek positif user yang ditemukan
-    - Mood assessment user saat sesi: 5 skala chip (😔 Sangat Buruk → 😊 Sangat Baik)
-    - → Ini yang tampil sebagai kartu "Catatan" dengan bullet 🔍/💡/🌟 di `prescriptions.html` user
+    - Textarea Observasi (maks 600 karakter + counter live)
+    - Textarea Insight & Analisis (maks 500 karakter + counter live)
+    - Textarea Kekuatan yang Teridentifikasi (maks 400 karakter + counter live)
+    - Mood assessment: 5 opsi chip bergambar face SVG (Sangat Buruk/Cukup Buruk/Netral/Cukup Baik/Sangat Baik) dengan highlight warna per pilihan
   - **Tab 2 — Tugas Mandiri (Homework):**
-    - Tambah item: input nama tugas + pilih frekuensi chip (Harian/Mingguan/Sekali) + deadline opsional
-    - Hapus item dengan ikon trash per baris
-    - Preview checklist interaktif di bawah form
-    - → Ini yang tampil sebagai kartu "Tugas" dengan checklist di `prescriptions.html` user
+    - Form tambah: input tugas + chip frekuensi (Harian/Mingguan/Sekali/Sesuai Kebutuhan) + deadline opsional
+    - Kartu per tugas dengan tombol hapus (ikon trash)
+    - Preview checklist interaktif di bawah — ditampilkan sebagai daftar tugas klien
   - **Tab 3 — Suplemen & Saran:**
-    - Tambah item: nama suplemen/teknik · dosis atau durasi · frekuensi chip (Pagi/Siang/Malam/Sesuai Kebutuhan)
-    - Warning card kuning otomatis: "Rekomendasikan konsultasi dengan dokter atau psikiater sebelum mengonsumsi suplemen apa pun"
-    - → Ini yang tampil sebagai kartu "Obat-Suplemen" di `prescriptions.html` user
-  - **Rekomendasi Sesi Lanjutan:**
-    - Toggle aktif/nonaktif
-    - Jika aktif: pilih rentang waktu (1 minggu / 2 minggu / 1 bulan) + textarea pesan singkat untuk user
-    - → Memicu notifikasi sesi lanjutan di sisi user
-  - Tombol "Simpan & Kirim ke User" → sheet konfirmasi → toast sukses → redirect ke Riwayat Sesi
+    - Warning card oranye: saran konsultasi dokter/psikiater
+    - Form tambah: nama suplemen + dosis/durasi + chip waktu (Pagi/Siang/Malam/Sesuai Kebutuhan)
+    - Kartu per suplemen dengan ikon dan tombol hapus
+  - **Rekomendasi Sesi Lanjutan** (sticky di bawah semua tab):
+    - Toggle aktif/nonaktif dengan animasi slide
+    - Jika aktif: chip durasi (1 minggu/2 minggu/1 bulan/Sesuai kebutuhan) + textarea pesan untuk klien
+  - Tombol "Simpan & Kirim ke Klien" → sheet konfirmasi dengan ringkasan 5 item → overlay processing 2 detik → redirect ke Riwayat Sesi
+  - Navigasi kembali membawa catatan cepat (quickNote) dan flag krisis dari halaman chat/call via sessionStorage params
 
-- **Riwayat Sesi Expert:**
-  - Stats strip: Total Sesi · Sesi Bulan Ini · Rata-rata Rating · Pendapatan Total
-  - Filter tab: Semua / Selesai / Dibatalkan
-  - Month separator antar bulan
-  - Kartu sesi: avatar inisial user, tipe, tanggal, durasi, bintang rating dari user, pendapatan per sesi
-  - Kartu dibatalkan: info siapa yang membatalkan + info refund
-  - Tap kartu → bottom sheet: catatan klinis yang sudah diisi + tombol "Edit Catatan" (aktif hanya dalam 24 jam)
+- **Riwayat Sesi (`history.html`):**
+  - Stats hero gradient teal: 4 kartu (Total Sesi, Sesi Bulan Ini, Rata-rata Rating, Pendapatan Total)
+  - Filter chip: Semua / Selesai / Dibatalkan
+  - Pengelompokan kartu per bulan dengan separator teks
+  - Kartu sesi: ikon tipe berwarna (Chat biru, Call hijau, Offline oranye, Dibatalkan abu), nama user disamarkan, tanggal + jam + durasi, bintang rating, nominal pendapatan, badge "Ada catatan klinis"
+  - Kartu sesi dibatalkan: banner merah bawah dengan info siapa yang membatalkan
+  - Tap kartu → bottom sheet detail lengkap:
+    - Informasi sesi (tipe, tanggal, durasi, pendapatan)
+    - Rating bintang + komentar klien
+    - Catatan klinis: mood badge berwarna, blok Observasi/Insight/Kekuatan
+    - Daftar tugas mandiri dengan checklist visual + chip frekuensi
+    - Kartu suplemen & saran
+    - Rekomendasi sesi lanjutan jika aktif
+    - Banner merah jika sesi ditandai darurat
+  - Tombol "Edit Catatan" (aktif dalam 24 jam pasca sesi)
+  - Mock data: 7 sesi mencakup Januari–Februari 2025, berbagai tipe dan status
+  - Bottom nav: Home, Jadwal, Chat, Profil
 
 ---
 

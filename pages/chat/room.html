@@ -576,7 +576,11 @@
   function endSession() {
     closeSheet('endSheet');
     showToast('Sesi diakhiri. Mengarahkan ke Post-Session...');
-    setTimeout(() => { showToast('Post-Session Form — Phase 2.5'); }, 1800);
+    const note = document.getElementById('noteText')?.value?.trim() || '';
+    const crisis = document.getElementById('crisisToggle')?.classList.contains('on') || false;
+    setTimeout(() => {
+      go('session-summary', { sessionId: chatId, quickNote: note, crisisFlag: crisis });
+    }, 1200);
   }
 
   function showToast(msg) {

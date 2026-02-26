@@ -381,9 +381,12 @@
   // ── End Call ──
   function endCall() {
     closeSheet('endCallSheet');
-    // show a brief overlay then navigate
+    const note = document.getElementById('callNote')?.value?.trim() || '';
     document.getElementById('callTimer').textContent = 'Selesai';
-    setTimeout(() => { go('chat-list'); }, 1200);
+    toast('Sesi telah berakhir');
+    setTimeout(() => {
+      go('session-summary', { sessionId: chatId, quickNote: note, crisisFlag: false });
+    }, 1600);
   }
 </script>
 </body>

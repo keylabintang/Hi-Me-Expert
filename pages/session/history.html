@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Riwayat Sesi — Hi-Me Expert</title>
+  <link rel="stylesheet" href="../../css/global.css">
+  <style>
+    /* ─── Stats Strip ─── */
+    .stats-hero {
+      background: linear-gradient(135deg, var(--teal-900), var(--teal-700));
+      padding: 20px 20px 32px; position: relative;
+    }
+    .stats-hero::after {
+      content: ''; position: absolute; bottom: -1px; left: 0; right: 0;
+      height: 24px; background: var(--bg); border-radius: 24px 24px 0 0;
+    }
+    .stats-header {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 18px;
+    }
+    .back-white {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.2);
+      display: flex; align-items: center; justify-content: center;
+      color: white; cursor: pointer; flex-shrink: 0; transition: background .15s;
+    }
+    .back-white:active { background: rgba(255,255,255,.25); }
+    .stats-title { font-size: 18px; font-weight: 800; color: white; flex: 1; }
+
+    .stats-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    }
+    .stat-card {
+      background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15);
+      border-radius: var(--r-md); padding: 12px 14px;
+    }
+    .stat-label { font-size: 10px; font-weight: 700; color: rgba(255,255,255,.65); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; }
+    .stat-value { font-size: 22px; font-weight: 800; color: white; letter-spacing: -0.5px; }
+    .stat-sub   { font-size: 10px; color: rgba(255,255,255,.55); margin-top: 2px; }
+
+    /* ─── Filter Bar ─── */
+    .filter-bar {
+      display: flex; padding: 14px 16px 10px; gap: 8px;
+      background: var(--bg); position: sticky; top: 0; z-index: 10;
+    }
+    .filter-chip {
+      padding: 7px 14px; border-radius: 100px;
+      border: 1.5px solid var(--border); background: var(--bg-card);
+      font-size: 12px; font-weight: 700; color: var(--text-muted);
+      cursor: pointer; transition: all .15s; white-space: nowrap;
+    }
+    .filter-chip.active { border-color: var(--primary); background: var(--primary-pale); color: var(--primary); }
+    .filter-chip:active { transform: scale(.95); }
+
+    /* ─── Month Separator ─── */
+    .month-sep {
+      padding: 6px 20px 4px;
+      font-size: 11px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.6px; color: var(--text-muted);
+    }
+
+    /* ─── Session Card ─── */
+    .session-card {
+      background: var(--bg-card); border-radius: var(--r-lg);
+      border: 1px solid var(--border); margin: 0 16px 10px;
+      box-shadow: var(--shadow-xs); overflow: hidden;
+      cursor: pointer; transition: box-shadow .15s;
+    }
+    .session-card:active { box-shadow: var(--shadow-md); }
+    .session-card.cancelled { opacity: .8; }
+    .session-card-body { padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+    .session-type-badge {
+      width: 40px; height: 40px; border-radius: var(--r-sm); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .badge-chat    { background: #EFF6FF; color: #1D4ED8; }
+    .badge-call    { background: #F0FDF4; color: #15803D; }
+    .badge-offline { background: #FFF7ED; color: #C2410C; }
+    .badge-cancelled { background: #F1F5F9; color: var(--text-muted); }
+
+    .session-info { flex: 1; min-width: 0; }
+    .session-user { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+    .session-meta { font-size: 11px; color: var(--text-muted); margin-top: 3px; display: flex; gap: 6px; flex-wrap: wrap; }
+    .session-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
+    .session-price { font-size: 13px; font-weight: 800; color: var(--text-primary); }
+    .session-cancelled-price { font-size: 12px; color: var(--text-muted); text-decoration: line-through; }
+
+    /* Stars */
+    .star-row { display: flex; gap: 2px; }
+    .star-filled { color: #F59E0B; }
+    .star-empty  { color: var(--border-dark); }
+
+    /* Cancelled banner */
+    .cancelled-banner {
+      background: #FEF2F2; border-top: 1px solid #FECACA;
+      padding: 8px 16px; display: flex; align-items: center; gap: 8px;
+      font-size: 11px; font-weight: 600; color: #7F1D1D;
+    }
+
+    /* Note badge */
+    .note-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px; border-radius: 100px;
+      background: var(--primary-pale); color: var(--primary);
+      font-size: 10px; font-weight: 700;
+    }
+
+    /* ─── Empty State ─── */
+    .empty-wrap {
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      padding: 52px 24px; text-align: center;
+    }
+    .empty-icon  { color: var(--text-muted); opacity: .35; }
+    .empty-title { font-size: 15px; font-weight: 700; color: var(--text-primary); }
+    .empty-desc  { font-size: 13px; color: var(--text-muted); max-width: 220px; line-height: 1.6; }
+
+    /* ─── Bottom Sheet ─── */
+    .sheet-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 100;
+      display: none; align-items: flex-end; justify-content: center;
+    }
+    .sheet-overlay.open { display: flex; }
+    .sheet-panel {
+      width: 390px; background: var(--bg-card);
+      border-radius: var(--r-xl) var(--r-xl) 0 0;
+      padding: 0 0 36px; max-height: 88vh; overflow-y: auto;
+      scrollbar-width: none;
+      animation: slideUp .25s ease;
+    }
+    .sheet-panel::-webkit-scrollbar { display: none; }
+    @media (max-width: 430px) { .sheet-panel { width: 100%; } }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .sheet-handle { width: 36px; height: 4px; background: var(--border-dark); border-radius: 2px; margin: 12px auto 8px; }
+    .sheet-title  { font-size: 16px; font-weight: 800; padding: 8px 20px 16px; border-bottom: 1px solid var(--border); }
+    .sheet-body   { padding: 16px 20px 0; }
+
+    /* Detail sheet sections */
+    .detail-section { margin-bottom: 20px; }
+    .detail-section-title {
+      font-size: 11px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 10px;
+      display: flex; align-items: center; gap: 7px;
+    }
+    .detail-section-icon {
+      width: 24px; height: 24px; border-radius: 4px; flex-shrink: 0;
+      background: var(--primary-pale); color: var(--primary);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .detail-info-row {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      padding: 8px 0; border-bottom: 1px solid var(--border);
+    }
+    .detail-info-row:last-child { border-bottom: none; }
+    .detail-info-label { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+    .detail-info-value { font-size: 13px; font-weight: 700; color: var(--text-primary); text-align: right; max-width: 65%; }
+
+    .note-block {
+      background: var(--bg); border-radius: var(--r-md); padding: 12px 14px;
+      margin-bottom: 10px;
+    }
+    .note-block-label {
+      font-size: 10px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.4px; color: var(--text-muted); margin-bottom: 6px;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .note-block-text { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+
+    /* Homework preview in detail */
+    .hw-row {
+      display: flex; align-items: center; gap: 10px; padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .hw-row:last-child { border-bottom: none; }
+    .hw-check { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; }
+    .hw-row-text { flex: 1; font-size: 12px; color: var(--text-secondary); }
+    .hw-row-freq { font-size: 10px; font-weight: 700; color: var(--primary); background: var(--primary-pale); padding: 2px 7px; border-radius: 100px; }
+
+    /* Mood badge */
+    .mood-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 10px; border-radius: 100px;
+      font-size: 12px; font-weight: 700;
+    }
+
+    /* Rating in detail */
+    .rating-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .rating-note { font-size: 12px; color: var(--text-muted); font-style: italic; margin-top: 4px; }
+
+    /* Bottom nav */
+    .bottomnav {
+      position: fixed; left: 50%; transform: translateX(-50%);
+      bottom: 0; width: 390px; height: var(--nav-h);
+      background: var(--bg-card); border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-around;
+      padding: 0 4px 8px; z-index: 300;
+      box-shadow: 0 -2px 16px rgba(4,47,46,0.07);
+    }
+    @media (max-width: 430px) { .bottomnav { width: 100vw; } }
+  </style>
+</head>
+<body>
+<div class="phone" id="phoneWrap">
+  <div class="scroll-area has-nav">
+
+    <!-- Stats Hero -->
+    <div class="stats-hero">
+      <div class="stats-header">
+        <div class="back-white" onclick="go('dashboard')">
+          <svg class="icon-svg" width="18" height="18" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+        </div>
+        <div class="stats-title">Riwayat Sesi</div>
+        <div style="width:34px;"></div>
+      </div>
+      <div class="stats-grid" id="statsGrid">
+        <!-- populated by JS -->
+      </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+      <div class="filter-chip active" id="filter-all"       onclick="setFilter('all')">Semua</div>
+      <div class="filter-chip"        id="filter-done"      onclick="setFilter('done')">Selesai</div>
+      <div class="filter-chip"        id="filter-cancelled" onclick="setFilter('cancelled')">Dibatalkan</div>
+    </div>
+
+    <!-- Session List -->
+    <div id="sessionList" style="padding-bottom: 8px;"></div>
+
+  </div>
+</div>
+
+<!-- Bottom Nav -->
+<div class="bottomnav">
+  <div class="nav-item" onclick="go('dashboard')">
+    <div class="nav-icon"><svg class="icon-svg" width="21" height="21" viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5"/><path d="M5 10v9h14v-9"/><path d="M9 19v-6h6v6"/></svg></div>
+    <div class="nav-label">Home</div>
+  </div>
+  <div class="nav-item" onclick="go('schedule')">
+    <div class="nav-icon"><svg class="icon-svg" width="21" height="21" viewBox="0 0 24 24"><path d="M7 3v4"/><path d="M17 3v4"/><path d="M4 8h16"/><path d="M5 5h14a1 1 0 0 1 1 1v14H4V6a1 1 0 0 1 1-1z"/></svg></div>
+    <div class="nav-label">Jadwal</div>
+  </div>
+  <div class="nav-item" onclick="go('chat-list')">
+    <div class="nav-icon"><svg class="icon-svg" width="21" height="21" viewBox="0 0 24 24"><path d="M4 5h16v10H7l-3 3V5z"/></svg></div>
+    <div class="nav-label">Chat</div>
+  </div>
+  <div class="nav-item active" onclick="go('profile')">
+    <div class="nav-icon"><svg class="icon-svg" width="21" height="21" viewBox="0 0 24 24"><path d="M20 21a8 8 0 0 0-16 0"/><path d="M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/></svg></div>
+    <div class="nav-label">Profil</div>
+  </div>
+</div>
+
+<!-- Detail Sheet -->
+<div class="sheet-overlay" id="detailSheet" onclick="if(event.target===this)closeSheet('detailSheet')">
+  <div class="sheet-panel">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" id="detailTitle">Detail Sesi</div>
+    <div class="sheet-body" id="detailBody"></div>
+    <div style="padding: 16px 20px 0;" id="detailActions"></div>
+  </div>
+</div>
+
+<script src="../../js/app.js"></script>
+<script>
+  Object.assign(ROUTES, {
+    dashboard:   '../../pages/dashboard/index.html',
+    schedule:    '../../pages/schedule/index.html',
+    'chat-list': '../../pages/chat/index.html',
+    profile:     '../../pages/profile/index.html',
+    'session-summary': 'summary.html',
+  });
+
+  // ── Compute stats ──
+  function buildStats() {
+    const done = MOCK_SESSION_HISTORY.filter(s => !s.cancelledBy);
+    const total = MOCK_SESSION_HISTORY.length;
+    const month = done.filter(s => s.dateSort?.startsWith('2025-02')).length;
+    const avgRating = done.filter(s => s.rating).reduce((a,b) => a + b.rating, 0) / (done.filter(s=>s.rating).length || 1);
+    const totalEarnings = done.reduce((a,b) => a + b.price, 0);
+
+    document.getElementById('statsGrid').innerHTML = [
+      { label: 'Total Sesi', value: total, sub: 'sepanjang waktu' },
+      { label: 'Sesi Bulan Ini', value: month, sub: 'Februari 2025' },
+      { label: 'Rata-rata Rating', value: avgRating.toFixed(1), sub: 'dari 5.0' },
+      { label: 'Pendapatan Total', value: 'Rp ' + Math.round(totalEarnings/1000) + 'rb', sub: 'setelah biaya platform' },
+    ].map(s => `
+      <div class="stat-card">
+        <div class="stat-label">${s.label}</div>
+        <div class="stat-value">${s.value}</div>
+        <div class="stat-sub">${s.sub}</div>
+      </div>
+    `).join('');
+  }
+
+  // ── Filter ──
+  let currentFilter = 'all';
+  function setFilter(f) {
+    currentFilter = f;
+    ['all','done','cancelled'].forEach(k => {
+      document.getElementById('filter-' + k).classList.toggle('active', k === f);
+    });
+    renderList();
+  }
+
+  // ── Render list ──
+  function renderList() {
+    const list = document.getElementById('sessionList');
+    let sessions = [...MOCK_SESSION_HISTORY];
+    if (currentFilter === 'done')      sessions = sessions.filter(s => !s.cancelledBy);
+    if (currentFilter === 'cancelled') sessions = sessions.filter(s =>  s.cancelledBy);
+
+    if (sessions.length === 0) {
+      list.innerHTML = `
+        <div class="empty-wrap">
+          <div class="empty-icon"><svg class="icon-svg" width="52" height="52" viewBox="0 0 24 24"><path d="M7 3v4M17 3v4M4 8h16M5 5h14a1 1 0 0 1 1 1v14H4V6a1 1 0 0 1 1-1z"/></svg></div>
+          <div class="empty-title">Tidak ada sesi ditemukan</div>
+          <div class="empty-desc">Coba pilih filter yang berbeda.</div>
+        </div>`;
+      return;
+    }
+
+    // Group by month
+    const groups = {};
+    sessions.forEach(s => {
+      const m = s.month || 'Lainnya';
+      if (!groups[m]) groups[m] = [];
+      groups[m].push(s);
+    });
+
+    let html = '';
+    Object.entries(groups).forEach(([month, items]) => {
+      html += `<div class="month-sep">${month}</div>`;
+      items.forEach(s => {
+        const isCancelled = !!s.cancelledBy;
+        const typeClass = isCancelled ? 'badge-cancelled' : {
+          'Chat': 'badge-chat', 'Call': 'badge-call', 'Offline': 'badge-offline'
+        }[s.sessionType] || 'badge-chat';
+        const typeIcon = {
+          'Chat': '<path d="M4 5h16v10H7l-3 3V5z"/>',
+          'Call': '<path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.79 19.79 0 0 1 11.19 18.85a19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.81.31 1.6.57 2.35a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-.95a2 2 0 0 1 2.11-.45c.75.26 1.54.45 2.35.57A2 2 0 0 1 22 16.92z"/>',
+          'Offline': '<path d="M4 21h16M6 21V7l6-4 6 4v14M9 11h.01M12 11h.01M15 11h.01M9 15h.01M12 15h.01M15 15h.01"/>',
+        }[s.sessionType] || '';
+
+        const stars = s.rating ? Array.from({length:5}, (_,i) =>
+          `<svg class="icon-svg ${i<s.rating?'star-filled':'star-empty'}" width="12" height="12" viewBox="0 0 24 24"><path d="M12 3l2.8 5.8L21 9.8l-4.5 4.4 1.1 6.3L12 17.8 6.4 20.5l1.1-6.3L3 9.8l6.2-1z" ${i<s.rating?'fill="currentColor"':'fill="none"'}/></svg>`
+        ).join('') : '';
+
+        html += `
+          <div class="session-card ${isCancelled ? 'cancelled' : ''}" onclick="openDetail('${s.id}')">
+            <div class="session-card-body">
+              <div class="session-type-badge ${typeClass}">
+                <svg class="icon-svg" width="18" height="18" viewBox="0 0 24 24">${typeIcon}</svg>
+              </div>
+              <div class="session-info">
+                <div class="session-user">${s.userName}</div>
+                <div class="session-meta">
+                  <span>${s.date}</span>
+                  <span>·</span>
+                  <span>${s.time}</span>
+                  ${!isCancelled ? `<span>·</span><span>${s.duration} mnt</span>` : ''}
+                </div>
+                ${s.hasClinicalNote ? `<div class="note-badge" style="margin-top:5px;">
+                  <svg class="icon-svg" width="10" height="10" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+                  Ada catatan klinis
+                </div>` : ''}
+              </div>
+              <div class="session-right">
+                ${isCancelled
+                  ? `<span class="chip chip-danger" style="font-size:10px;padding:3px 8px;">Dibatalkan</span>
+                     <span class="session-cancelled-price">${formatRupiah(s.price)}</span>`
+                  : `<span class="session-price">${formatRupiah(s.price)}</span>
+                     <div class="star-row">${stars}</div>`
+                }
+              </div>
+            </div>
+            ${isCancelled ? `
+              <div class="cancelled-banner">
+                <svg class="icon-svg" width="12" height="12" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+                Dibatalkan oleh ${s.cancelledBy === 'user' ? 'klien' : 'Anda'}
+              </div>` : ''}
+          </div>`;
+      });
+    });
+
+    list.innerHTML = html;
+  }
+
+  // ── Detail Sheet ──
+  function openDetail(id) {
+    const s = MOCK_SESSION_HISTORY.find(h => h.id === id);
+    if (!s) return;
+
+    document.getElementById('detailTitle').textContent = s.userName;
+
+    const moodLabels = ['', 'Sangat Buruk', 'Cukup Buruk', 'Netral', 'Cukup Baik', 'Sangat Baik'];
+    const moodColors = ['','#D62828','#F97316','#EAB308','#22C55E','#10B981'];
+
+    let body = '';
+
+    // Sesi Info
+    body += `
+      <div class="detail-section">
+        <div class="detail-section-title">
+          <div class="detail-section-icon"><svg class="icon-svg" width="12" height="12" viewBox="0 0 24 24"><path d="M7 3v4M17 3v4M4 8h16M5 5h14a1 1 0 0 1 1 1v14H4V6a1 1 0 0 1 1-1z"/></svg></div>
+          Informasi Sesi
+        </div>
+        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;">
+          ${[
+            ['Tipe Sesi', s.sessionType],
+            ['Tanggal', s.date],
+            ['Pukul', s.time + ' WIB'],
+            ['Durasi', s.cancelledBy ? 'Sesi dibatalkan' : s.duration + ' menit'],
+            ['Pendapatan', s.cancelledBy ? 'Refund diberikan' : formatRupiah(s.price)],
+          ].map(([l,v]) => `
+            <div class="detail-info-row" style="padding:10px 14px;">
+              <div class="detail-info-label">${l}</div>
+              <div class="detail-info-value">${v}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+
+    // Rating
+    if (s.rating) {
+      const stars = Array.from({length:5}, (_,i) =>
+        `<svg class="icon-svg ${i<s.rating?'star-filled':'star-empty'}" width="16" height="16" viewBox="0 0 24 24"><path d="M12 3l2.8 5.8L21 9.8l-4.5 4.4 1.1 6.3L12 17.8 6.4 20.5l1.1-6.3L3 9.8l6.2-1z" ${i<s.rating?'fill="currentColor"':'fill="none"'}/></svg>`
+      ).join('');
+      body += `
+        <div class="detail-section">
+          <div class="detail-section-title">
+            <div class="detail-section-icon"><svg class="icon-svg" width="12" height="12" viewBox="0 0 24 24"><path d="M12 3l2.8 5.8L21 9.8l-4.5 4.4 1.1 6.3L12 17.8 6.4 20.5l1.1-6.3L3 9.8l6.2-1z"/></svg></div>
+            Rating dari Klien
+          </div>
+          <div class="rating-row">${stars}<strong style="font-size:15px;color:var(--text-primary);">${s.rating}/5</strong></div>
+          ${s.ratingNote ? `<div class="rating-note">${s.ratingNote}</div>` : ''}
+        </div>`;
+    }
+
+    // Clinical Note
+    if (s.hasClinicalNote && s.clinicalNote) {
+      const n = s.clinicalNote;
+      body += `
+        <div class="detail-section">
+          <div class="detail-section-title">
+            <div class="detail-section-icon"><svg class="icon-svg" width="12" height="12" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg></div>
+            Catatan Klinis
+          </div>
+          ${n.mood ? `
+            <div style="margin-bottom:10px;">
+              <span class="mood-badge" style="background:${moodColors[n.mood]}18;color:${moodColors[n.mood]};">
+                <svg class="icon-svg" width="12" height="12" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
+                Kondisi Klien: ${moodLabels[n.mood]}
+              </span>
+            </div>` : ''}
+          <div class="note-block">
+            <div class="note-block-label">
+              <svg class="icon-svg" width="10" height="10" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              Observasi
+            </div>
+            <div class="note-block-text">${n.observation}</div>
+          </div>
+          <div class="note-block">
+            <div class="note-block-label">
+              <svg class="icon-svg" width="10" height="10" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/><path d="M12 16v-4M12 8h.01"/></svg>
+              Insight &amp; Analisis
+            </div>
+            <div class="note-block-text">${n.insight}</div>
+          </div>
+          <div class="note-block" style="margin-bottom:0;">
+            <div class="note-block-label">
+              <svg class="icon-svg" width="10" height="10" viewBox="0 0 24 24"><path d="M12 3l2.8 5.8L21 9.8l-4.5 4.4 1.1 6.3L12 17.8 6.4 20.5l1.1-6.3L3 9.8l6.2-1z"/></svg>
+              Kekuatan
+            </div>
+            <div class="note-block-text">${n.strength}</div>
+          </div>
+        </div>`;
+
+      // Homework
+      if (n.homework?.length) {
+        body += `
+          <div class="detail-section">
+            <div class="detail-section-title">
+              <div class="detail-section-icon"><svg class="icon-svg" width="12" height="12" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+              Tugas Mandiri (${n.homework.length})
+            </div>
+            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-md);padding:0 14px;">
+              ${n.homework.map(h => `
+                <div class="hw-row">
+                  <div class="hw-check"></div>
+                  <div class="hw-row-text">${h.task}${h.deadline ? ` <span style="color:var(--text-muted);">· ${h.deadline}</span>` : ''}</div>
+                  <div class="hw-row-freq">${h.freq}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>`;
+      }
+
+      // Supplements
+      if (n.supplements?.length) {
+        body += `
+          <div class="detail-section">
+            <div class="detail-section-title">
+              <div class="detail-section-icon"><svg class="icon-svg" width="12" height="12" viewBox="0 0 24 24"><path d="M10.5 2h3"/><path d="M12 14V8"/><path d="M5 19c0-3.3 3.1-6 7-6s7 2.7 7 6"/><path d="M3 21h18"/></svg></div>
+              Suplemen &amp; Saran
+            </div>
+            ${n.supplements.map(s => `
+              <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-md);padding:10px 14px;display:flex;gap:10px;margin-bottom:8px;">
+                <div style="width:30px;height:30px;border-radius:6px;background:var(--primary-pale);color:var(--primary);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                  <svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24"><path d="M10.5 2h3"/><path d="M12 14V8"/><path d="M5 19c0-3.3 3.1-6 7-6s7 2.7 7 6"/><path d="M3 21h18"/></svg>
+                </div>
+                <div>
+                  <div style="font-size:13px;font-weight:700;color:var(--text-primary);">${s.name}</div>
+                  <div style="font-size:11px;color:var(--text-muted);">${s.dose ? s.dose + ' · ' : ''}${s.freq}</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>`;
+      }
+
+      // Follow-up
+      if (n.followUp?.active) {
+        body += `
+          <div class="detail-section">
+            <div class="detail-section-title">
+              <div class="detail-section-icon"><svg class="icon-svg" width="12" height="12" viewBox="0 0 24 24"><path d="M23 4v6h-6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></div>
+              Rekomendasi Sesi Lanjutan
+            </div>
+            <div style="background:var(--primary-xpale);border:1px solid var(--primary-pale);border-radius:var(--r-md);padding:12px 14px;">
+              <div style="font-size:12px;font-weight:700;color:var(--primary);margin-bottom:4px;">Dalam ${n.followUp.duration}</div>
+              ${n.followUp.message ? `<div style="font-size:12px;color:var(--teal-800);line-height:1.6;">${n.followUp.message}</div>` : ''}
+            </div>
+          </div>`;
+      }
+
+      if (n.crisisFlag) {
+        body += `
+          <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:var(--r-md);padding:12px 14px;display:flex;gap:10px;margin-bottom:16px;">
+            <svg class="icon-svg" width="18" height="18" viewBox="0 0 24 24" style="color:var(--danger);flex-shrink:0;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+            <div style="font-size:12px;font-weight:700;color:#7F1D1D;">Sesi ini ditandai sebagai situasi darurat.</div>
+          </div>`;
+      }
+    }
+
+    document.getElementById('detailBody').innerHTML = body;
+
+    // Edit button (only within 24h — always show for demo)
+    const savedAt = s.clinicalNote?.savedAt;
+    const canEdit = s.hasClinicalNote; // in demo always true for completed sessions
+    document.getElementById('detailActions').innerHTML = s.hasClinicalNote ? `
+      <button class="btn btn-secondary" style="margin-bottom:8px;" onclick="handleEditNote('${s.id}')">
+        <svg class="icon-svg" width="15" height="15" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+        Edit Catatan
+        <span style="font-size:10px;font-weight:600;color:var(--text-muted);margin-left:4px;">(dalam 24 jam)</span>
+      </button>` : '';
+
+    openSheet('detailSheet');
+  }
+
+  function handleEditNote(id) {
+    toast('Fitur edit catatan tersedia selama 24 jam setelah sesi selesai.');
+  }
+
+  function openSheet(id)  { document.getElementById(id).classList.add('open'); }
+  function closeSheet(id) { document.getElementById(id).classList.remove('open'); }
+
+  function toast(msg) {
+    let el = document.querySelector('.phone .toast');
+    if (!el) {
+      el = document.createElement('div');
+      el.className = 'toast';
+      document.getElementById('phoneWrap').appendChild(el);
+    }
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.classList.remove('show'), 2800);
+  }
+
+  buildStats();
+  renderList();
+</script>
+</body>
+</html>
