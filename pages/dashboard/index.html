@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Dashboard — Hi-Me Expert</title>
+  <link rel="stylesheet" href="../../css/global.css">
+  <style>
+    /* ─── Header Hero ─── */
+    .dash-header {
+      background: linear-gradient(150deg, var(--teal-900) 0%, var(--teal-700) 70%, var(--teal-600) 100%);
+      padding: 0 20px 28px;
+      position: relative; overflow: hidden;
+    }
+    .dash-header::before {
+      content: '';
+      position: absolute; top: -60px; right: -60px;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(94,234,212,.12) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .dash-header::after {
+      content: ''; position: absolute; bottom: -1px; left: 0; right: 0;
+      height: 28px; background: var(--bg); border-radius: 28px 28px 0 0;
+    }
+
+    /* Status bar override */
+    .dash-header .statusbar { color: rgba(255,255,255,.7); }
+    .dash-header .statusbar .status-time { color: white; }
+
+    /* ─── Expert Greeting Row ─── */
+    .greeting-row {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding-top: 6px;
+    }
+    .greeting-info { flex: 1; }
+    .greeting-hello {
+      font-size: 11px; font-weight: 600; color: rgba(255,255,255,.6);
+      text-transform: uppercase; 
+      letter-spacing: 0.7px; 
+      margin-bottom: 2px;
+      margin-top: 20px;
+    }
+    .greeting-name {
+      font-family: 'DM Serif Display', serif;
+      font-size: 22px; color: white; line-height: 1.1; margin-bottom: 4px;
+    }
+    .greeting-spec {
+      font-size: 11px; color: rgba(255,255,255,.55); font-weight: 500;
+    }
+    .verified-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2);
+      border-radius: 100px; padding: 3px 8px;
+      font-size: 10px; font-weight: 700; color: var(--teal-300);
+      margin-top: 6px;
+    }
+    .expert-avatar {
+      width: 52px; height: 52px; border-radius: var(--r-md);
+      background: linear-gradient(135deg, var(--teal-500), var(--teal-300));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; font-weight: 800; color: white;
+      flex-shrink: 0; border: 2px solid rgba(255,255,255,.2);
+      margin-top: 20px;
+      position: relative;
+    }
+    .status-dot {
+      position: absolute; bottom: -3px; right: -3px;
+      width: 14px; height: 14px; border-radius: 50%;
+      border: 2px solid var(--teal-900);
+    }
+    .status-dot.online  { background: #22C55E; }
+    .status-dot.busy    { background: var(--warning); }
+    .status-dot.offline { background: #94A3B8; }
+
+    /* ─── Status Toggle ─── */
+    .status-toggle-row {
+      display: flex; gap: 6px; margin-top: 14px;
+    }
+    .status-chip {
+      flex: 1; padding: 7px 0; border-radius: 100px;
+      font-size: 11px; font-weight: 700;
+      border: 1.5px solid rgba(255,255,255,.2);
+      background: transparent; color: rgba(255,255,255,.55);
+      cursor: pointer; transition: all .15s;
+      display: flex; align-items: center; justify-content: center; gap: 5px;
+    }
+    .status-chip .chip-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+    }
+    .status-chip.online-chip  .chip-dot { background: #22C55E; }
+    .status-chip.busy-chip    .chip-dot { background: var(--warning); }
+    .status-chip.offline-chip .chip-dot { background: #94A3B8; }
+    .status-chip.active {
+      background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.35);
+      color: white;
+    }
+
+    /* ─── Stats Strip ─── */
+    .stats-row {
+      display: grid; grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 10px; padding: 20px 20px 0;
+    }
+    .stat-card {
+      background: var(--bg-card); border-radius: var(--r-md);
+      padding: 12px 10px; text-align: center;
+      box-shadow: var(--shadow-sm); border: 1px solid var(--border);
+    }
+    .stat-card-num {
+      font-size: 18px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px;
+    }
+    .stat-card-label {
+      font-size: 9px; font-weight: 600; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.4px; margin-top: 2px; line-height: 1.3;
+    }
+
+    /* ─── Banner Sesi Berlangsung ─── */
+    .session-banner {
+      margin: 18px 20px 0;
+      background: linear-gradient(135deg, #065F46, #059669);
+      border-radius: var(--r-lg); padding: 16px;
+      display: flex; align-items: center; gap: 14px;
+      box-shadow: 0 6px 24px rgba(5,150,105,.3);
+      cursor: pointer;
+    }
+    .session-banner-icon {
+      width: 42px; height: 42px; border-radius: var(--r-sm);
+      background: rgba(255,255,255,.15); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      color: white;
+    }
+    .session-banner-info { flex: 1; }
+    .session-banner-label {
+      font-size: 10px; font-weight: 700; color: rgba(255,255,255,.7);
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .session-banner-name { font-size: 14px; font-weight: 700; color: white; margin: 2px 0; }
+    .session-banner-timer { font-size: 20px; font-weight: 800; color: white; letter-spacing: -0.5px; font-variant-numeric: tabular-nums; }
+    .session-banner-cta {
+      padding: 8px 14px; background: white; color: #065F46;
+      border-radius: var(--r-sm); font-size: 12px; font-weight: 800;
+      border: none; cursor: pointer; flex-shrink: 0;
+    }
+
+    /* ─── Section Card ─── */
+    .section-card {
+      margin: 18px 20px 0;
+      background: var(--bg-card); border-radius: var(--r-lg);
+      border: 1px solid var(--border); box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 16px 0;
+    }
+    .section-title-text {
+      font-size: 13px; font-weight: 800; color: var(--text-primary);
+    }
+    .section-count {
+      font-size: 11px; font-weight: 700; color: white;
+      background: var(--primary); border-radius: 100px;
+      padding: 2px 8px; min-width: 22px; text-align: center;
+    }
+    .section-link {
+      font-size: 12px; font-weight: 700; color: var(--primary); cursor: pointer;
+    }
+
+    /* ─── Request Card ─── */
+    .request-item {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .request-item:last-child { border-bottom: none; }
+    .request-top {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
+    }
+    .request-user-info { flex: 1; }
+    .request-user-name { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+    .request-meta { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+    .request-price { font-size: 14px; font-weight: 800; color: var(--primary); }
+    .request-note {
+      font-size: 12px; color: var(--text-muted); line-height: 1.5;
+      background: var(--bg); border-radius: var(--r-sm); padding: 8px 10px;
+      margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .request-actions { display: flex; gap: 8px; }
+    .btn-accept {
+      flex: 1; padding: 9px; border-radius: var(--r-sm);
+      background: var(--success); color: white;
+      font-size: 13px; font-weight: 700; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: opacity .15s;
+    }
+    .btn-accept:active { opacity: .8; }
+    .btn-reject {
+      flex: 1; padding: 9px; border-radius: var(--r-sm);
+      background: transparent; color: var(--danger);
+      font-size: 13px; font-weight: 700;
+      border: 1.5px solid rgba(214,40,40,.25); cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: background .15s;
+    }
+    .btn-reject:active { background: rgba(214,40,40,.06); }
+
+    /* ─── Session Type Chips ─── */
+    .type-chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 8px; border-radius: 100px; font-size: 10px; font-weight: 700;
+    }
+    .type-chip.chat    { background: rgba(58,134,255,.1); color: #3A86FF; }
+    .type-chip.call    { background: rgba(93,186,132,.1); color: #5DBA84; }
+    .type-chip.offline { background: rgba(244,162,97,.1); color: #E07B39; }
+
+    /* ─── Schedule Timeline ─── */
+    .schedule-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px; border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+    .schedule-item:last-child { border-bottom: none; }
+    .schedule-time {
+      font-size: 12px; font-weight: 700; color: var(--text-muted);
+      width: 40px; flex-shrink: 0; text-align: right;
+    }
+    .schedule-line {
+      width: 2px; height: 100%; background: var(--border);
+      position: absolute; left: 68px; top: 0; bottom: 0;
+    }
+    .schedule-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      flex-shrink: 0; margin-left: 4px;
+    }
+    .schedule-dot.done     { background: var(--border-dark); }
+    .schedule-dot.active   { background: #22C55E; box-shadow: 0 0 0 3px rgba(34,197,94,.2); }
+    .schedule-dot.upcoming { background: var(--primary); }
+    .schedule-content { flex: 1; }
+    .schedule-name  { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+    .schedule-sub   { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+    .status-badge {
+      font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 100px;
+    }
+    .status-badge.done     { background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); }
+    .status-badge.active   { background: rgba(34,197,94,.1); color: #16A34A; }
+    .status-badge.upcoming { background: var(--primary-pale); color: var(--primary); }
+
+    /* ─── Weekly Earnings Chart ─── */
+    .earnings-section {
+      margin: 18px 20px;
+    }
+    .earnings-card {
+      background: var(--bg-card); border-radius: var(--r-lg);
+      border: 1px solid var(--border); box-shadow: var(--shadow-sm);
+      padding: 16px;
+    }
+    .earnings-header {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;
+    }
+    .earnings-totals { display: flex; gap: 20px; }
+    .earnings-total-item {}
+    .earnings-total-label { font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
+    .earnings-total-num { font-size: 16px; font-weight: 800; color: var(--text-primary); margin-top: 2px; }
+    .earnings-total-num.primary { color: var(--primary); }
+    .chart-bars {
+      display: flex; align-items: flex-end; gap: 6px; height: 64px;
+    }
+    .chart-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .chart-bar-wrap { flex: 1; width: 100%; display: flex; align-items: flex-end; }
+    .chart-bar {
+      width: 100%; border-radius: 4px 4px 0 0;
+      background: var(--primary-pale);
+      transition: height .4s ease;
+    }
+    .chart-bar.today { background: var(--primary); }
+    .chart-bar.zero  { background: var(--border); height: 3px !important; border-radius: 2px; }
+    .chart-day { font-size: 10px; font-weight: 600; color: var(--text-muted); }
+    .chart-day.today { color: var(--primary); font-weight: 800; }
+
+    /* ─── Bottom Nav ─── */
+    .bottom-nav {
+      position: sticky; bottom: 0;
+      background: var(--bg-card); border-top: 1px solid var(--border);
+      height: var(--nav-h);
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      padding-bottom: env(safe-area-inset-bottom, 0);
+    }
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 3px; cursor: pointer; transition: all .15s;
+      color: var(--text-muted); padding: 8px 0; position: relative;
+    }
+    .nav-item.active { color: var(--primary); }
+    .nav-item.active svg { stroke: var(--primary); }
+    .nav-label { font-size: 10px; font-weight: 600; }
+    .nav-badge {
+      position: absolute; top: 6px; right: 18%;
+      min-width: 16px; height: 16px; border-radius: 100px;
+      background: var(--danger); color: white;
+      font-size: 9px; font-weight: 700; padding: 0 4px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ─── Bottom Sheet ─── */
+    .sheet-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 100;
+      display: none; align-items: flex-end; justify-content: center;
+    }
+    .sheet-overlay.open { display: flex; }
+    .sheet-panel {
+      width: 390px; background: var(--bg-card);
+      border-radius: var(--r-xl) var(--r-xl) 0 0;
+      padding: 0 0 32px; max-height: 80vh; overflow-y: auto;
+      animation: slideUp .25s ease;
+    }
+    @media (max-width: 430px) { .sheet-panel { width: 100%; } }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .sheet-handle {
+      width: 36px; height: 4px; background: var(--border-dark); border-radius: 2px;
+      margin: 12px auto 8px;
+    }
+    .sheet-title {
+      font-size: 16px; font-weight: 800; color: var(--text-primary);
+      padding: 8px 20px 16px; border-bottom: 1px solid var(--border);
+    }
+    .sheet-body { padding: 20px; }
+    .sheet-detail-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 0; border-bottom: 1px solid var(--border);
+    }
+    .sheet-detail-row:last-child { border-bottom: none; }
+    .sheet-detail-label { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+    .sheet-detail-val   { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+    .sheet-actions { display: flex; gap: 10px; margin-top: 20px; }
+    .sheet-note-box {
+      background: var(--bg); border-radius: var(--r-sm); padding: 12px;
+      font-size: 12px; color: var(--text-secondary); line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    /* ─── Reject Reason Sheet ─── */
+    .reason-option {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 0; border-bottom: 1px solid var(--border); cursor: pointer;
+    }
+    .reason-option:last-child { border-bottom: none; }
+    .reason-radio {
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 2px solid var(--border-dark); flex-shrink: 0;
+    }
+    .reason-option.selected .reason-radio {
+      border-color: var(--primary); background: var(--primary);
+      position: relative;
+    }
+    .reason-option.selected .reason-radio::after {
+      content: ''; width: 7px; height: 7px; border-radius: 50%;
+      background: white; position: absolute;
+      top: 50%; left: 50%; transform: translate(-50%,-50%);
+    }
+    .reason-text { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .reason-input {
+      width: 100%; margin-top: 10px; padding: 10px 12px;
+      border: 1.5px solid var(--border); border-radius: var(--r-sm);
+      font-size: 13px; color: var(--text-primary); background: var(--bg);
+      resize: none; display: none;
+    }
+    .reason-input.visible { display: block; }
+
+    /* ─── Toast ─── */
+    .dash-toast {
+      position: fixed; bottom: calc(var(--nav-h) + 16px); left: 50%; transform: translateX(-50%) translateY(20px);
+      background: #1F2937; color: white; border-radius: var(--r-sm);
+      padding: 10px 18px; font-size: 13px; font-weight: 600;
+      opacity: 0; transition: all .25s; pointer-events: none; z-index: 200;
+      white-space: nowrap;
+    }
+    .dash-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- Header -->
+  <div class="dash-header">
+    <div class="statusbar">
+      <span class="status-time" id="headerTime">09:41</span>
+      <div class="status-icons">
+        <svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" stroke="rgba(255,255,255,.7)"><path d="M1 6l5.5 5.5L12 6l5.5 5.5L23 6"/></svg>
+        <svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" stroke="rgba(255,255,255,.7)"><path d="M23 7a2 2 0 0 1-2 2H3a2 2 0 0 1 0-4h18a2 2 0 0 1 2 2z"/><rect x="2" y="11" width="20" height="10" rx="2"/></svg>
+      </div>
+    </div>
+
+    <div class="greeting-row anim-fade-in">
+      <div class="greeting-info">
+        <div class="greeting-hello">Selamat Pagi</div>
+        <div class="greeting-name" id="expertName">Rina Kusuma, M.Psi.</div>
+        <div class="greeting-spec" id="expertSpec">Psikolog · Kecemasan, Burnout, Depresi</div>
+        <div class="verified-badge">
+          <svg class="icon-svg" width="10" height="10" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+          Terverifikasi
+        </div>
+      </div>
+      <div class="expert-avatar" id="expertAvatar">
+        RK
+        <div class="status-dot online" id="avatarDot"></div>
+      </div>
+    </div>
+
+    <div class="status-toggle-row anim-fade-up d1">
+      <button class="status-chip online-chip active" onclick="setStatus('online')">
+        <div class="chip-dot"></div> Online
+      </button>
+      <button class="status-chip busy-chip" onclick="setStatus('busy')">
+        <div class="chip-dot"></div> Sibuk
+      </button>
+      <button class="status-chip offline-chip" onclick="setStatus('offline')">
+        <div class="chip-dot"></div> Offline
+      </button>
+    </div>
+    <div style="height: 28px;"></div>
+  </div>
+
+  <!-- Scroll Content -->
+  <div class="scroll-area" style="padding-bottom: calc(var(--nav-h) + 20px);">
+
+    <!-- Stats Strip -->
+    <div class="stats-row anim-fade-up d1">
+      <div class="stat-card">
+        <div class="stat-card-num" id="statSesi">4</div>
+        <div class="stat-card-label">Sesi Hari Ini</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-num" id="statRequest">2</div>
+        <div class="stat-card-label">Pending Request</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-num" id="statRating">4.9</div>
+        <div class="stat-card-label">Rating Bulan Ini</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-num" id="statEarnings">365K</div>
+        <div class="stat-card-label">Pendapatan Hari Ini</div>
+      </div>
+    </div>
+
+    <!-- Banner Sesi Berlangsung -->
+    <div class="session-banner anim-fade-up d2" id="sessionBanner" onclick="goToSession()">
+      <div class="session-banner-icon">
+        <svg class="icon-svg" width="20" height="20" viewBox="0 0 24 24" stroke="white"><path d="M4 5h16v10H7l-3 3V5z"/></svg>
+      </div>
+      <div class="session-banner-info">
+        <div class="session-banner-label">Sesi Berlangsung</div>
+        <div class="session-banner-name">M*** R*** · Chat</div>
+        <div class="session-banner-timer" id="sessionTimer">23:41</div>
+      </div>
+      <button class="session-banner-cta" onclick="event.stopPropagation(); goToSession()">Masuk</button>
+    </div>
+
+    <!-- Request Masuk -->
+    <div class="section-card anim-fade-up d2">
+      <div class="section-header">
+        <div class="section-title-text">Request Masuk</div>
+        <span class="section-count" id="requestCount">2</span>
+      </div>
+      <div style="height: 14px;"></div>
+      <div id="requestList"></div>
+    </div>
+
+    <!-- Jadwal Hari Ini -->
+    <div class="section-card anim-fade-up d3">
+      <div class="section-header">
+        <div class="section-title-text">Jadwal Hari Ini</div>
+        <span class="section-link" onclick="go('schedule')">Lihat Semua</span>
+      </div>
+      <div style="height: 14px;"></div>
+      <div id="scheduleList"></div>
+    </div>
+
+    <!-- Statistik Mingguan -->
+    <div class="earnings-section anim-fade-up d3">
+      <div class="earnings-card">
+        <div class="earnings-header">
+          <div class="section-title-text">Minggu Ini</div>
+          <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24" stroke="var(--primary)"><path d="M23 6l-9.5 9.5-5-5L1 18"/><path d="M17 6h6v6"/></svg>
+        </div>
+        <div class="earnings-totals" style="margin-bottom: 16px;">
+          <div class="earnings-total-item">
+            <div class="earnings-total-label">Minggu Ini</div>
+            <div class="earnings-total-num primary" id="weekTotal">Rp 2.010.000</div>
+          </div>
+          <div class="earnings-total-item">
+            <div class="earnings-total-label">Minggu Lalu</div>
+            <div class="earnings-total-num" id="lastWeekTotal">Rp 1.750.000</div>
+          </div>
+        </div>
+        <div class="chart-bars" id="weekChart"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Nav -->
+  <div class="bottom-nav">
+    <div class="nav-item active">
+      <svg class="icon-svg" width="22" height="22" viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5"/><path d="M5 10v9h14v-9"/><path d="M9 19v-6h6v6"/></svg>
+      <span class="nav-label">Home</span>
+    </div>
+    <div class="nav-item" onclick="showToast('Halaman Jadwal — Phase 2.3')">
+      <svg class="icon-svg" width="22" height="22" viewBox="0 0 24 24"><path d="M7 3v4"/><path d="M17 3v4"/><path d="M4 8h16"/><path d="M5 5h14a1 1 0 0 1 1 1v14H4V6a1 1 0 0 1 1-1z"/></svg>
+      <span class="nav-label">Jadwal</span>
+    </div>
+    <div class="nav-item" onclick="go('chat-list')" style="position:relative;">
+      <svg class="icon-svg" width="22" height="22" viewBox="0 0 24 24"><path d="M4 5h16v10H7l-3 3V5z"/></svg>
+      <span class="nav-label">Chat</span>
+      <div class="nav-badge">1</div>
+    </div>
+    <div class="nav-item" onclick="showToast('Halaman Profil — Phase 2.6')">
+      <svg class="icon-svg" width="22" height="22" viewBox="0 0 24 24"><path d="M20 21a8 8 0 0 0-16 0"/><path d="M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/></svg>
+      <span class="nav-label">Profil</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- Sheet: Konfirmasi Terima -->
+<div class="sheet-overlay" id="acceptSheet" onclick="overlayClick(event,'acceptSheet')">
+  <div class="sheet-panel">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Konfirmasi Terima Sesi</div>
+    <div class="sheet-body">
+      <div id="acceptSheetContent"></div>
+      <div class="sheet-actions">
+        <button class="btn btn-ghost" style="flex:1" onclick="closeSheet('acceptSheet')">Batal</button>
+        <button class="btn btn-primary" style="flex:2" onclick="confirmAccept()">Ya, Terima Sesi</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Sheet: Tolak -->
+<div class="sheet-overlay" id="rejectSheet" onclick="overlayClick(event,'rejectSheet')">
+  <div class="sheet-panel">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Alasan Penolakan</div>
+    <div class="sheet-body">
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">Pilih alasan penolakan. Alasan ini akan dikirimkan sebagai notifikasi kepada pengguna.</p>
+      <div id="reasonList"></div>
+      <textarea class="reason-input" id="reasonInput" rows="3" placeholder="Tulis alasan lainnya..."></textarea>
+      <div class="sheet-actions" style="margin-top:16px;">
+        <button class="btn btn-ghost" style="flex:1" onclick="closeSheet('rejectSheet')">Batal</button>
+        <button class="btn" style="flex:2;background:var(--danger);color:white;" onclick="confirmReject()">Tolak Sesi</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="dash-toast" id="globalToast"></div>
+
+<script src="../../js/app.js"></script>
+<script>
+  // ── Expert mock state ──
+  const expert = MOCK_EXPERT;
+  let requests = [...MOCK_REQUESTS];
+  let currentStatus = 'online';
+  let activeRejectId = null;
+  let activeAcceptId = null;
+  let selectedReason = null;
+  const REASONS = [
+    'Jadwal Sudah Penuh',
+    'Tidak Sesuai Spesialisasi',
+    'Darurat Pribadi',
+    'Lainnya'
+  ];
+
+  // ── Header time ──
+  function updateTime() {
+    const t = new Date().toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit', hour12:false });
+    document.getElementById('headerTime').textContent = t;
+  }
+  updateTime(); setInterval(updateTime, 10000);
+
+  // ── Status Toggle ──
+  function setStatus(s) {
+    currentStatus = s;
+    document.querySelectorAll('.status-chip').forEach(c => c.classList.remove('active'));
+    document.querySelector(`.${s}-chip`).classList.add('active');
+    const dot = document.getElementById('avatarDot');
+    dot.className = `status-dot ${s}`;
+    const labels = { online: 'Online', busy: 'Sedang Sibuk', offline: 'Offline' };
+    showToast(`Status diubah ke ${labels[s]}`);
+  }
+
+  // ── Render Requests ──
+  function renderRequests() {
+    const list = document.getElementById('requestList');
+    document.getElementById('requestCount').textContent = requests.length;
+    document.getElementById('statRequest').textContent = requests.length;
+    if (!requests.length) {
+      list.innerHTML = `<div style="padding:24px;text-align:center;">
+        <div style="font-size:13px;color:var(--text-muted);">Belum ada request masuk saat ini</div>
+      </div>`;
+      return;
+    }
+    list.innerHTML = requests.map(r => `
+      <div class="request-item" id="req-${r.id}">
+        <div class="request-top">
+          ${avatarGrad(r.userInitials, 38, 14)}
+          <div class="request-user-info">
+            <div class="request-user-name">${r.userName}</div>
+            <div class="request-meta">
+              <span class="type-chip ${r.sessionType.toLowerCase()}">${r.sessionType}</span>
+              &nbsp;${r.date} · ${r.time} · ${r.duration} menit
+            </div>
+          </div>
+          <div class="request-price">${formatRupiah(r.price)}</div>
+        </div>
+        <div class="request-note">"${r.note}"</div>
+        <div class="request-actions">
+          <button class="btn-accept" onclick="openAccept('${r.id}')">
+            <svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+            Terima
+          </button>
+          <button class="btn-reject" onclick="openReject('${r.id}')">
+            <svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+            Tolak
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // ── Accept Sheet ──
+  function openAccept(id) {
+    activeAcceptId = id;
+    const r = requests.find(x => x.id === id);
+    document.getElementById('acceptSheetContent').innerHTML = `
+      <div class="sheet-detail-row"><div class="sheet-detail-label">Klien</div><div class="sheet-detail-val">${r.userName}</div></div>
+      <div class="sheet-detail-row"><div class="sheet-detail-label">Tipe Sesi</div><div class="sheet-detail-val">${r.sessionType} · ${r.duration} menit</div></div>
+      <div class="sheet-detail-row"><div class="sheet-detail-label">Jadwal</div><div class="sheet-detail-val">${r.date} · ${r.time}</div></div>
+      <div class="sheet-detail-row"><div class="sheet-detail-label">Harga</div><div class="sheet-detail-val" style="color:var(--primary)">${formatRupiah(r.price)}</div></div>
+      <div class="sheet-note-box">"${r.note}"</div>
+    `;
+    openSheet('acceptSheet');
+  }
+  function confirmAccept() {
+    closeSheet('acceptSheet');
+    requests = requests.filter(x => x.id !== activeAcceptId);
+    renderRequests();
+    showToast('Sesi berhasil diterima. Klien telah dinotifikasi.');
+  }
+
+  // ── Reject Sheet ──
+  function openReject(id) {
+    activeRejectId = id;
+    selectedReason = null;
+    document.getElementById('reasonInput').classList.remove('visible');
+    document.getElementById('reasonList').innerHTML = REASONS.map((r,i) => `
+      <div class="reason-option" id="reason-${i}" onclick="selectReason(${i},'${r}')">
+        <div class="reason-radio"></div>
+        <div class="reason-text">${r}</div>
+      </div>
+    `).join('');
+    openSheet('rejectSheet');
+  }
+  function selectReason(idx, text) {
+    selectedReason = text;
+    document.querySelectorAll('.reason-option').forEach((el,i) => {
+      el.classList.toggle('selected', i === idx);
+    });
+    document.getElementById('reasonInput').classList.toggle('visible', text === 'Lainnya');
+  }
+  function confirmReject() {
+    if (!selectedReason) { showToast('Pilih alasan terlebih dahulu'); return; }
+    closeSheet('rejectSheet');
+    requests = requests.filter(x => x.id !== activeRejectId);
+    renderRequests();
+    showToast('Sesi ditolak. Klien telah dinotifikasi.');
+  }
+
+  // ── Render Schedule ──
+  function renderSchedule() {
+    const list = document.getElementById('scheduleList');
+    const typeMap = { Chat: 'chat', Call: 'call', Offline: 'offline' };
+    const statusLabel = { done: 'Selesai', active: 'Berlangsung', upcoming: 'Mendatang' };
+    list.innerHTML = MOCK_SESSIONS_TODAY.map(s => `
+      <div class="schedule-item">
+        <div class="schedule-time">${s.time}</div>
+        <div class="schedule-dot ${s.status}"></div>
+        <div class="schedule-content">
+          <div class="schedule-name">${s.userName}</div>
+          <div class="schedule-sub">
+            <span class="type-chip ${typeMap[s.sessionType]}">${s.sessionType}</span>
+            &nbsp;${s.duration} menit
+          </div>
+        </div>
+        <div class="status-badge ${s.status}">${statusLabel[s.status]}</div>
+      </div>
+    `).join('');
+  }
+
+  // ── Render Chart ──
+  function renderChart() {
+    const max = Math.max(...MOCK_EARNINGS_WEEKLY.map(d => d.amount));
+    const total = MOCK_EARNINGS_WEEKLY.reduce((a,b) => a + b.amount, 0);
+    document.getElementById('weekTotal').textContent = formatRupiah(total);
+    const today = new Date().getDay();
+    const dayMap = [6,0,1,2,3,4,5]; // Sun=0 → Minggu index 6
+    const todayIdx = dayMap[today] ?? 4;
+    const chart = document.getElementById('weekChart');
+    chart.innerHTML = MOCK_EARNINGS_WEEKLY.map((d, i) => {
+      const pct = max > 0 ? Math.max(4, Math.round((d.amount / max) * 56)) : 3;
+      const isToday = i === todayIdx;
+      const isZero = d.amount === 0;
+      return `
+        <div class="chart-col">
+          <div class="chart-bar-wrap">
+            <div class="chart-bar ${isToday ? 'today' : ''} ${isZero ? 'zero' : ''}"
+                 style="height:${isZero ? 3 : pct}px;"></div>
+          </div>
+          <div class="chart-day ${isToday ? 'today' : ''}">${d.day}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ── Session Banner Timer ──
+  let sessionSeconds = 23 * 60 + 41;
+  function updateTimer() {
+    sessionSeconds++;
+    const m = String(Math.floor(sessionSeconds / 60)).padStart(2,'0');
+    const s = String(sessionSeconds % 60).padStart(2,'0');
+    const el = document.getElementById('sessionTimer');
+    if (el) el.textContent = `${m}:${s}`;
+  }
+  setInterval(updateTimer, 1000);
+
+  function goToSession() {
+    showToast('Membuka ruang sesi... (Phase 2.4)');
+  }
+
+  // ── Toast ──
+  function showToast(msg) {
+    let el = document.getElementById('globalToast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.classList.remove('show'), 2800);
+  }
+
+  // ── go() override for notifications ──
+  const _go = go;
+
+  // ── Init ──
+  renderRequests();
+  renderSchedule();
+  renderChart();
+</script>
+</body>
+</html>

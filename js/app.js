@@ -46,8 +46,9 @@ const CANONICAL_ROUTES = {
   'register-setup':        `${APP_ROOT}/pages/auth/register-setup.html`,
   pending:   `${APP_ROOT}/pages/auth/pending.html`,
   rejected:  `${APP_ROOT}/pages/auth/rejected.html`,
-  dashboard: `${APP_ROOT}/pages/dashboard/index.html`,
-  schedule:  `${APP_ROOT}/pages/schedule/index.html`,
+  dashboard:     `${APP_ROOT}/pages/dashboard/index.html`,
+  notifications: `${APP_ROOT}/pages/notifications/index.html`,
+  schedule:      `${APP_ROOT}/pages/schedule/index.html`,
   'chat-list': `${APP_ROOT}/pages/chat/index.html`,
   profile:   `${APP_ROOT}/pages/profile/index.html`,
 };
@@ -168,6 +169,173 @@ function avatarGrad(initials, size = 52, fontSize = 20) {
   const id = `ag${Math.random().toString(36).slice(2,7)}`;
   return `<div class="avatar" style="width:${size}px;height:${size}px;font-size:${fontSize}px;background:linear-gradient(135deg,${c1},${c2});color:white;">${initials}</div>`;
 }
+
+// ── Mock Data (Phase 2.2) ──
+
+const MOCK_EXPERT = {
+  id: 'exp_001',
+  name: 'Rina Kusuma',
+  degree: 'M.Psi.',
+  type: 'Psikolog',
+  status: 'active',
+  specializations: ['Kecemasan', 'Burnout', 'Depresi'],
+  rating: 4.9,
+  totalSessions: 142,
+  experience: 6,
+  onlineStatus: 'online',
+  pricing: { chat30: 75000, chat60: 140000, call30: 85000, call60: 160000, offline: 200000 }
+};
+
+const MOCK_REQUESTS = [
+  {
+    id: 'req_001',
+    userInitials: 'AN',
+    userName: 'A*** N***',
+    sessionType: 'Chat',
+    date: 'Kamis, 27 Feb 2025',
+    time: '14:00',
+    duration: 60,
+    price: 140000,
+    requestedAt: '2 jam lalu',
+    note: 'Saya sering merasa cemas berlebihan sebelum presentasi kerja dan sulit tidur.'
+  },
+  {
+    id: 'req_002',
+    userInitials: 'BY',
+    userName: 'B*** Y***',
+    sessionType: 'Call',
+    date: 'Jumat, 28 Feb 2025',
+    time: '10:00',
+    duration: 30,
+    price: 85000,
+    requestedAt: '5 jam lalu',
+    note: 'Butuh bantuan mengelola stres karena deadline pekerjaan yang menumpuk.'
+  }
+];
+
+const MOCK_SESSIONS_TODAY = [
+  {
+    id: 'ses_001',
+    userInitials: 'DS',
+    userName: 'D*** S***',
+    sessionType: 'Chat',
+    time: '09:00',
+    duration: 60,
+    status: 'done'
+  },
+  {
+    id: 'ses_002',
+    userInitials: 'MR',
+    userName: 'M*** R***',
+    sessionType: 'Call',
+    time: '11:00',
+    duration: 30,
+    status: 'active'
+  },
+  {
+    id: 'ses_003',
+    userInitials: 'FS',
+    userName: 'F*** S***',
+    sessionType: 'Chat',
+    time: '14:00',
+    duration: 60,
+    status: 'upcoming'
+  },
+  {
+    id: 'ses_004',
+    userInitials: 'KP',
+    userName: 'K*** P***',
+    sessionType: 'Offline',
+    time: '16:30',
+    duration: 60,
+    status: 'upcoming'
+  }
+];
+
+const MOCK_EARNINGS_WEEKLY = [
+  { day: 'Sen', amount: 280000 },
+  { day: 'Sel', amount: 420000 },
+  { day: 'Rab', amount: 140000 },
+  { day: 'Kam', amount: 560000 },
+  { day: 'Jum', amount: 385000 },
+  { day: 'Sab', amount: 225000 },
+  { day: 'Min', amount: 0 }
+];
+
+const MOCK_NOTIFICATIONS = [
+  {
+    id: 'notif_001',
+    category: 'request',
+    title: 'Request Sesi Baru',
+    desc: 'A*** N*** mengajukan sesi Chat 60 menit untuk Kamis, 27 Feb pukul 14:00.',
+    time: '2 jam lalu',
+    read: false,
+    route: 'requests'
+  },
+  {
+    id: 'notif_002',
+    category: 'payment',
+    title: 'Pembayaran Terkonfirmasi',
+    desc: 'Dana sebesar Rp 85.000 dari sesi Call bersama B*** Y*** telah masuk ke saldo Anda.',
+    time: '5 jam lalu',
+    read: false,
+    route: 'earnings'
+  },
+  {
+    id: 'notif_003',
+    category: 'session',
+    title: 'Pengingat Sesi',
+    desc: 'Sesi Chat bersama F*** S*** akan dimulai dalam 30 menit (pukul 14:00).',
+    time: '30 menit lalu',
+    read: false,
+    route: 'schedule'
+  },
+  {
+    id: 'notif_004',
+    category: 'rating',
+    title: 'Rating Baru Masuk',
+    desc: 'D*** S*** memberikan rating 5 bintang untuk sesi hari ini. "Sangat membantu!"',
+    time: '1 jam lalu',
+    read: true,
+    route: 'history'
+  },
+  {
+    id: 'notif_005',
+    category: 'request',
+    title: 'Request Sesi Baru',
+    desc: 'B*** Y*** mengajukan sesi Call 30 menit untuk Jumat, 28 Feb pukul 10:00.',
+    time: '5 jam lalu',
+    read: true,
+    route: 'requests'
+  },
+  {
+    id: 'notif_006',
+    category: 'system',
+    title: 'Pembaruan Kebijakan Platform',
+    desc: 'Hi-Me telah memperbarui Syarat & Ketentuan Mitra. Berlaku mulai 1 Maret 2025.',
+    time: '1 hari lalu',
+    read: true,
+    route: null
+  },
+  {
+    id: 'notif_007',
+    category: 'payment',
+    title: 'Pembayaran Terkonfirmasi',
+    desc: 'Dana sebesar Rp 140.000 dari sesi Chat bersama D*** S*** telah masuk ke saldo Anda.',
+    time: '2 jam lalu',
+    read: true,
+    route: 'earnings'
+  },
+  {
+    id: 'notif_008',
+    category: 'session',
+    title: 'Sesi Terkonfirmasi',
+    desc: 'Sesi Offline bersama K*** P*** pada Kamis, 27 Feb pukul 16:30 telah terkonfirmasi.',
+    time: '3 jam lalu',
+    read: true,
+    route: 'schedule'
+  }
+];
 
 // ── Register State (cross-page) ──
 const RegState = {

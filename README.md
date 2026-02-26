@@ -124,7 +124,7 @@ Dua warna ini berdampingan dengan baik karena sama-sama **cool-tone** dan sama-s
 
 ---
 
-### 🔮 Phase 2.1 — Registrasi & Onboarding Expert *(PLANNED)*
+### ✅ Phase 2.1 — Registrasi & Onboarding Expert *(DONE)*
 
 Fokus: Alur pendaftaran expert yang terstruktur seperti proses lamaran kerja profesional — dengan upload dokumen resmi, verifikasi admin, dan halaman status pending/ditolak sebelum bisa masuk platform.
 
@@ -132,14 +132,14 @@ Fokus: Alur pendaftaran expert yang terstruktur seperti proses lamaran kerja pro
 
 | Halaman | Path | Status |
 |---|---|---|
-| Landing Expert | `index.html` | 🔮 Planned |
-| Login Expert | `pages/auth/login.html` | 🔮 Planned |
-| Register — Step 1: Informasi Akun | `pages/auth/register.html` | 🔮 Planned |
-| Register — Step 2: Profil Profesional | `pages/auth/register-professional.html` | 🔮 Planned |
-| Register — Step 3: Upload Dokumen | `pages/auth/register-documents.html` | 🔮 Planned |
-| Register — Step 4: Pengaturan Awal | `pages/auth/register-setup.html` | 🔮 Planned |
-| Status Pendaftaran (Menunggu Verifikasi) | `pages/auth/pending.html` | 🔮 Planned |
-| Pendaftaran Ditolak / Revisi Dokumen | `pages/auth/rejected.html` | 🔮 Planned |
+| Landing Expert | `index.html` | ✅ Done |
+| Login Expert | `pages/auth/login.html` | ✅ Done |
+| Register — Step 1: Informasi Akun | `pages/auth/register.html` | ✅ Done |
+| Register — Step 2: Profil Profesional | `pages/auth/register-professional.html` | ✅ Done |
+| Register — Step 3: Upload Dokumen | `pages/auth/register-documents.html` | ✅ Done |
+| Register — Step 4: Pengaturan Awal | `pages/auth/register-setup.html` | ✅ Done |
+| Status Pendaftaran (Menunggu Verifikasi) | `pages/auth/pending.html` | ✅ Done |
+| Pendaftaran Ditolak / Revisi Dokumen | `pages/auth/rejected.html` | ✅ Done |
 
 **Fitur Phase 2.1:**
 
@@ -214,7 +214,7 @@ Fokus: Alur pendaftaran expert yang terstruktur seperti proses lamaran kerja pro
 
 ---
 
-### 🔮 Phase 2.2 — Dashboard & Notifikasi Expert *(PLANNED)*
+### ✅ Phase 2.2 — Dashboard & Notifikasi Expert *(DONE)*
 
 Fokus: Tampilan utama setelah login — command center harian expert untuk memantau semua aktivitas sekaligus.
 
@@ -222,8 +222,8 @@ Fokus: Tampilan utama setelah login — command center harian expert untuk meman
 
 | Halaman | Path | Status |
 |---|---|---|
-| Dashboard Expert | `pages/dashboard/index.html` | 🔮 Planned |
-| Notifikasi | `pages/notifications/index.html` | 🔮 Planned |
+| Dashboard Expert | `pages/dashboard/index.html` | ✅ Done |
+| Notifikasi | `pages/notifications/index.html` | ✅ Done |
 
 **Fitur Phase 2.2:**
 
@@ -498,7 +498,7 @@ hi-me-expert/
 ## Navigation Structure
 
 ### Expert (Mobile Bottom Nav)
-🏠 Home · 📅 Jadwal · 💬 Chat · 👤 Profil
+[Home] Home · [Kalender] Jadwal · [Chat] Chat · [User] Profil
 
 ---
 
