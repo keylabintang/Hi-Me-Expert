@@ -12,6 +12,13 @@
       height: 844px; min-height: 100dvh; overflow: hidden;
       background: #F0FDFA;
     }
+    .phone.phone-layout {
+      height: min(844px, calc(100dvh - 48px));
+      min-height: 0;
+    }
+    @media (max-width: 430px) {
+      .phone.phone-layout { height: 100dvh; }
+    }
 
     /* ─── Topbar ─── */
     .topbar {
@@ -269,7 +276,7 @@
   </style>
 </head>
 <body>
-<div class="phone" style="position:relative;">
+<div class="phone phone-layout" style="position:relative;">
 
   <!-- Topbar -->
   <div class="topbar">
@@ -455,6 +462,15 @@
   let noteOpen = false;
   let crisisFlagged = false;
 
+  function scrollToLatest() {
+    const body = document.getElementById('chatBody');
+    if (!body) return;
+    requestAnimationFrame(() => {
+      body.scrollTop = body.scrollHeight;
+      requestAnimationFrame(() => { body.scrollTop = body.scrollHeight; });
+    });
+  }
+
   // ── Timer ──
   function tick() {
     timerSecs++;
@@ -496,7 +512,7 @@
         </div>`;
     }
     body.innerHTML = html;
-    if (scroll) body.scrollTop = body.scrollHeight;
+    if (scroll) scrollToLatest();
   }
 
   // Auto-type user response after expert sends
@@ -590,6 +606,7 @@
   }
 
   renderMessages();
+  scrollToLatest();
 </script>
 </body>
 </html>

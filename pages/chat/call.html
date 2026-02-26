@@ -223,7 +223,7 @@
 
   <!-- Top Bar -->
   <div class="call-topbar">
-    <button class="btn-icon-circle" onclick="go('chat-list')">
+    <button class="btn-icon-circle" onclick="openSheet('endCallSheet')">
       <svg class="icon-svg" width="18" height="18" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
     </button>
     <div class="call-session-info">
@@ -381,11 +381,12 @@
   // ── End Call ──
   function endCall() {
     closeSheet('endCallSheet');
-    const note = document.getElementById('callNote')?.value?.trim() || '';
+    const note = document.getElementById('callNote')?.value?.trim() || sessionStorage.getItem('hime_call_note') || '';
     document.getElementById('callTimer').textContent = 'Selesai';
+    toast('Sesi telah berakhir');
     setTimeout(() => {
-      go('session-summary', { sessionId: callInfo?.id || 'ses_002', quickNote: note, crisisFlag: false });
-    }, 1200);
+      go('session-summary', { sessionId: chatId, quickNote: note, crisisFlag: false });
+    }, 1600);
   }
 </script>
 </body>
