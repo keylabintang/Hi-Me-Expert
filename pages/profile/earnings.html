@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Pendapatan — Hi-Me Expert</title>
+  <link rel="stylesheet" href="../../css/global.css">
+  <style>
+    /* ─── Hero ─── */
+    .earnings-hero {
+      background: linear-gradient(135deg, var(--teal-900), var(--teal-700));
+      padding: 20px 20px 44px; position: relative;
+    }
+    .earnings-hero::after {
+      content: ''; position: absolute; bottom: -1px; left: 0; right: 0;
+      height: 28px; background: var(--bg); border-radius: 28px 28px 0 0;
+    }
+    .hero-header {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+    }
+    .back-white {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.2);
+      display: flex; align-items: center; justify-content: center;
+      color: white; cursor: pointer;
+    }
+    .hero-title { font-size: 18px; font-weight: 800; color: white; flex: 1; }
+    .saldo-label { font-size: 12px; font-weight: 700; color: rgba(255,255,255,.65); margin-bottom: 6px; }
+    .saldo-amount { font-size: 32px; font-weight: 800; color: white; letter-spacing: -1px; }
+    .saldo-sub { font-size: 12px; color: rgba(255,255,255,.6); margin-top: 4px; }
+    .hero-stats { display: flex; gap: 12px; margin-top: 18px; }
+    .hero-stat {
+      background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15);
+      border-radius: var(--r-md); padding: 10px 14px; flex: 1;
+    }
+    .hero-stat-label { font-size: 10px; font-weight: 700; color: rgba(255,255,255,.6); text-transform: uppercase; letter-spacing: 0.4px; }
+    .hero-stat-value { font-size: 16px; font-weight: 800; color: white; margin-top: 3px; }
+    .btn-tarik {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 13px; background: white; color: var(--teal-700);
+      border: none; border-radius: var(--r-md); font-size: 14px; font-weight: 800;
+      cursor: pointer; margin-top: 16px; transition: opacity .15s;
+      box-shadow: var(--shadow-md);
+    }
+    .btn-tarik:active { opacity: .88; }
+
+    /* ─── Bar Chart ─── */
+    .chart-section { padding: 20px 20px 10px; }
+    .chart-title {
+      font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 16px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .chart-sub { font-size: 11px; font-weight: 600; color: var(--text-muted); }
+    .bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 80px; }
+    .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+    .bar-fill {
+      width: 100%; border-radius: 4px 4px 0 0;
+      background: var(--primary-pale); transition: background .15s;
+      position: relative; cursor: pointer;
+    }
+    .bar-fill.current { background: var(--primary); }
+    .bar-fill:active { background: var(--primary-hover); }
+    .bar-label { font-size: 10px; font-weight: 700; color: var(--text-muted); }
+
+    /* ─── Filter ─── */
+    .filter-bar {
+      display: flex; padding: 4px 20px 12px; gap: 8px; overflow-x: auto; scrollbar-width: none;
+    }
+    .filter-bar::-webkit-scrollbar { display: none; }
+    .filter-chip {
+      padding: 7px 14px; border-radius: 100px; white-space: nowrap;
+      border: 1.5px solid var(--border); background: var(--bg-card);
+      font-size: 12px; font-weight: 700; color: var(--text-muted);
+      cursor: pointer; transition: all .15s; flex-shrink: 0;
+    }
+    .filter-chip.active { border-color: var(--primary); background: var(--primary-pale); color: var(--primary); }
+
+    /* ─── Transaction List ─── */
+    .tx-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--r-lg); margin: 0 20px 10px;
+      padding: 14px 16px; box-shadow: var(--shadow-xs);
+      display: flex; align-items: center; gap: 12px;
+      cursor: pointer; transition: box-shadow .15s;
+    }
+    .tx-card:active { box-shadow: var(--shadow-md); }
+    .tx-icon {
+      width: 40px; height: 40px; border-radius: var(--r-sm); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .tx-body { flex: 1; min-width: 0; }
+    .tx-user { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+    .tx-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .tx-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
+    .tx-amount { font-size: 14px; font-weight: 800; }
+    .tx-amount.cair    { color: var(--primary); }
+    .tx-amount.pending { color: #CA8A04; }
+    .tx-amount.refund  { color: var(--danger); }
+
+    /* Section header */
+    .list-section-header {
+      padding: 6px 20px 4px;
+      font-size: 11px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.5px; color: var(--text-muted);
+    }
+
+    /* ─── Bottom Sheet ─── */
+    .sheet-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 100;
+      display: none; align-items: flex-end; justify-content: center;
+    }
+    .sheet-overlay.open { display: flex; }
+    .sheet-panel {
+      width: 390px; background: var(--bg-card);
+      border-radius: var(--r-xl) var(--r-xl) 0 0;
+      padding: 0 0 36px; max-height: 80vh; overflow-y: auto; scrollbar-width: none;
+      animation: slideUp .25s ease;
+    }
+    .sheet-panel::-webkit-scrollbar { display: none; }
+    @media (max-width:430px) { .sheet-panel { width: 100%; } }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .sheet-handle { width: 36px; height: 4px; background: var(--border-dark); border-radius: 2px; margin: 12px auto 8px; }
+    .sheet-title  { font-size: 16px; font-weight: 800; padding: 8px 20px 16px; border-bottom: 1px solid var(--border); }
+    .sheet-body   { padding: 16px 20px 0; }
+
+    /* Bank selector */
+    .bank-option {
+      display: flex; align-items: center; gap: 12px;
+      padding: 13px 0; border-bottom: 1px solid var(--border); cursor: pointer;
+    }
+    .bank-option:last-child { border-bottom: none; }
+    .bank-option.selected .bank-radio { background: var(--primary); border-color: var(--primary); }
+    .bank-option.selected .bank-radio::after { display: block; }
+    .bank-radio {
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 2px solid var(--border-dark); flex-shrink: 0; position: relative;
+      transition: all .15s;
+    }
+    .bank-radio::after {
+      content: ''; display: none; position: absolute;
+      top: 50%; left: 50%; transform: translate(-50%,-50%);
+      width: 8px; height: 8px; border-radius: 50%; background: white;
+    }
+    .bank-info { flex: 1; }
+    .bank-name { font-size: 14px; font-weight: 800; color: var(--text-primary); }
+    .bank-num  { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .bank-primary-badge {
+      font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 100px;
+      background: var(--primary-pale); color: var(--primary);
+    }
+
+    /* Nominal input */
+    .nominal-wrap { position: relative; margin: 8px 0 16px; }
+    .nominal-prefix {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      font-size: 15px; font-weight: 700; color: var(--text-muted); pointer-events: none;
+    }
+    .nominal-input {
+      width: 100%; padding: 13px 14px 13px 44px;
+      border: 1.5px solid var(--border); border-radius: var(--r-sm);
+      font-size: 18px; font-weight: 800; color: var(--text-primary);
+      background: var(--bg); outline: none; font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: border-color .15s;
+    }
+    .nominal-input:focus { border-color: var(--primary); background: var(--bg-card); }
+
+    .info-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 12px; border-radius: 100px;
+      background: var(--primary-xpale); border: 1px solid var(--primary-pale);
+      font-size: 12px; font-weight: 700; color: var(--teal-700);
+    }
+  </style>
+</head>
+<body>
+<div class="phone" id="phoneWrap">
+  <div class="scroll-area has-nav" style="padding-bottom: 80px;">
+
+    <!-- Hero -->
+    <div class="earnings-hero">
+      <div class="hero-header">
+        <div class="back-white" onclick="go('profile')">
+          <svg class="icon-svg" width="18" height="18" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+        </div>
+        <div class="hero-title">Pendapatan</div>
+      </div>
+      <div class="saldo-label">Saldo Tersedia</div>
+      <div class="saldo-amount">Rp 544.000</div>
+      <div class="saldo-sub">Dapat ditarik sekarang</div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-label">Bulan Ini</div>
+          <div class="hero-stat-value">Rp 1,89jt</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-label">Total Sepanjang Waktu</div>
+          <div class="hero-stat-value">Rp 17,7jt</div>
+        </div>
+      </div>
+      <button class="btn-tarik" onclick="openSheet('tarikSheet')">
+        <svg class="icon-svg" width="18" height="18" viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+        Tarik Dana
+      </button>
+    </div>
+
+    <!-- Bar Chart -->
+    <div class="chart-section">
+      <div class="chart-title">
+        Pendapatan 6 Bulan
+        <span class="chart-sub">Sep 2024 – Feb 2025</span>
+      </div>
+      <div class="bar-chart" id="barChart"></div>
+    </div>
+
+    <!-- Filter -->
+    <div class="filter-bar">
+      <div class="filter-chip active" id="f-all"     onclick="setFilter('all')">Semua</div>
+      <div class="filter-chip"        id="f-cair"    onclick="setFilter('cair')">Cair</div>
+      <div class="filter-chip"        id="f-pending" onclick="setFilter('pending')">Pending</div>
+      <div class="filter-chip"        id="f-refund"  onclick="setFilter('refund')">Refund</div>
+    </div>
+
+    <!-- Transaction List -->
+    <div id="txList" style="padding-bottom:16px;"></div>
+
+  </div>
+</div>
+
+<!-- Tarik Dana Sheet -->
+<div class="sheet-overlay" id="tarikSheet" onclick="if(event.target===this)closeSheet('tarikSheet')">
+  <div class="sheet-panel">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Tarik Dana</div>
+    <div class="sheet-body">
+      <div style="margin-bottom:14px;">
+        <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:10px;">Pilih Rekening Tujuan</div>
+        <div id="bankList"></div>
+      </div>
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:6px;">Nominal</div>
+      <div class="nominal-wrap">
+        <span class="nominal-prefix">Rp</span>
+        <input class="nominal-input" type="number" id="nominalInput" placeholder="50.000" min="50000" oninput="validateNominal()">
+      </div>
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:16px;">Minimal penarikan Rp 50.000 · Estimasi cair dalam 1×24 jam</div>
+      <div class="info-chip" style="margin-bottom:20px;">
+        <svg class="icon-svg" width="13" height="13" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/><path d="M12 16v-4M12 8h.01"/></svg>
+        Saldo tersedia: Rp 544.000
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-ghost" style="flex:1;" onclick="closeSheet('tarikSheet')">Batal</button>
+        <button class="btn btn-primary" style="flex:2;" id="tarikBtn" onclick="doWithdraw()" disabled>Tarik Dana</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TX Detail Sheet -->
+<div class="sheet-overlay" id="txDetailSheet" onclick="if(event.target===this)closeSheet('txDetailSheet')">
+  <div class="sheet-panel">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" id="txDetailTitle">Detail Transaksi</div>
+    <div class="sheet-body" id="txDetailBody"></div>
+  </div>
+</div>
+
+<script src="../../js/app.js"></script>
+<script>
+  Object.assign(ROUTES, { profile: 'index.html' });
+
+  // ── Bar Chart ──
+  const maxAmount = Math.max(...MOCK_EARNINGS_MONTHLY.map(m => m.amount));
+  document.getElementById('barChart').innerHTML = MOCK_EARNINGS_MONTHLY.map((m, i) => {
+    const pct = maxAmount ? (m.amount / maxAmount) * 72 : 0;
+    const isCurrent = i === MOCK_EARNINGS_MONTHLY.length - 1;
+    return `<div class="bar-col">
+      <div class="bar-fill ${isCurrent ? 'current' : ''}" style="height:${pct}px;" title="${formatRupiah(m.amount)}"></div>
+      <div class="bar-label">${m.month}</div>
+    </div>`;
+  }).join('');
+
+  // ── Filter ──
+  let currentFilter = 'all';
+  function setFilter(f) {
+    currentFilter = f;
+    ['all','cair','pending','refund'].forEach(k => {
+      document.getElementById('f-' + k).classList.toggle('active', k === f);
+    });
+    renderTxList();
+  }
+
+  // ── Render TX List ──
+  const typeIconMap = {
+    'Chat':    { icon: '<path d="M4 5h16v10H7l-3 3V5z"/>',   cls: 'style="background:#EFF6FF;color:#1D4ED8;"' },
+    'Call':    { icon: '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>', cls: 'style="background:#F0FDF4;color:#15803D;"' },
+    'Offline': { icon: '<path d="M4 21h16M6 21V7l6-4 6 4v14"/>',                                                                                                                                                                                                                                                                                                                                                                                          cls: 'style="background:#FFF7ED;color:#C2410C;"' },
+  };
+
+  const statusLabels = { cair: 'Cair', pending: 'Pending', refund: 'Refund' };
+  const statusColors = { cair: 'var(--primary)', pending: '#CA8A04', refund: 'var(--danger)' };
+  const statusBgs    = { cair: 'var(--primary-pale)', pending: '#FEF9C3', refund: '#FEF2F2' };
+
+  function renderTxList() {
+    const txs = currentFilter === 'all' ? MOCK_TRANSACTIONS : MOCK_TRANSACTIONS.filter(t => t.status === currentFilter);
+    if (!txs.length) {
+      document.getElementById('txList').innerHTML = `<div style="text-align:center;padding:40px 20px;font-size:13px;color:var(--text-muted);">Tidak ada transaksi ditemukan.</div>`;
+      return;
+    }
+    const typeInfo = t => typeIconMap[t.type] || typeIconMap['Chat'];
+    document.getElementById('txList').innerHTML = txs.map(tx => `
+      <div class="tx-card" onclick="openTxDetail('${tx.id}')">
+        <div class="tx-icon" ${typeInfo(tx).cls}>
+          <svg class="icon-svg" width="18" height="18" viewBox="0 0 24 24">${typeInfo(tx).icon}</svg>
+        </div>
+        <div class="tx-body">
+          <div class="tx-user">${tx.userName}</div>
+          <div class="tx-meta">${tx.type} · ${tx.date}</div>
+        </div>
+        <div class="tx-right">
+          <div class="tx-amount ${tx.status}">${tx.status === 'refund' ? '-' : '+'}${formatRupiah(tx.amount).replace('Rp ', 'Rp\u00A0')}</div>
+          <div class="chip" style="font-size:10px;padding:2px 8px;background:${statusBgs[tx.status]};color:${statusColors[tx.status]};border:none;">${statusLabels[tx.status]}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // ── TX Detail ──
+  function openTxDetail(id) {
+    const tx = MOCK_TRANSACTIONS.find(t => t.id === id);
+    if (!tx) return;
+    document.getElementById('txDetailTitle').textContent = `${tx.type} · ${tx.userName}`;
+    document.getElementById('txDetailBody').innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:0;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;margin-bottom:20px;">
+        ${[
+          ['Status', `<span style="font-weight:800;color:${statusColors[tx.status]};">${statusLabels[tx.status]}</span>`],
+          ['Tipe Sesi', tx.type],
+          ['Tanggal', tx.date],
+          ['Nominal', `<strong>${formatRupiah(tx.amount)}</strong>`],
+          ['Catatan', tx.note],
+        ].map(([l,v]) => `
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid var(--border);">
+            <div style="font-size:12px;color:var(--text-muted);font-weight:600;">${l}</div>
+            <div style="font-size:13px;font-weight:700;color:var(--text-primary);text-align:right;max-width:65%;">${v}</div>
+          </div>`).join('')}
+      </div>
+      <button class="btn btn-ghost" style="width:100%;margin-bottom:4px;" onclick="closeSheet('txDetailSheet')">Tutup</button>
+    `;
+    openSheet('txDetailSheet');
+  }
+
+  // ── Bank selector ──
+  let selectedBank = MOCK_BANK_ACCOUNTS[0]?.id;
+  function renderBanks() {
+    document.getElementById('bankList').innerHTML = MOCK_BANK_ACCOUNTS.map(b => `
+      <div class="bank-option ${b.id === selectedBank ? 'selected' : ''}" onclick="selectBank('${b.id}')">
+        <div class="bank-radio"></div>
+        <div class="bank-info">
+          <div class="bank-name">${b.bank} ${b.number}</div>
+          <div class="bank-num">a.n. ${b.name}</div>
+        </div>
+        ${b.primary ? '<div class="bank-primary-badge">Utama</div>' : ''}
+      </div>
+    `).join('');
+  }
+  function selectBank(id) {
+    selectedBank = id;
+    renderBanks();
+  }
+  function validateNominal() {
+    const val = parseInt(document.getElementById('nominalInput').value) || 0;
+    document.getElementById('tarikBtn').disabled = val < 50000 || val > 544000;
+  }
+  function doWithdraw() {
+    const val = parseInt(document.getElementById('nominalInput').value);
+    closeSheet('tarikSheet');
+    toast(`Dana Rp ${val.toLocaleString('id-ID')} sedang diproses. Estimasi cair 1×24 jam.`);
+  }
+
+  function openSheet(id)  { document.getElementById(id).classList.add('open'); if(id==='tarikSheet') renderBanks(); }
+  function closeSheet(id) { document.getElementById(id).classList.remove('open'); }
+
+  function toast(msg) {
+    let el = document.querySelector('.phone .toast');
+    if (!el) { el = document.createElement('div'); el.className = 'toast'; document.getElementById('phoneWrap').appendChild(el); }
+    el.textContent = msg; el.classList.add('show');
+    clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), 3200);
+  }
+
+  renderTxList();
+</script>
+</body>
+</html>

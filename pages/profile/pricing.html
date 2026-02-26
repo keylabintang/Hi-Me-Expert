@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Pengaturan Harga — Hi-Me Expert</title>
+  <link rel="stylesheet" href="../../css/global.css">
+  <style>
+    .page-header {
+      background: var(--bg-card); border-bottom: 1px solid var(--border);
+      padding: 14px 20px; display: flex; align-items: center; gap: 12px;
+      position: sticky; top: 0; z-index: 10;
+    }
+    .back-btn { background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 4px; }
+    .page-title { font-size: 16px; font-weight: 800; color: var(--text-primary); flex: 1; }
+
+    /* Session type card */
+    .session-type-card {
+      background: var(--bg-card); border: 1.5px solid var(--border);
+      border-radius: var(--r-lg); margin: 0 20px 12px;
+      overflow: hidden; transition: border-color .15s;
+    }
+    .session-type-card.active { border-color: var(--primary); }
+    .type-header {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 16px; cursor: pointer;
+    }
+    .type-icon {
+      width: 38px; height: 38px; border-radius: var(--r-sm); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .type-info { flex: 1; }
+    .type-name { font-size: 14px; font-weight: 800; color: var(--text-primary); }
+    .type-sub  { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .toggle-sw {
+      width: 42px; height: 24px; border-radius: 100px;
+      background: var(--border-dark); position: relative;
+      cursor: pointer; transition: background .2s; flex-shrink: 0;
+    }
+    .toggle-sw.on { background: var(--primary); }
+    .toggle-sw::after {
+      content: ''; position: absolute; top: 3px; left: 3px;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: white; box-shadow: var(--shadow-xs); transition: transform .2s;
+    }
+    .toggle-sw.on::after { transform: translateX(18px); }
+    .type-body { display: none; border-top: 1px solid var(--border); padding: 14px 16px; }
+    .type-body.open { display: block; }
+
+    /* Price input */
+    .price-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
+    .price-label { font-size: 12px; font-weight: 700; color: var(--text-secondary); width: 72px; flex-shrink: 0; }
+    .price-input-wrap { flex: 1; position: relative; }
+    .price-prefix {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      font-size: 13px; font-weight: 700; color: var(--text-muted); pointer-events: none;
+    }
+    .price-input {
+      width: 100%; padding: 9px 12px 9px 36px;
+      border: 1.5px solid var(--border); border-radius: var(--r-sm);
+      font-size: 13px; font-weight: 700; color: var(--text-primary);
+      background: var(--bg); outline: none; font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: border-color .15s;
+    }
+    .price-input:focus { border-color: var(--primary); background: var(--bg-card); }
+
+    /* Promo Section */
+    .promo-section { padding: 0 20px 20px; }
+    .promo-card {
+      background: var(--bg-card); border: 1.5px solid var(--border);
+      border-radius: var(--r-lg); overflow: hidden;
+    }
+    .promo-card.active { border-color: var(--accent); }
+    .promo-header {
+      display: flex; align-items: center; gap: 12px; padding: 14px 16px;
+    }
+    .promo-icon {
+      width: 38px; height: 38px; border-radius: var(--r-sm);
+      background: #FDF4FF; color: var(--accent);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .promo-body { display: none; border-top: 1px solid var(--border); padding: 14px 16px; }
+    .promo-body.open { display: block; }
+    .percent-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+    .pct-chip {
+      padding: 6px 14px; border-radius: 100px;
+      border: 1.5px solid var(--border); background: var(--bg);
+      font-size: 12px; font-weight: 700; color: var(--text-secondary);
+      cursor: pointer; transition: all .15s;
+    }
+    .pct-chip.selected { border-color: var(--accent); background: #FDF4FF; color: var(--accent); }
+    .date-row { display: flex; gap: 10px; }
+    .date-row .form-group { flex: 1; margin-bottom: 0; }
+
+    /* Preview card */
+    .preview-section { padding: 0 20px 20px; }
+    .preview-label {
+      font-size: 11px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 10px;
+      display: flex; align-items: center; gap: 7px;
+    }
+    .preview-label-icon {
+      width: 20px; height: 20px; border-radius: 4px;
+      background: var(--primary-pale); color: var(--primary);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .preview-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--r-lg); padding: 14px 16px; box-shadow: var(--shadow-xs);
+    }
+    .preview-card-title { font-size: 12px; font-weight: 800; color: var(--text-secondary); margin-bottom: 12px; }
+    .price-list-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 0; border-bottom: 1px solid var(--border);
+    }
+    .price-list-item:last-child { border-bottom: none; }
+    .pli-label { font-size: 13px; color: var(--text-secondary); display: flex; align-items: center; gap: 7px; }
+    .pli-price { font-size: 14px; font-weight: 800; color: var(--primary); }
+    .pli-strike { font-size: 11px; color: var(--text-muted); text-decoration: line-through; margin-right: 4px; }
+
+    /* Save footer */
+    .save-footer { padding: 16px 20px 28px; background: var(--bg); border-top: 1px solid var(--border); }
+  </style>
+</head>
+<body>
+<div class="phone" id="phoneWrap">
+
+  <div class="page-header">
+    <button class="back-btn" onclick="go('profile')">
+      <svg class="icon-svg" width="22" height="22" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="page-title">Pengaturan Harga</div>
+  </div>
+
+  <div class="scroll-area" style="padding-bottom: 90px; padding-top: 16px;">
+
+    <!-- Chat -->
+    <div class="session-type-card active" id="card-chat">
+      <div class="type-header" onclick="toggleCard('chat')">
+        <div class="type-icon" style="background:#EFF6FF;color:#1D4ED8;">
+          <svg class="icon-svg" width="18" height="18" viewBox="0 0 24 24"><path d="M4 5h16v10H7l-3 3V5z"/></svg>
+        </div>
+        <div class="type-info">
+          <div class="type-name">Chat</div>
+          <div class="type-sub">Sesi pesan teks</div>
+        </div>
+        <div class="toggle-sw on" id="toggle-chat" onclick="event.stopPropagation(); toggleSwitch('chat')"></div>
+      </div>
+      <div class="type-body open" id="body-chat">
+        <div class="price-row">
+          <div class="price-label">30 menit</div>
+          <div class="price-input-wrap">
+            <span class="price-prefix">Rp</span>
+            <input class="price-input" type="number" id="price-chat30" value="75000" oninput="updatePreview()">
+          </div>
+        </div>
+        <div class="price-row" style="margin-bottom:0;">
+          <div class="price-label">60 menit</div>
+          <div class="price-input-wrap">
+            <span class="price-prefix">Rp</span>
+            <input class="price-input" type="number" id="price-chat60" value="140000" oninput="updatePreview()">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Call -->
+    <div class="session-type-card active" id="card-call">
+      <div class="type-header" onclick="toggleCard('call')">
+        <div class="type-icon" style="background:#F0FDF4;color:#15803D;">
+          <svg class="icon-svg" width="18" height="18" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        </div>
+        <div class="type-info">
+          <div class="type-name">Video / Audio Call</div>
+          <div class="type-sub">Sesi panggilan langsung</div>
+        </div>
+        <div class="toggle-sw on" id="toggle-call" onclick="event.stopPropagation(); toggleSwitch('call')"></div>
+      </div>
+      <div class="type-body open" id="body-call">
+        <div class="price-row">
+          <div class="price-label">30 menit</div>
+          <div class="price-input-wrap">
+            <span class="price-prefix">Rp</span>
+            <input class="price-input" type="number" id="price-call30" value="85000" oninput="updatePreview()">
+          </div>
+        </div>
+        <div class="price-row" style="margin-bottom:0;">
+          <div class="price-label">60 menit</div>
+          <div class="price-input-wrap">
+            <span class="price-prefix">Rp</span>
+            <input class="price-input" type="number" id="price-call60" value="160000" oninput="updatePreview()">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Offline -->
+    <div class="session-type-card" id="card-offline">
+      <div class="type-header" onclick="toggleCard('offline')">
+        <div class="type-icon" style="background:#FFF7ED;color:#C2410C;">
+          <svg class="icon-svg" width="18" height="18" viewBox="0 0 24 24"><path d="M4 21h16M6 21V7l6-4 6 4v14M9 11h.01M12 11h.01M15 11h.01M9 15h.01M12 15h.01M15 15h.01"/></svg>
+        </div>
+        <div class="type-info">
+          <div class="type-name">Offline / Tatap Muka</div>
+          <div class="type-sub">Sesi langsung di klinik</div>
+        </div>
+        <div class="toggle-sw" id="toggle-offline" onclick="event.stopPropagation(); toggleSwitch('offline')"></div>
+      </div>
+      <div class="type-body" id="body-offline">
+        <div class="price-row" style="margin-bottom:0;">
+          <div class="price-label">Per sesi</div>
+          <div class="price-input-wrap">
+            <span class="price-prefix">Rp</span>
+            <input class="price-input" type="number" id="price-offline" value="200000" oninput="updatePreview()">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Promo -->
+    <div class="promo-section" style="padding-top:4px;">
+      <div class="promo-card" id="promoCard">
+        <div class="promo-header">
+          <div class="promo-icon">
+            <svg class="icon-svg" width="18" height="18" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          </div>
+          <div class="type-info">
+            <div class="type-name">Promo Sementara</div>
+            <div class="type-sub">Diskon terbatas waktu untuk semua sesi</div>
+          </div>
+          <div class="toggle-sw" id="toggle-promo" onclick="togglePromo()"></div>
+        </div>
+        <div class="promo-body" id="promo-body">
+          <div class="form-group" style="margin-bottom:8px;">
+            <label class="form-label">Persentase Diskon</label>
+            <div class="percent-row">
+              <div class="pct-chip" onclick="selectPct(10,this)">10%</div>
+              <div class="pct-chip" onclick="selectPct(15,this)">15%</div>
+              <div class="pct-chip" onclick="selectPct(20,this)">20%</div>
+              <div class="pct-chip" onclick="selectPct(25,this)">25%</div>
+              <div class="pct-chip" onclick="selectPct(30,this)">30%</div>
+            </div>
+          </div>
+          <div class="date-row">
+            <div class="form-group">
+              <label class="form-label">Mulai</label>
+              <input class="form-input" type="date" id="promoStart" value="2025-02-27">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Berakhir</label>
+              <input class="form-input" type="date" id="promoEnd" value="2025-03-05">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview -->
+    <div class="preview-section">
+      <div class="preview-label">
+        <div class="preview-label-icon">
+          <svg class="icon-svg" width="12" height="12" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </div>
+        Preview Harga di Halaman Pencarian
+      </div>
+      <div class="preview-card">
+        <div class="preview-card-title">Tampilan yang dilihat pengguna:</div>
+        <div id="previewList"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="save-footer">
+    <button class="btn btn-primary" onclick="handleSave()">
+      <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+      Simpan Harga
+    </button>
+  </div>
+
+</div>
+
+<script src="../../js/app.js"></script>
+<script>
+  Object.assign(ROUTES, { profile: 'index.html' });
+
+  const toggleStates = { chat: true, call: true, offline: false };
+  let promoActive = false;
+  let promoPct = 0;
+
+  function toggleCard(type) {
+    const body = document.getElementById('body-' + type);
+    body.classList.toggle('open');
+  }
+
+  function toggleSwitch(type) {
+    toggleStates[type] = !toggleStates[type];
+    const sw = document.getElementById('toggle-' + type);
+    const card = document.getElementById('card-' + type);
+    sw.classList.toggle('on', toggleStates[type]);
+    card.classList.toggle('active', toggleStates[type]);
+    if (toggleStates[type]) {
+      document.getElementById('body-' + type).classList.add('open');
+    } else {
+      document.getElementById('body-' + type).classList.remove('open');
+    }
+    updatePreview();
+  }
+
+  function togglePromo() {
+    promoActive = !promoActive;
+    document.getElementById('toggle-promo').classList.toggle('on', promoActive);
+    document.getElementById('promo-body').classList.toggle('open', promoActive);
+    document.getElementById('promoCard').classList.toggle('active', promoActive);
+    updatePreview();
+  }
+
+  function selectPct(val, el) {
+    promoPct = val;
+    document.querySelectorAll('.pct-chip').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    updatePreview();
+  }
+
+  function getPrice(id) { return parseInt(document.getElementById(id)?.value) || 0; }
+  function fmt(n) { return 'Rp ' + n.toLocaleString('id-ID'); }
+  function applyDiscount(n) { return Math.round(n * (1 - promoPct/100)); }
+
+  function updatePreview() {
+    const items = [];
+    const typeIcons = {
+      Chat: '<path d="M4 5h16v10H7l-3 3V5z"/>',
+      Call: '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>',
+      Offline: '<path d="M4 21h16M6 21V7l6-4 6 4v14M9 11h.01M12 11h.01M15 11h.01M9 15h.01M12 15h.01M15 15h.01"/>',
+    };
+    if (toggleStates.chat) {
+      items.push({ label: 'Chat 30 mnt', icon: typeIcons.Chat, raw: getPrice('price-chat30') });
+      items.push({ label: 'Chat 60 mnt', icon: typeIcons.Chat, raw: getPrice('price-chat60') });
+    }
+    if (toggleStates.call) {
+      items.push({ label: 'Call 30 mnt', icon: typeIcons.Call, raw: getPrice('price-call30') });
+      items.push({ label: 'Call 60 mnt', icon: typeIcons.Call, raw: getPrice('price-call60') });
+    }
+    if (toggleStates.offline) {
+      items.push({ label: 'Tatap Muka', icon: typeIcons.Offline, raw: getPrice('price-offline') });
+    }
+
+    document.getElementById('previewList').innerHTML = items.map(item => {
+      const final = (promoActive && promoPct > 0) ? applyDiscount(item.raw) : item.raw;
+      const showStrike = promoActive && promoPct > 0;
+      return `<div class="price-list-item">
+        <div class="pli-label">
+          <svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" style="color:var(--text-muted);">${item.icon}</svg>
+          ${item.label}
+        </div>
+        <div class="pli-price">
+          ${showStrike ? `<span class="pli-strike">${fmt(item.raw)}</span>` : ''}
+          ${fmt(final)}
+        </div>
+      </div>`;
+    }).join('') || '<div style="text-align:center;padding:16px;font-size:13px;color:var(--text-muted);">Aktifkan minimal satu tipe sesi</div>';
+  }
+
+  function handleSave() {
+    toast('Harga berhasil diperbarui');
+    setTimeout(() => go('profile'), 1000);
+  }
+
+  function toast(msg) {
+    let el = document.querySelector('.phone .toast');
+    if (!el) { el = document.createElement('div'); el.className = 'toast'; document.getElementById('phoneWrap').appendChild(el); }
+    el.textContent = msg; el.classList.add('show');
+    clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), 2600);
+  }
+
+  updatePreview();
+</script>
+</body>
+</html>

@@ -383,10 +383,9 @@
     closeSheet('endCallSheet');
     const note = document.getElementById('callNote')?.value?.trim() || '';
     document.getElementById('callTimer').textContent = 'Selesai';
-    toast('Sesi telah berakhir');
     setTimeout(() => {
-      go('session-summary', { sessionId: chatId, quickNote: note, crisisFlag: false });
-    }, 1600);
+      go('session-summary', { sessionId: callInfo?.id || 'ses_002', quickNote: note, crisisFlag: false });
+    }, 1200);
   }
 </script>
 </body>

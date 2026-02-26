@@ -57,7 +57,12 @@ const CANONICAL_ROUTES = {
   'call-room': `${APP_ROOT}/pages/chat/call.html`,
   'session-summary': `${APP_ROOT}/pages/session/summary.html`,
   'session-history': `${APP_ROOT}/pages/session/history.html`,
-  profile:   `${APP_ROOT}/pages/profile/index.html`,
+  profile:          `${APP_ROOT}/pages/profile/index.html`,
+  'profile-edit':   `${APP_ROOT}/pages/profile/edit.html`,
+  'profile-pricing':`${APP_ROOT}/pages/profile/pricing.html`,
+  'profile-earnings':`${APP_ROOT}/pages/profile/earnings.html`,
+  'profile-notifications':`${APP_ROOT}/pages/profile/notifications.html`,
+  'profile-privacy':`${APP_ROOT}/pages/profile/privacy.html`,
 };
 
 const ROUTES = { ...CANONICAL_ROUTES };
@@ -725,6 +730,44 @@ const MOCK_EARNINGS_MONTHLY = [
   { month: 'Des', amount: 2680000 },
   { month: 'Jan', amount: 3760000 },
   { month: 'Feb', amount: 1890000 },
+];
+
+// ── Mock Data (Phase 2.6) ──
+
+const MOCK_TRANSACTIONS = [
+  { id: 'tx_001', userInitials: 'DS', userName: 'D*** S***', type: 'Chat', date: 'Kamis, 27 Feb 2025', amount: 119000, status: 'cair',    note: '60 menit' },
+  { id: 'tx_002', userInitials: 'MR', userName: 'M*** R***', type: 'Call', date: 'Kamis, 27 Feb 2025', amount: 68000,  status: 'cair',    note: '30 menit' },
+  { id: 'tx_003', userInitials: 'FS', userName: 'F*** S***', type: 'Chat', date: 'Kamis, 27 Feb 2025', amount: 119000, status: 'pending', note: '60 menit — menunggu konfirmasi' },
+  { id: 'tx_004', userInitials: 'KP', userName: 'K*** P***', type: 'Offline', date: 'Kamis, 27 Feb 2025', amount: 170000, status: 'pending', note: 'Tatap muka — menunggu sesi selesai' },
+  { id: 'tx_005', userInitials: 'AR', userName: 'A*** R***', type: 'Chat', date: 'Senin, 24 Feb 2025', amount: 119000, status: 'cair',    note: '60 menit' },
+  { id: 'tx_006', userInitials: 'BW', userName: 'B*** W***', type: 'Call', date: 'Senin, 24 Feb 2025', amount: 68000,  status: 'cair',    note: '30 menit' },
+  { id: 'tx_007', userInitials: 'CL', userName: 'C*** L***', type: 'Offline', date: 'Selasa, 25 Feb 2025', amount: 170000, status: 'cair', note: 'Tatap muka' },
+  { id: 'tx_008', userInitials: 'EP', userName: 'E*** P***', type: 'Offline', date: 'Rabu, 19 Feb 2025', amount: 170000, status: 'refund', note: 'Sesi dibatalkan klien — refund diproses' },
+  { id: 'tx_009', userInitials: 'FH', userName: 'F*** H***', type: 'Chat', date: 'Jumat, 17 Jan 2025', amount: 59000,  status: 'cair',    note: '30 menit' },
+  { id: 'tx_010', userInitials: 'CL', userName: 'C*** L***', type: 'Offline', date: 'Selasa, 28 Jan 2025', amount: 170000, status: 'cair', note: 'Tatap muka' },
+];
+
+const MOCK_BANK_ACCOUNTS = [
+  { id: 'bank_001', bank: 'BCA', number: '•••• •••• 4291', name: 'Rina Kusuma', primary: true },
+  { id: 'bank_002', bank: 'Mandiri', number: '•••• •••• 7738', name: 'Rina Kusuma', primary: false },
+];
+
+const MOCK_ACTIVITY_LOG = [
+  { action: 'Login berhasil', device: 'Chrome · macOS', time: '2 jam lalu', icon: 'check-circle' },
+  { action: 'Ubah kata sandi', device: 'Chrome · macOS', time: '3 hari lalu', icon: 'lock' },
+  { action: 'Login berhasil', device: 'Safari · iPhone', time: '5 hari lalu', icon: 'check-circle' },
+  { action: 'Perbarui profil', device: 'Chrome · macOS', time: '1 minggu lalu', icon: 'edit' },
+  { action: 'Login berhasil', device: 'Chrome · Windows', time: '2 minggu lalu', icon: 'check-circle' },
+];
+
+const MOCK_EDUCATION = [
+  { institution: 'Universitas Indonesia', degree: 'S2 Psikologi Klinis', year: '2018' },
+  { institution: 'Universitas Padjadjaran', degree: 'S1 Psikologi', year: '2016' },
+];
+
+const MOCK_CERTIFICATIONS = [
+  { name: 'Sertifikat Kompetensi Psikolog Klinis', issuer: 'HIMPSI', year: '2019' },
+  { name: 'Certified Cognitive Behavioral Therapist', issuer: 'Beck Institute', year: '2021' },
 ];
 
 // ── Register State (cross-page) ──

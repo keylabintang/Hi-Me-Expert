@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Edit Profil — Hi-Me Expert</title>
+  <link rel="stylesheet" href="../../css/global.css">
+  <style>
+    .page-header {
+      background: var(--bg-card); border-bottom: 1px solid var(--border);
+      padding: 14px 20px; display: flex; align-items: center; gap: 12px;
+      position: sticky; top: 0; z-index: 10;
+    }
+    .back-btn { background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 4px; }
+    .page-title { font-size: 16px; font-weight: 800; color: var(--text-primary); flex: 1; }
+
+    /* Avatar picker */
+    .avatar-picker {
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      padding: 24px 20px 16px; background: var(--bg-card); border-bottom: 1px solid var(--border);
+    }
+    .avatar-lg {
+      width: 80px; height: 80px; border-radius: 50%; position: relative;
+      background: linear-gradient(135deg, var(--teal-700), var(--teal-500));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; font-weight: 800; color: white;
+    }
+    .avatar-edit-overlay {
+      position: absolute; inset: 0; border-radius: 50%;
+      background: rgba(0,0,0,.35); display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity .15s; cursor: pointer; color: white;
+    }
+    .avatar-lg:hover .avatar-edit-overlay { opacity: 1; }
+    .avatar-hint { font-size: 12px; color: var(--text-muted); }
+
+    /* Form sections */
+    .form-section { padding: 20px; border-bottom: 1px solid var(--border); }
+    .form-section:last-child { border-bottom: none; }
+    .section-title {
+      font-size: 11px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 16px;
+      display: flex; align-items: center; gap: 7px;
+    }
+    .section-title-icon {
+      width: 22px; height: 22px; border-radius: 4px; flex-shrink: 0;
+      background: var(--primary-pale); color: var(--primary);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .readonly-field {
+      background: var(--bg); border: 1.5px solid var(--border); border-radius: var(--r-sm);
+      padding: 11px 14px; font-size: 13px; font-weight: 600;
+      color: var(--text-muted); display: flex; align-items: center; justify-content: space-between;
+    }
+    .readonly-badge {
+      font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 100px;
+      background: rgba(244,162,97,.15); color: #C2410C; flex-shrink: 0;
+    }
+    .char-counter { font-size: 11px; color: var(--text-muted); text-align: right; margin-top: 4px; }
+
+    /* Spec chips */
+    .chip-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+    .spec-chip {
+      padding: 6px 14px; border-radius: 100px;
+      border: 1.5px solid var(--border); background: var(--bg-card);
+      font-size: 12px; font-weight: 700; color: var(--text-secondary);
+      cursor: pointer; transition: all .15s;
+    }
+    .spec-chip.selected { border-color: var(--primary); background: var(--primary-pale); color: var(--primary); }
+    .spec-chip:active { transform: scale(.95); }
+
+    /* Education/cert rows */
+    .entry-row {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--r-md);
+      padding: 12px 14px; margin-bottom: 8px; display: flex; gap: 10px; align-items: flex-start;
+    }
+    .entry-body { flex: 1; min-width: 0; }
+    .entry-title { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+    .entry-sub   { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .entry-delete {
+      background: none; border: none; cursor: pointer; color: var(--text-muted);
+      padding: 2px; flex-shrink: 0; transition: color .15s;
+    }
+    .entry-delete:active { color: var(--danger); }
+    .add-btn {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 14px; border-radius: var(--r-md);
+      border: 1.5px dashed var(--border); background: transparent;
+      font-size: 13px; font-weight: 700; color: var(--text-muted);
+      cursor: pointer; width: 100%; transition: border-color .15s;
+    }
+    .add-btn:active { border-color: var(--primary); color: var(--primary); }
+
+    /* Bottom sheet */
+    .sheet-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 100;
+      display: none; align-items: flex-end; justify-content: center;
+    }
+    .sheet-overlay.open { display: flex; }
+    .sheet-panel {
+      width: 390px; background: var(--bg-card);
+      border-radius: var(--r-xl) var(--r-xl) 0 0;
+      padding: 0 0 36px; max-height: 80vh; overflow-y: auto; scrollbar-width: none;
+      animation: slideUp .25s ease;
+    }
+    .sheet-panel::-webkit-scrollbar { display: none; }
+    @media (max-width:430px) { .sheet-panel { width: 100%; } }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .sheet-handle { width: 36px; height: 4px; background: var(--border-dark); border-radius: 2px; margin: 12px auto 8px; }
+    .sheet-title  { font-size: 16px; font-weight: 800; padding: 8px 20px 16px; border-bottom: 1px solid var(--border); }
+    .sheet-body   { padding: 16px 20px 0; }
+
+    /* Footer */
+    .save-footer { padding: 16px 20px 28px; background: var(--bg); border-top: 1px solid var(--border); }
+  </style>
+</head>
+<body>
+<div class="phone" id="phoneWrap">
+
+  <!-- Header -->
+  <div class="page-header">
+    <button class="back-btn" onclick="go('profile')">
+      <svg class="icon-svg" width="22" height="22" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="page-title">Edit Profil</div>
+  </div>
+
+  <div class="scroll-area" style="padding-bottom: 90px;">
+
+    <!-- Avatar picker -->
+    <div class="avatar-picker">
+      <div class="avatar-lg" onclick="toast('Fitur upload foto akan tersedia segera')">
+        RK
+        <div class="avatar-edit-overlay">
+          <svg class="icon-svg" width="20" height="20" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 20h16"/></svg>
+        </div>
+      </div>
+      <div class="avatar-hint">Ketuk untuk mengubah foto profil</div>
+    </div>
+
+    <!-- Informasi Dasar -->
+    <div class="form-section">
+      <div class="section-title">
+        <div class="section-title-icon"><svg class="icon-svg" width="12" height="12" viewBox="0 0 24 24"><path d="M20 21a8 8 0 0 0-16 0"/><path d="M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/></svg></div>
+        Informasi Dasar
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nama Lengkap</label>
+        <input class="form-input" type="text" id="fullName" value="Rina Kusuma">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Gelar</label>
+        <input class="form-input" type="text" id="degree" value="M.Psi.">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nomor STR
+          <span style="font-weight:400;color:var(--text-muted);"> — hanya baca</span>
+        </label>
+        <div class="readonly-field">
+          <span>12345/STR/2019</span>
+          <span class="readonly-badge">Butuh re-verifikasi</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nomor SIP
+          <span style="font-weight:400;color:var(--text-muted);"> — hanya baca</span>
+        </label>
+        <div class="readonly-field">
+          <span>SIP/2019/67890</span>
+          <span class="readonly-badge">Butuh re-verifikasi</span>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">Bio / Deskripsi Diri</label>
+        <textarea class="form-input" id="bioInput" rows="4" maxlength="300"
+          oninput="document.getElementById('bioCount').textContent=this.value.length"
+          placeholder="Ceritakan tentang pendekatan Anda, pengalaman, dan cara Anda membantu klien...">Psikolog klinis dengan spesialisasi kecemasan, burnout, dan depresi. Pendekatan saya berfokus pada CBT dan Mindfulness-Based Therapy untuk membantu klien menemukan keseimbangan dan kekuatan dalam diri mereka.</textarea>
+        <div class="char-counter"><span id="bioCount">244</span>/300</div>
+      </div>
+    </div>
+
+    <!-- Spesialisasi -->
+    <div class="form-section">
+      <div class="section-title">
+        <div class="section-title-icon"><svg class="icon-svg" width="12" height="12" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 5-3.5 8-7 9-3.5-1-7-4-7-9V6z"/></svg></div>
+        Spesialisasi
+        <span style="font-weight:400;color:var(--text-muted);font-size:10px;text-transform:none;letter-spacing:0;">(maks. 5)</span>
+      </div>
+      <div class="chip-grid" id="specChips"></div>
+    </div>
+
+    <!-- Bahasa -->
+    <div class="form-section">
+      <div class="section-title">
+        <div class="section-title-icon"><svg class="icon-svg" width="12" height="12" viewBox="0 0 24 24"><path d="M2 12h20M2 12a10 10 0 0 1 20 0M2 12a10 10 0 0 0 20 0M12 2a15 15 0 0 1 4 10M12 2a15 15 0 0 0-4 10M12 22a15 15 0 0 0 4-10M12 22a15 15 0 0 1-4-10"/></svg></div>
+        Bahasa
+      </div>
+      <div class="chip-grid" id="langChips"></div>
+    </div>
+
+    <!-- Riwayat Pendidikan -->
+    <div class="form-section">
+      <div class="section-title">
+        <div class="section-title-icon"><svg class="icon-svg" width="12" height="12" viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"/></svg></div>
+        Riwayat Pendidikan
+      </div>
+      <div id="educationList"></div>
+      <button class="add-btn" onclick="openSheet('addEduSheet')">
+        <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        Tambah Pendidikan
+      </button>
+    </div>
+
+    <!-- Sertifikasi -->
+    <div class="form-section">
+      <div class="section-title">
+        <div class="section-title-icon"><svg class="icon-svg" width="12" height="12" viewBox="0 0 24 24"><path d="M12 15a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/><path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.12"/></svg></div>
+        Sertifikasi
+      </div>
+      <div id="certList"></div>
+      <button class="add-btn" onclick="openSheet('addCertSheet')">
+        <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        Tambah Sertifikasi
+      </button>
+    </div>
+
+    <!-- Lokasi -->
+    <div class="form-section">
+      <div class="section-title">
+        <div class="section-title-icon"><svg class="icon-svg" width="12" height="12" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+        Lokasi Praktik Offline
+      </div>
+      <div class="form-group">
+        <label class="form-label">Kota</label>
+        <input class="form-input" type="text" value="Jakarta Selatan" placeholder="Masukkan kota praktik">
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">Alamat Klinik <span style="font-weight:400;color:var(--text-muted);">(opsional)</span></label>
+        <input class="form-input" type="text" value="Jl. Kemang Raya No. 12" placeholder="Alamat lengkap klinik/praktik">
+      </div>
+    </div>
+
+  </div>
+
+  <div class="save-footer">
+    <button class="btn btn-primary" onclick="handleSave()">
+      <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+      Simpan Perubahan
+    </button>
+  </div>
+
+</div>
+
+<!-- Add Education Sheet -->
+<div class="sheet-overlay" id="addEduSheet" onclick="if(event.target===this)closeSheet('addEduSheet')">
+  <div class="sheet-panel">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Tambah Pendidikan</div>
+    <div class="sheet-body">
+      <div class="form-group">
+        <label class="form-label">Institusi</label>
+        <input class="form-input" type="text" id="eduInstitution" placeholder="Nama universitas / sekolah">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Gelar / Program</label>
+        <input class="form-input" type="text" id="eduDegree" placeholder="Contoh: S2 Psikologi Klinis">
+      </div>
+      <div class="form-group" style="margin-bottom:20px;">
+        <label class="form-label">Tahun Lulus</label>
+        <input class="form-input" type="text" id="eduYear" placeholder="2018" maxlength="4">
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-ghost" style="flex:1;" onclick="closeSheet('addEduSheet')">Batal</button>
+        <button class="btn btn-primary" style="flex:2;" onclick="addEducation()">Tambah</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Cert Sheet -->
+<div class="sheet-overlay" id="addCertSheet" onclick="if(event.target===this)closeSheet('addCertSheet')">
+  <div class="sheet-panel">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Tambah Sertifikasi</div>
+    <div class="sheet-body">
+      <div class="form-group">
+        <label class="form-label">Nama Sertifikat</label>
+        <input class="form-input" type="text" id="certName" placeholder="Nama sertifikasi atau pelatihan">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Lembaga Penerbit</label>
+        <input class="form-input" type="text" id="certIssuer" placeholder="Organisasi / institusi penerbit">
+      </div>
+      <div class="form-group" style="margin-bottom:20px;">
+        <label class="form-label">Tahun</label>
+        <input class="form-input" type="text" id="certYear" placeholder="2021" maxlength="4">
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-ghost" style="flex:1;" onclick="closeSheet('addCertSheet')">Batal</button>
+        <button class="btn btn-primary" style="flex:2;" onclick="addCert()">Tambah</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../../js/app.js"></script>
+<script>
+  Object.assign(ROUTES, { profile: 'index.html' });
+
+  // ── Specializations ──
+  const ALL_SPECS = ['Kecemasan', 'Depresi', 'Stres Kerja', 'Burnout', 'Trauma', 'Relationship', 'Self-esteem', 'Gangguan Tidur', 'Anak & Remaja', 'Pasangan'];
+  const ALL_LANGS = ['Indonesia', 'Inggris', 'Jawa', 'Sunda', 'Mandarin'];
+  let selectedSpecs = ['Kecemasan', 'Burnout', 'Depresi'];
+  let selectedLangs = ['Indonesia', 'Inggris'];
+
+  function renderChips() {
+    document.getElementById('specChips').innerHTML = ALL_SPECS.map(s => `
+      <div class="spec-chip ${selectedSpecs.includes(s)?'selected':''}" onclick="toggleSpec('${s}')">${s}</div>
+    `).join('');
+    document.getElementById('langChips').innerHTML = ALL_LANGS.map(l => `
+      <div class="spec-chip ${selectedLangs.includes(l)?'selected':''}" onclick="toggleLang('${l}')">${l}</div>
+    `).join('');
+  }
+
+  function toggleSpec(s) {
+    if (selectedSpecs.includes(s)) { selectedSpecs = selectedSpecs.filter(x => x !== s); }
+    else if (selectedSpecs.length < 5) { selectedSpecs.push(s); }
+    else { toast('Maksimal 5 spesialisasi'); return; }
+    renderChips();
+  }
+  function toggleLang(l) {
+    if (selectedLangs.includes(l)) selectedLangs = selectedLangs.filter(x => x !== l);
+    else selectedLangs.push(l);
+    renderChips();
+  }
+
+  // ── Education ──
+  let educations = [...MOCK_EDUCATION];
+  function renderEducation() {
+    document.getElementById('educationList').innerHTML = educations.map((e, i) => `
+      <div class="entry-row">
+        <div style="width:34px;height:34px;border-radius:var(--r-sm);background:var(--primary-pale);color:var(--primary);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"/></svg>
+        </div>
+        <div class="entry-body">
+          <div class="entry-title">${e.institution}</div>
+          <div class="entry-sub">${e.degree} · ${e.year}</div>
+        </div>
+        <button class="entry-delete" onclick="deleteEdu(${i})">
+          <svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>
+        </button>
+      </div>
+    `).join('');
+  }
+  function deleteEdu(i) { educations.splice(i,1); renderEducation(); }
+  function addEducation() {
+    const inst = document.getElementById('eduInstitution').value.trim();
+    const deg  = document.getElementById('eduDegree').value.trim();
+    const yr   = document.getElementById('eduYear').value.trim();
+    if (!inst || !deg) { toast('Isi nama institusi dan gelar'); return; }
+    educations.unshift({ institution: inst, degree: deg, year: yr });
+    ['eduInstitution','eduDegree','eduYear'].forEach(id => document.getElementById(id).value = '');
+    closeSheet('addEduSheet');
+    renderEducation();
+    toast('Pendidikan ditambahkan');
+  }
+
+  // ── Certifications ──
+  let certs = [...MOCK_CERTIFICATIONS];
+  function renderCerts() {
+    document.getElementById('certList').innerHTML = certs.map((c, i) => `
+      <div class="entry-row">
+        <div style="width:34px;height:34px;border-radius:var(--r-sm);background:#FDF4FF;color:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24"><path d="M12 15a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/><path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.12"/></svg>
+        </div>
+        <div class="entry-body">
+          <div class="entry-title">${c.name}</div>
+          <div class="entry-sub">${c.issuer} · ${c.year}</div>
+        </div>
+        <button class="entry-delete" onclick="deleteCert(${i})">
+          <svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>
+        </button>
+      </div>
+    `).join('');
+  }
+  function deleteCert(i) { certs.splice(i,1); renderCerts(); }
+  function addCert() {
+    const name   = document.getElementById('certName').value.trim();
+    const issuer = document.getElementById('certIssuer').value.trim();
+    const year   = document.getElementById('certYear').value.trim();
+    if (!name || !issuer) { toast('Isi nama sertifikat dan lembaga'); return; }
+    certs.unshift({ name, issuer, year });
+    ['certName','certIssuer','certYear'].forEach(id => document.getElementById(id).value = '');
+    closeSheet('addCertSheet');
+    renderCerts();
+    toast('Sertifikasi ditambahkan');
+  }
+
+  // ── Save ──
+  function handleSave() {
+    toast('Profil berhasil diperbarui');
+    setTimeout(() => go('profile'), 1200);
+  }
+
+  function openSheet(id)  { document.getElementById(id).classList.add('open'); }
+  function closeSheet(id) { document.getElementById(id).classList.remove('open'); }
+
+  function toast(msg) {
+    let el = document.querySelector('.phone .toast');
+    if (!el) { el = document.createElement('div'); el.className = 'toast'; document.getElementById('phoneWrap').appendChild(el); }
+    el.textContent = msg; el.classList.add('show');
+    clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), 2600);
+  }
+
+  renderChips();
+  renderEducation();
+  renderCerts();
+</script>
+</body>
+</html>

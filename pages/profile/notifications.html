@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Notifikasi — Hi-Me Expert</title>
+  <link rel="stylesheet" href="../../css/global.css">
+  <style>
+    .page-header {
+      background: var(--bg-card); border-bottom: 1px solid var(--border);
+      padding: 14px 20px; display: flex; align-items: center; gap: 12px;
+      position: sticky; top: 0; z-index: 10;
+    }
+    .back-btn { background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 4px; }
+    .page-title { font-size: 16px; font-weight: 800; color: var(--text-primary); flex: 1; }
+
+    /* Section */
+    .notif-section { padding: 20px 20px 0; }
+    .section-label {
+      font-size: 11px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.5px; color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+    .notif-group {
+      background: var(--bg-card); border-radius: var(--r-lg);
+      border: 1px solid var(--border); overflow: hidden;
+      box-shadow: var(--shadow-xs); margin-bottom: 6px;
+    }
+    .notif-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 16px; border-bottom: 1px solid var(--border);
+    }
+    .notif-item:last-child { border-bottom: none; }
+    .notif-icon {
+      width: 34px; height: 34px; border-radius: var(--r-sm);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .notif-text { flex: 1; }
+    .notif-name { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+    .notif-desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .toggle-sw {
+      width: 42px; height: 24px; border-radius: 100px; cursor: pointer;
+      background: var(--border-dark); transition: background .2s; position: relative; flex-shrink: 0;
+    }
+    .toggle-sw.on { background: var(--primary); }
+    .toggle-sw::after {
+      content: ''; position: absolute; top: 3px; left: 3px;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: white; box-shadow: var(--shadow-xs); transition: transform .2s;
+    }
+    .toggle-sw.on::after { transform: translateX(18px); }
+
+    /* Reminder chips */
+    .reminder-section { padding: 16px 20px 0; }
+    .reminder-title { font-size: 14px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px; }
+    .reminder-sub   { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
+    .chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .time-chip {
+      padding: 8px 16px; border-radius: 100px;
+      border: 1.5px solid var(--border); background: var(--bg-card);
+      font-size: 12px; font-weight: 700; color: var(--text-secondary);
+      cursor: pointer; transition: all .15s;
+    }
+    .time-chip.selected { border-color: var(--primary); background: var(--primary-pale); color: var(--primary); }
+    .time-chip:active { transform: scale(.95); }
+
+    /* Info card */
+    .info-card {
+      margin: 16px 20px 20px;
+      background: var(--primary-xpale); border: 1px solid var(--primary-pale);
+      border-radius: var(--r-md); padding: 12px 14px;
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 12px; color: var(--teal-800); line-height: 1.6;
+    }
+
+    /* Save footer */
+    .save-footer { padding: 16px 20px 28px; background: var(--bg); border-top: 1px solid var(--border); }
+  </style>
+</head>
+<body>
+<div class="phone" id="phoneWrap">
+
+  <div class="page-header">
+    <button class="back-btn" onclick="go('profile')">
+      <svg class="icon-svg" width="22" height="22" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="page-title">Notifikasi</div>
+  </div>
+
+  <div class="scroll-area" style="padding-bottom: 90px;">
+
+    <div class="notif-section" style="padding-top:20px;">
+      <div class="section-label">Sesi &amp; Request</div>
+      <div class="notif-group">
+        <div class="notif-item">
+          <div class="notif-icon" style="background:#EFF6FF;color:#1D4ED8;">
+            <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24"><path d="M4 5h16v10H7l-3 3V5z"/></svg>
+          </div>
+          <div class="notif-text">
+            <div class="notif-name">Request Masuk</div>
+            <div class="notif-desc">Notifikasi saat ada booking baru</div>
+          </div>
+          <div class="toggle-sw on" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <div class="notif-item">
+          <div class="notif-icon" style="background:#F0FDF4;color:#15803D;">
+            <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+          </div>
+          <div class="notif-text">
+            <div class="notif-name">Sesi Terkonfirmasi</div>
+            <div class="notif-desc">Konfirmasi booking berhasil</div>
+          </div>
+          <div class="toggle-sw on" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <div class="notif-item">
+          <div class="notif-icon" style="background:#FEF9C3;color:#CA8A04;">
+            <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>
+          </div>
+          <div class="notif-text">
+            <div class="notif-name">Pengingat Sesi</div>
+            <div class="notif-desc">Pengingat sebelum sesi dimulai</div>
+          </div>
+          <div class="toggle-sw on" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <div class="notif-item">
+          <div class="notif-icon" style="background:#FEF2F2;color:var(--danger);">
+            <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </div>
+          <div class="notif-text">
+            <div class="notif-name">Pembatalan Sesi</div>
+            <div class="notif-desc">Notifikasi saat klien membatalkan</div>
+          </div>
+          <div class="toggle-sw on" onclick="this.classList.toggle('on')"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="notif-section">
+      <div class="section-label">Keuangan</div>
+      <div class="notif-group">
+        <div class="notif-item">
+          <div class="notif-icon" style="background:#F0FDF4;color:#15803D;">
+            <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <div class="notif-text">
+            <div class="notif-name">Pembayaran Masuk</div>
+            <div class="notif-desc">Saat dana sesi berhasil masuk</div>
+          </div>
+          <div class="toggle-sw on" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <div class="notif-item">
+          <div class="notif-icon" style="background:var(--primary-pale);color:var(--primary);">
+            <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+          </div>
+          <div class="notif-text">
+            <div class="notif-name">Penarikan Dana</div>
+            <div class="notif-desc">Status proses pencairan dana</div>
+          </div>
+          <div class="toggle-sw on" onclick="this.classList.toggle('on')"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="notif-section">
+      <div class="section-label">Feedback &amp; Platform</div>
+      <div class="notif-group">
+        <div class="notif-item">
+          <div class="notif-icon" style="background:#FFF7ED;color:#C2410C;">
+            <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24"><path d="M12 3l2.8 5.8L21 9.8l-4.5 4.4 1.1 6.3L12 17.8 6.4 20.5l1.1-6.3L3 9.8l6.2-1z"/></svg>
+          </div>
+          <div class="notif-text">
+            <div class="notif-name">Rating Baru</div>
+            <div class="notif-desc">Saat klien memberikan penilaian</div>
+          </div>
+          <div class="toggle-sw on" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <div class="notif-item">
+          <div class="notif-icon" style="background:var(--bg);color:var(--text-muted);">
+            <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
+          </div>
+          <div class="notif-text">
+            <div class="notif-name">Info Platform</div>
+            <div class="notif-desc">Pembaruan kebijakan dan fitur</div>
+          </div>
+          <div class="toggle-sw" onclick="this.classList.toggle('on')"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reminder timing -->
+    <div class="reminder-section" style="padding-top: 24px;">
+      <div class="section-label">Waktu Pengingat Sesi</div>
+      <div style="background:var(--bg-card);border-radius:var(--r-lg);border:1px solid var(--border);padding:16px;box-shadow:var(--shadow-xs);">
+        <div class="reminder-sub">Berapa lama sebelum sesi dimulai, Anda ingin diingatkan?</div>
+        <div class="chip-row">
+          <div class="time-chip"       onclick="selectReminder(this)">15 menit</div>
+          <div class="time-chip selected" onclick="selectReminder(this)">30 menit</div>
+          <div class="time-chip"       onclick="selectReminder(this)">1 jam</div>
+          <div class="time-chip"       onclick="selectReminder(this)">2 jam</div>
+          <div class="time-chip"       onclick="selectReminder(this)">1 hari</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info -->
+    <div class="info-card">
+      <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:1px;color:var(--teal-700);">
+        <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/><path d="M12 16v-4M12 8h.01"/>
+      </svg>
+      Notifikasi melalui email dan push notification akan dikirim berdasarkan preferensi di atas. Pastikan izin notifikasi perangkat Anda aktif.
+    </div>
+
+  </div>
+
+  <div class="save-footer">
+    <button class="btn btn-primary" onclick="handleSave()">
+      <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+      Simpan Preferensi
+    </button>
+  </div>
+
+</div>
+
+<script src="../../js/app.js"></script>
+<script>
+  Object.assign(ROUTES, { profile: 'index.html' });
+
+  function selectReminder(el) {
+    document.querySelectorAll('.time-chip').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  function handleSave() {
+    toast('Preferensi notifikasi disimpan');
+    setTimeout(() => go('profile'), 1000);
+  }
+
+  function toast(msg) {
+    let el = document.querySelector('.phone .toast');
+    if (!el) { el = document.createElement('div'); el.className = 'toast'; document.getElementById('phoneWrap').appendChild(el); }
+    el.textContent = msg; el.classList.add('show');
+    clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), 2400);
+  }
+</script>
+</body>
+</html>

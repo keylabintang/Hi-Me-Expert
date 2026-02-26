@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Privasi & Keamanan — Hi-Me Expert</title>
+  <link rel="stylesheet" href="../../css/global.css">
+  <style>
+    .page-header {
+      background: var(--bg-card); border-bottom: 1px solid var(--border);
+      padding: 14px 20px; display: flex; align-items: center; gap: 12px;
+      position: sticky; top: 0; z-index: 10;
+    }
+    .back-btn { background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 4px; }
+    .page-title { font-size: 16px; font-weight: 800; color: var(--text-primary); flex: 1; }
+
+    /* ─── Security Score Card ─── */
+    .score-card {
+      margin: 20px; background: linear-gradient(135deg, var(--teal-800), var(--teal-700));
+      border-radius: var(--r-xl); padding: 20px; position: relative; overflow: hidden;
+    }
+    .score-card::before {
+      content: ''; position: absolute; top: -30px; right: -30px;
+      width: 100px; height: 100px; border-radius: 50%;
+      background: rgba(255,255,255,.07);
+    }
+    .score-title { font-size: 12px; font-weight: 700; color: rgba(255,255,255,.7); margin-bottom: 12px; }
+    .score-body  { display: flex; align-items: center; gap: 16px; }
+    .score-ring  {
+      width: 68px; height: 68px; flex-shrink: 0; position: relative;
+    }
+    .score-ring svg { transform: rotate(-90deg); }
+    .score-ring-text {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 800; color: white;
+    }
+    .score-info { flex: 1; }
+    .score-label { font-size: 16px; font-weight: 800; color: white; margin-bottom: 4px; }
+    .score-sub   { font-size: 11px; color: rgba(255,255,255,.65); line-height: 1.5; }
+    .score-items { display: flex; flex-direction: column; gap: 6px; margin-top: 16px; }
+    .score-item  { display: flex; align-items: center; gap: 8px; font-size: 12px; color: rgba(255,255,255,.8); }
+    .score-dot-good { width: 8px; height: 8px; border-radius: 50%; background: #4ADE80; flex-shrink: 0; }
+    .score-dot-warn { width: 8px; height: 8px; border-radius: 50%; background: #FACC15; flex-shrink: 0; }
+
+    /* ─── Sections ─── */
+    .priv-section { padding: 0 20px 4px; }
+    .section-label {
+      font-size: 11px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.5px; color: var(--text-muted);
+      padding: 16px 0 8px;
+    }
+    .priv-group {
+      background: var(--bg-card); border-radius: var(--r-lg);
+      border: 1px solid var(--border); overflow: hidden; box-shadow: var(--shadow-xs);
+    }
+    .priv-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 16px; border-bottom: 1px solid var(--border);
+      cursor: pointer; transition: background .1s;
+    }
+    .priv-item:last-child { border-bottom: none; }
+    .priv-item:active { background: var(--bg); }
+    .priv-icon {
+      width: 34px; height: 34px; border-radius: var(--r-sm); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .priv-text { flex: 1; }
+    .priv-name { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+    .priv-sub  { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .toggle-sw {
+      width: 42px; height: 24px; border-radius: 100px; cursor: pointer;
+      background: var(--border-dark); transition: background .2s; position: relative; flex-shrink: 0;
+    }
+    .toggle-sw.on { background: var(--primary); }
+    .toggle-sw::after {
+      content: ''; position: absolute; top: 3px; left: 3px;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: white; box-shadow: var(--shadow-xs); transition: transform .2s;
+    }
+    .toggle-sw.on::after { transform: translateX(18px); }
+    .badge-status {
+      font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 100px;
+    }
+
+    /* Danger zone */
+    .danger-section { padding: 0 20px 32px; }
+    .danger-group {
+      background: var(--bg-card); border-radius: var(--r-lg);
+      border: 1.5px solid rgba(214,40,40,.2); overflow: hidden;
+    }
+    .danger-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 16px; border-bottom: 1px solid rgba(214,40,40,.1);
+      cursor: pointer; transition: background .1s;
+    }
+    .danger-item:last-child { border-bottom: none; }
+    .danger-item:active { background: rgba(214,40,40,.04); }
+    .danger-icon {
+      width: 34px; height: 34px; border-radius: var(--r-sm); flex-shrink: 0;
+      background: rgba(214,40,40,.08); color: var(--danger);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .danger-title { font-size: 14px; font-weight: 700; color: var(--danger); }
+    .danger-sub   { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+    /* ─── Bottom Sheet ─── */
+    .sheet-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 100;
+      display: none; align-items: flex-end; justify-content: center;
+    }
+    .sheet-overlay.open { display: flex; }
+    .sheet-panel {
+      width: 390px; background: var(--bg-card);
+      border-radius: var(--r-xl) var(--r-xl) 0 0;
+      padding: 0 0 36px; max-height: 85vh; overflow-y: auto; scrollbar-width: none;
+      animation: slideUp .25s ease;
+    }
+    .sheet-panel::-webkit-scrollbar { display: none; }
+    @media (max-width:430px) { .sheet-panel { width: 100%; } }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .sheet-handle { width: 36px; height: 4px; background: var(--border-dark); border-radius: 2px; margin: 12px auto 8px; }
+    .sheet-title  { font-size: 16px; font-weight: 800; padding: 8px 20px 16px; border-bottom: 1px solid var(--border); }
+    .sheet-body   { padding: 16px 20px 0; }
+
+    /* Password strength */
+    .strength-bar { display: flex; gap: 4px; margin: 6px 0 4px; }
+    .strength-seg { flex: 1; height: 4px; border-radius: 2px; background: var(--border); transition: background .2s; }
+    .strength-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-align: right; }
+
+    /* Activity log item */
+    .log-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 0; border-bottom: 1px solid var(--border);
+    }
+    .log-item:last-child { border-bottom: none; }
+    .log-icon {
+      width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+      background: var(--primary-pale); color: var(--primary);
+      display: flex; align-items: center; justify-content: center; margin-top: 2px;
+    }
+    .log-text { flex: 1; }
+    .log-action { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+    .log-device { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .log-time   { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+  </style>
+</head>
+<body>
+<div class="phone" id="phoneWrap">
+
+  <div class="page-header">
+    <button class="back-btn" onclick="go('profile')">
+      <svg class="icon-svg" width="22" height="22" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="page-title">Privasi &amp; Keamanan</div>
+  </div>
+
+  <div class="scroll-area" style="padding-bottom: 24px;">
+
+    <!-- Security Score -->
+    <div class="score-card">
+      <div class="score-title">SKOR KEAMANAN AKUN</div>
+      <div class="score-body">
+        <div class="score-ring">
+          <svg width="68" height="68" viewBox="0 0 68 68">
+            <circle cx="34" cy="34" r="28" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="7"/>
+            <circle cx="34" cy="34" r="28" fill="none" stroke="#4ADE80" stroke-width="7"
+              stroke-dasharray="175.9" stroke-dashoffset="35.2" stroke-linecap="round"/>
+          </svg>
+          <div class="score-ring-text">80</div>
+        </div>
+        <div class="score-info">
+          <div class="score-label">Cukup Aman</div>
+          <div class="score-sub">Aktifkan 2FA untuk meningkatkan keamanan akun Anda</div>
+        </div>
+      </div>
+      <div class="score-items">
+        <div class="score-item"><div class="score-dot-good"></div> Kata sandi kuat</div>
+        <div class="score-item"><div class="score-dot-good"></div> Email terverifikasi</div>
+        <div class="score-item"><div class="score-dot-warn"></div> Autentikasi 2 Faktor belum aktif</div>
+      </div>
+    </div>
+
+    <!-- Keamanan -->
+    <div class="priv-section">
+      <div class="section-label">Keamanan</div>
+      <div class="priv-group">
+        <div class="priv-item" onclick="openSheet('passSheet')">
+          <div class="priv-icon" style="background:var(--primary-pale);color:var(--primary);">
+            <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24"><path d="M7 11V8a5 5 0 0 1 10 0v3"/><path d="M5 11h14v10H5z"/></svg>
+          </div>
+          <div class="priv-text">
+            <div class="priv-name">Ubah Kata Sandi</div>
+            <div class="priv-sub">Terakhir diubah 3 hari lalu</div>
+          </div>
+          <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24" style="color:var(--text-muted);"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+        <div class="priv-item" onclick="toggle2FA()">
+          <div class="priv-icon" style="background:#FDF4FF;color:var(--accent);">
+            <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 5-3.5 8-7 9-3.5-1-7-4-7-9V6z"/></svg>
+          </div>
+          <div class="priv-text">
+            <div class="priv-name">Autentikasi 2 Faktor</div>
+            <div class="priv-sub">Keamanan login tambahan via SMS/app</div>
+          </div>
+          <div class="badge-status" id="twoFaBadge" style="background:#FEF9C3;color:#CA8A04;">Nonaktif</div>
+          <div class="toggle-sw" id="twoFaToggle" onclick="event.stopPropagation(); toggle2FA()"></div>
+        </div>
+        <div class="priv-item" onclick="openSheet('logSheet')">
+          <div class="priv-icon" style="background:var(--bg);color:var(--text-muted);">
+            <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>
+          </div>
+          <div class="priv-text">
+            <div class="priv-name">Log Aktivitas Akun</div>
+            <div class="priv-sub">Riwayat login dan perubahan akun</div>
+          </div>
+          <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24" style="color:var(--text-muted);"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Privasi -->
+    <div class="priv-section">
+      <div class="section-label">Privasi</div>
+      <div class="priv-group">
+        <div class="priv-item">
+          <div class="priv-icon" style="background:var(--primary-pale);color:var(--primary);">
+            <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><path d="M1 1l22 22"/></svg>
+          </div>
+          <div class="priv-text">
+            <div class="priv-name">Sembunyikan Profil dari Pencarian</div>
+            <div class="priv-sub">Profil tidak muncul di hasil pencarian pengguna</div>
+          </div>
+          <div class="toggle-sw" id="hideProfileToggle" onclick="this.classList.toggle('on'); updateScoreHint()"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Zona Berbahaya -->
+    <div class="danger-section">
+      <div class="section-label" style="padding-bottom:8px;">Zona Berbahaya</div>
+      <div style="background:#FEF2F2;border-radius:var(--r-md);padding:12px 14px;margin-bottom:12px;font-size:12px;color:#7F1D1D;line-height:1.6;display:flex;gap:10px;align-items:flex-start;">
+        <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24" style="flex-shrink:0;color:var(--danger);margin-top:1px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+        Tindakan di bawah ini bersifat permanen atau berdampak besar. Harap pertimbangkan dengan hati-hati.
+      </div>
+      <div class="danger-group">
+        <div class="danger-item" onclick="openSheet('deactivateSheet')">
+          <div class="danger-icon">
+            <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><path d="M12 2v10"/></svg>
+          </div>
+          <div class="priv-text">
+            <div class="danger-title">Nonaktifkan Akun</div>
+            <div class="danger-sub">Profil tidak terlihat sementara waktu</div>
+          </div>
+        </div>
+        <div class="danger-item" onclick="openSheet('deleteSheet')">
+          <div class="danger-icon">
+            <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v6M14 11v6"/></svg>
+          </div>
+          <div class="priv-text">
+            <div class="danger-title">Hapus Akun Permanen</div>
+            <div class="danger-sub">Semua data akun akan dihapus</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Change Password Sheet -->
+<div class="sheet-overlay" id="passSheet" onclick="if(event.target===this)closeSheet('passSheet')">
+  <div class="sheet-panel">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Ubah Kata Sandi</div>
+    <div class="sheet-body">
+      <div class="form-group">
+        <label class="form-label">Kata Sandi Lama</label>
+        <input class="form-input" type="password" placeholder="••••••••">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Kata Sandi Baru</label>
+        <input class="form-input" type="password" id="newPassInput" placeholder="Min. 8 karakter"
+          oninput="checkStrength(this.value)">
+        <div class="strength-bar">
+          <div class="strength-seg" id="str1"></div>
+          <div class="strength-seg" id="str2"></div>
+          <div class="strength-seg" id="str3"></div>
+          <div class="strength-seg" id="str4"></div>
+        </div>
+        <div class="strength-label" id="strLabel"></div>
+      </div>
+      <div class="form-group" style="margin-bottom:20px;">
+        <label class="form-label">Konfirmasi Kata Sandi Baru</label>
+        <input class="form-input" type="password" placeholder="Ulangi kata sandi baru">
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-ghost" style="flex:1;" onclick="closeSheet('passSheet')">Batal</button>
+        <button class="btn btn-primary" style="flex:2;" onclick="doChangePass()">Simpan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Activity Log Sheet -->
+<div class="sheet-overlay" id="logSheet" onclick="if(event.target===this)closeSheet('logSheet')">
+  <div class="sheet-panel">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Log Aktivitas Akun</div>
+    <div class="sheet-body" id="logBody"></div>
+  </div>
+</div>
+
+<!-- Deactivate Sheet -->
+<div class="sheet-overlay" id="deactivateSheet" onclick="if(event.target===this)closeSheet('deactivateSheet')">
+  <div class="sheet-panel">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" style="color:var(--danger);">Nonaktifkan Akun</div>
+    <div class="sheet-body">
+      <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:var(--r-md);padding:12px 14px;margin-bottom:16px;font-size:13px;color:#7F1D1D;line-height:1.6;">
+        Akun Anda tidak akan terlihat oleh pengguna dan tidak dapat menerima sesi baru. Data dan riwayat sesi tetap tersimpan sesuai regulasi yang berlaku. Anda dapat mengaktifkan kembali kapan saja.
+      </div>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">Untuk konfirmasi, ketik <strong>"NONAKTIFKAN"</strong> di bawah ini:</p>
+      <input class="form-input" type="text" id="deactivateConfirm" placeholder="NONAKTIFKAN" style="margin-bottom:16px;">
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-ghost" style="flex:1;" onclick="closeSheet('deactivateSheet')">Batal</button>
+        <button class="btn" style="flex:2;background:var(--danger);color:white;border-radius:var(--r-sm);" onclick="doDeactivate()">Nonaktifkan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Sheet -->
+<div class="sheet-overlay" id="deleteSheet" onclick="if(event.target===this)closeSheet('deleteSheet')">
+  <div class="sheet-panel">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" style="color:var(--danger);">Hapus Akun Permanen</div>
+    <div class="sheet-body">
+      <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:var(--r-md);padding:12px 14px;margin-bottom:16px;font-size:13px;color:#7F1D1D;line-height:1.6;">
+        <strong>Tindakan ini tidak dapat diurungkan.</strong> Seluruh data akun, profil, dan pengaturan akan dihapus. Riwayat sesi dan catatan klinis tetap disimpan selama 5 tahun sesuai regulasi kesehatan yang berlaku.
+      </div>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">Untuk konfirmasi, ketik <strong>"HAPUS AKUN SAYA"</strong> di bawah ini:</p>
+      <input class="form-input" type="text" id="deleteConfirm" placeholder="HAPUS AKUN SAYA" style="margin-bottom:16px;">
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-ghost" style="flex:1;" onclick="closeSheet('deleteSheet')">Batal</button>
+        <button class="btn" style="flex:2;background:var(--danger);color:white;border-radius:var(--r-sm);" onclick="doDelete()">Hapus Permanen</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../../js/app.js"></script>
+<script>
+  Object.assign(ROUTES, { profile: 'index.html' });
+
+  // ── 2FA Toggle ──
+  let twoFaActive = false;
+  function toggle2FA() {
+    twoFaActive = !twoFaActive;
+    document.getElementById('twoFaToggle').classList.toggle('on', twoFaActive);
+    const badge = document.getElementById('twoFaBadge');
+    badge.textContent = twoFaActive ? 'Aktif' : 'Nonaktif';
+    badge.style.background = twoFaActive ? 'var(--primary-pale)' : '#FEF9C3';
+    badge.style.color = twoFaActive ? 'var(--primary)' : '#CA8A04';
+    toast(twoFaActive ? 'Autentikasi 2 Faktor diaktifkan' : 'Autentikasi 2 Faktor dinonaktifkan');
+  }
+
+  // ── Password Strength ──
+  function checkStrength(val) {
+    let score = 0;
+    if (val.length >= 8) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+    const colors = ['','#D62828','#F97316','#EAB308','#22C55E'];
+    const labels = ['','Sangat lemah','Lemah','Cukup','Kuat'];
+    for (let i = 1; i <= 4; i++) {
+      const seg = document.getElementById('str' + i);
+      seg.style.background = i <= score ? colors[score] : 'var(--border)';
+    }
+    document.getElementById('strLabel').textContent = val.length ? labels[score] : '';
+    document.getElementById('strLabel').style.color = colors[score] || 'var(--text-muted)';
+  }
+
+  function doChangePass() {
+    closeSheet('passSheet');
+    toast('Kata sandi berhasil diubah');
+  }
+
+  // ── Activity Log ──
+  function openSheet(id) {
+    if (id === 'logSheet') {
+      document.getElementById('logBody').innerHTML = MOCK_ACTIVITY_LOG.map(l => {
+        const iconPath = {
+          'check-circle': '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/>',
+          'lock': '<path d="M7 11V8a5 5 0 0 1 10 0v3"/><path d="M5 11h14v10H5z"/>',
+          'edit': '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+        }[l.icon] || '<circle cx="12" cy="12" r="10"/>';
+        return `<div class="log-item">
+          <div class="log-icon"><svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24">${iconPath}</svg></div>
+          <div class="log-text">
+            <div class="log-action">${l.action}</div>
+            <div class="log-device">${l.device}</div>
+          </div>
+          <div class="log-time">${l.time}</div>
+        </div>`;
+      }).join('');
+    }
+    document.getElementById(id).classList.add('open');
+  }
+  function closeSheet(id) { document.getElementById(id).classList.remove('open'); }
+
+  // ── Deactivate / Delete ──
+  function doDeactivate() {
+    if (document.getElementById('deactivateConfirm').value !== 'NONAKTIFKAN') {
+      toast('Ketik "NONAKTIFKAN" untuk konfirmasi'); return;
+    }
+    closeSheet('deactivateSheet');
+    toast('Akun dinonaktifkan. Anda akan diarahkan ke halaman login.');
+    setTimeout(() => go('login'), 2000);
+  }
+
+  function doDelete() {
+    if (document.getElementById('deleteConfirm').value !== 'HAPUS AKUN SAYA') {
+      toast('Ketik "HAPUS AKUN SAYA" untuk konfirmasi'); return;
+    }
+    closeSheet('deleteSheet');
+    toast('Akun dihapus. Sampai jumpa.');
+    setTimeout(() => go('landing'), 2200);
+  }
+
+  function toast(msg) {
+    let el = document.querySelector('.phone .toast');
+    if (!el) { el = document.createElement('div'); el.className = 'toast'; document.getElementById('phoneWrap').appendChild(el); }
+    el.textContent = msg; el.classList.add('show');
+    clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), 2800);
+  }
+</script>
+</body>
+</html>

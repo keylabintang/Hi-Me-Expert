@@ -396,64 +396,70 @@ Fokus: Form yang diisi expert setelah sesi selesai — hasilnya langsung tampil 
 
 ---
 
-### 🔮 Phase 2.6 — Profil & Pengaturan Expert *(PLANNED)*
+### ✅ Phase 2.6 — Profil & Pengaturan Expert *(DONE)*
 
 Fokus: Profil yang bisa diedit, pengaturan harga layanan, dan dashboard pendapatan expert.
 
-**Halaman yang akan dibuat:**
+**Halaman yang dibuat:**
 
 | Halaman | Path | Status |
 |---|---|---|
-| Profil Expert | `pages/profile/index.html` | 🔮 Planned |
-| Edit Profil | `pages/profile/edit.html` | 🔮 Planned |
-| Pengaturan Harga | `pages/profile/pricing.html` | 🔮 Planned |
-| Earnings & Penarikan | `pages/profile/earnings.html` | 🔮 Planned |
-| Notifikasi Setting | `pages/profile/notifications.html` | 🔮 Planned |
-| Privasi & Keamanan | `pages/profile/privacy.html` | 🔮 Planned |
+| Profil Expert | `pages/profile/index.html` | ✅ Done |
+| Edit Profil | `pages/profile/edit.html` | ✅ Done |
+| Pengaturan Harga | `pages/profile/pricing.html` | ✅ Done |
+| Earnings & Penarikan | `pages/profile/earnings.html` | ✅ Done |
+| Notifikasi Setting | `pages/profile/notifications.html` | ✅ Done |
+| Privasi & Keamanan | `pages/profile/privacy.html` | ✅ Done |
 
 **Fitur Phase 2.6:**
 
-- **Profil Expert:**
-  - Hero: avatar inisial bergradient besar, nama + gelar, badge "✓ Terverifikasi", badge tipe expert
-  - Stats row: Total Sesi · Rata-rata Rating · Tahun Pengalaman · Total Ulasan
-  - **Preview "Tampilan di Mata User"** — card kecil menampilkan expert card persis seperti yang dilihat user di `expert/list.html` (nama, rating, harga, spesialisasi, online dot)
-  - Menu: Edit Profil · Pengaturan Harga · Earnings · Availability · Notifikasi · Privasi · Keluar (dengan konfirmasi sheet)
+- **Profil Expert (`index.html`):**
+  - Hero gradient teal dengan dekorasi lingkaran abstrak
+  - Avatar inisial bergradient teal-accent ukuran 84px dengan glow ring
+  - Nama lengkap + gelar, tipe expert, badge "Terverifikasi" (hijau) + badge tipe
+  - Stats row 4 kolom: Total Sesi · Rata-rata Rating · Tahun Pengalaman · Total Ulasan
+  - Card preview "Tampilan di Mata Pengguna" — persis seperti yang dilihat user di halaman pencarian (nama, spesialisasi, chip, rating bintang, harga mulai, online dot)
+  - Menu grup "Profil & Layanan": Edit Profil, Pengaturan Harga, Pendapatan (dengan badge saldo), Availability
+  - Menu grup "Akun": Notifikasi, Privasi & Keamanan (dengan badge skor), Riwayat Sesi
+  - Tombol Keluar dengan konfirmasi sheet
 
-- **Edit Profil:**
-  - Foto profil (avatar inisial atau upload — simulasi file picker)
-  - Nama lengkap + gelar, nomor STR/SIP (read-only, perubahan memerlukan proses re-verifikasi admin)
-  - Bio / deskripsi (textarea maks 300 karakter + counter)
-  - Multi-select chip spesialisasi, bahasa yang dikuasai
-  - Riwayat pendidikan: tambah/hapus entri (institusi, gelar, tahun lulus)
-  - Sertifikasi: tambah/hapus entri (nama sertifikat, lembaga, tahun)
-  - Lokasi praktik offline (kota + alamat klinik opsional)
+- **Edit Profil (`edit.html`):**
+  - Avatar picker dengan overlay edit on hover
+  - Form: nama lengkap, gelar, STR/SIP (read-only dengan badge "Butuh re-verifikasi"), bio (300 karakter + counter)
+  - Chip multi-select spesialisasi (maks. 5) dan bahasa
+  - Riwayat pendidikan: kartu per entri dengan ikon + tombol hapus, form tambah via bottom sheet
+  - Sertifikasi: kartu per entri (ikon aksen ungu), form tambah via bottom sheet
+  - Lokasi: kota + alamat klinik opsional
+  - Tombol simpan → toast → redirect ke profil
 
-- **Pengaturan Harga:**
-  - Toggle aktif/nonaktif per tipe sesi
-  - Input harga per durasi (30/60/90 menit) dengan format rupiah otomatis
-  - **Promo Sementara:** toggle + persentase diskon + rentang tanggal → preview harga coret otomatis
-  - Preview card: "Begini tampilan harga Anda di halaman expert:" → simulasi card user
-  - Simpan → toast konfirmasi
+- **Pengaturan Harga (`pricing.html`):**
+  - 3 kartu tipe sesi (Chat biru, Call hijau, Offline oranye) dengan toggle aktif/nonaktif
+  - Setiap kartu collapsible dengan input harga per durasi (prefix "Rp")
+  - Promo Sementara: toggle + chip persentase diskon (10–30%) + date range picker → preview harga coret otomatis
+  - Preview live "Tampilan di Halaman Pencarian" — tabel harga dengan ikon tipe dan harga coret jika promo aktif
 
-- **Earnings & Penarikan:**
-  - Summary card bergradient: Saldo Tersedia · Pendapatan Bulan Ini · Total Sepanjang Waktu
-  - Bar chart pendapatan 6 bulan terakhir (SVG/CSS sederhana)
-  - Filter riwayat transaksi: Semua / Cair / Pending / Refund
-  - Kartu transaksi: nama user disamarkan, tipe sesi, tanggal, nominal, status badge
-  - Tap kartu → bottom sheet detail
-  - Tombol **"Tarik Dana"** → sheet form: pilih rekening bank (BCA/BNI/BRI/Mandiri), nominal (min Rp 50.000), estimasi cair 1×24 jam → konfirmasi → toast sukses (simulasi)
+- **Earnings & Penarikan (`earnings.html`):**
+  - Hero gradient teal: saldo tersedia Rp 544.000, tombol "Tarik Dana" putih menonjol
+  - 2 stat card: Pendapatan Bulan Ini + Total Sepanjang Waktu
+  - Bar chart 6 bulan (CSS height dari data, bulan aktif highlighted)
+  - Filter: Semua / Cair / Pending / Refund
+  - Kartu transaksi: ikon tipe berwarna, user disamarkan, tanggal, nominal (+/-), badge status berwarna
+  - Tap kartu → sheet detail transaksi lengkap
+  - Sheet "Tarik Dana": selector rekening bank dengan radio button (BCA/Mandiri), input nominal dengan validasi min Rp 50.000, info estimasi cair 1×24 jam
 
-- **Notifikasi Setting:**
-  - Toggle per kategori: Request Masuk · Sesi Terkonfirmasi · Pembayaran Masuk · Rating Baru · Pengingat Sesi · Info Platform
-  - Chip waktu pengingat sesi: 30 menit / 1 jam / 2 jam / 1 hari sebelum sesi
+- **Notifikasi (`notifications.html`):**
+  - 3 kelompok toggle: Sesi & Request (4 item), Keuangan (2 item), Feedback & Platform (2 item)
+  - Setiap item dengan ikon berwarna sesuai kategori
+  - Seksi chip waktu pengingat sesi: 15 menit / 30 menit / 1 jam / 2 jam / 1 hari (single select)
+  - Info card teal tentang cara kerja notifikasi
 
-- **Privasi & Keamanan:**
-  - Security score card bergradient + ring indicator
-  - Ubah kata sandi via bottom sheet dengan strength indicator 4-bar
-  - Toggle Autentikasi 2 Faktor (badge Aktif/Nonaktif real-time)
-  - Log aktivitas akun dalam bottom sheet
-  - Toggle privasi: Sembunyikan Profil dari Pencarian
-  - Zona Berbahaya: Nonaktifkan Akun (dengan catatan data sesi tetap disimpan sesuai regulasi) + Hapus Akun Permanen
+- **Privasi & Keamanan (`privacy.html`):**
+  - Security score card gradient teal: ring SVG indicator (skor 80/100 hijau), label "Cukup Aman", daftar status poin (hijau = aman, kuning = perlu tindakan)
+  - Ubah Kata Sandi: sheet dengan 3 field + strength indicator 4-bar real-time (warna + label)
+  - Toggle 2FA dengan badge status "Aktif/Nonaktif" yang berubah warna real-time
+  - Log Aktivitas Akun: sheet dengan riwayat 5 aksi (login, ubah sandi, perbarui profil) + perangkat + waktu relatif
+  - Toggle "Sembunyikan Profil dari Pencarian"
+  - Zona Berbahaya dengan info card merah: Nonaktifkan Akun (konfirmasi ketik "NONAKTIFKAN") + Hapus Akun Permanen (konfirmasi ketik "HAPUS AKUN SAYA") — dengan catatan data riwayat sesi disimpan 5 tahun sesuai regulasi
 
 ---
 
